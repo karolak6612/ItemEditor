@@ -108,6 +108,11 @@ private slots:
     void onWareIdChanged(const QString& text);
 
     void showSpriteCandidates();
+    void showServerListContextMenu(const QPoint& pos);
+    // Context menu action slots
+    void copyServerId();
+    void copyClientId();
+    void copyItemName();
 
 
 private:
@@ -232,6 +237,11 @@ private:
 
     void clearItemDetailsView();
     bool loadClientForOtb(); // Helper to load client data via plugin
+
+    // Helper for styling changed properties
+    void updatePropertyStyle(QWidget* control, const std::function<bool(const OTB::ClientItem&)>& comparisonLambda);
+    template<typename T_Server, typename T_Client> // Not used yet, but could be for simpler cases
+    void updatePropertyStyleSimple(QWidget* control, const T_Server& serverValue, const T_Client& clientValue, bool clientDataAvailable);
 };
 
 #endif // MAINWINDOW_H

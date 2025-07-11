@@ -140,12 +140,23 @@ void ServerItem::copyPropertiesFrom(const ItemBase& source) {
 
     // SpriteHash is usually handled separately or explicitly copied if needed.
     // C# Item.CopyPropertiesFrom explicitly skips SpriteHash.
-    // if (source.spriteHash.size() == 16) {
+    // if (source.spriteHash.size() == 16) { // C# Item.CopyPropertiesFrom skips SpriteHash
     //    this->spriteHash = source.spriteHash;
     // }
 
     // After copying boolean properties, update the internal flags field
     this->updateFlagsFromProperties();
+
+    // Special handling for ClientID when copying from a ClientItem-like source
+    // If source is actually a ClientItem (or has a valid 'id' that represents a ClientID)
+    // This is more context-dependent. For ReloadItem, we want to preserve ServerItem.id
+    // but update based on ClientItem. C# MainForm.ReloadItem does:
+    //   ushort tmpId = item.ID;
+    //   item.CopyPropertiesFrom(clientItem); // clientItem.ID is ClientID
+    //   item.ID = tmpId; // Restore ServerID
+    //   item.ClientId = clientItem.ID; // Ensure ServerItem.ClientId is set from clientItem.ID
+    // Our ItemBase.id is ambiguous here. Let's assume copyPropertiesFrom doesn't change this->id.
+    // The caller of copyPropertiesFrom (like reloadItem) will manage IDs.
 }
 
 
