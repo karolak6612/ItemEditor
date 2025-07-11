@@ -2,6 +2,9 @@
 #include "otb/otbtypes.h"
 #include "dialogs/aboutdialog.h"
 #include "dialogs/spritecandidatesdialog.h"
+#include "dialogs/finditemdialog.h"
+#include "dialogs/preferencesdialog.h"
+#include "dialogs/compareotbdialog.h" // Ensured this is included
 #include "otb/otbreader.h"
 #include "otb/otbwriter.h"
 #include "plugins/dummyplugin.h"
@@ -31,7 +34,8 @@
 #include <QFileInfo>
 #include <QInputDialog>
 #include <QClipboard>
-#include <functional> // For std::function
+#include <functional>
+#include <QSettings>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -249,7 +253,7 @@ void MainWindow::createCentralWidget()
     reloadItemButtonMain->setEnabled(false);
     connect(reloadItemButtonMain, &QPushButton::clicked, this, &MainWindow::reloadCurrentItem);
     findItemButtonMain = new QPushButton(tr("Find"));
-    // connect(findItemButtonMain, &QPushButton::clicked, this, &MainWindow::findItem);
+    connect(findItemButtonMain, &QPushButton::clicked, this, &MainWindow::findItem);
 
     itemButtonsLayout->addWidget(newItemButtonMain);
     itemButtonsLayout->addWidget(duplicateItemButtonMain);
@@ -520,36 +524,23 @@ bool MainWindow::saveFileAs()
 }
 
 void MainWindow::showPreferences() {
-    if (pluginManager && !pluginManager->availablePlugins().isEmpty()) {
-        IPlugin* selectedPlugin = pluginManager->availablePlugins().first();
-        if (!selectedPlugin->getSupportedClients().isEmpty()) {
-            const OTB::SupportedClient& clientToLoad = selectedPlugin->getSupportedClients().first();
-            QString errorStr;
-            QString dummyClientPath = ".";
-
-            if (currentPlugin && currentPlugin->isClientLoaded() && currentPlugin->getCurrentLoadedClient().version == clientToLoad.version) {
-                 QMessageBox::information(this, tr("Preferences"), tr("Client %1 is already loaded.").arg(clientToLoad.description));
-                return;
-            }
-
-            if (selectedPlugin->loadClient(clientToLoad, dummyClientPath, true, true, true, errorStr)) {
-                currentPlugin = selectedPlugin;
-                statusBar()->showMessage(tr("Client %1 loaded via %2").arg(clientToLoad.description, currentPlugin->pluginName()), 5000);
-                 if (currentSelectedItem) {
-                    updateItemDetailsView(currentSelectedItem);
-                }
-            } else {
-                QMessageBox::warning(this, tr("Plugin Error"), tr("Could not load client %1 with %2:\n%3")
-                                     .arg(clientToLoad.description, selectedPlugin->pluginName(), errorStr));
+    PreferencesDialog prefDialog(pluginManager, this);
+    if (prefDialog.exec() == QDialog::Accepted) {
+        statusBar()->showMessage(tr("Preferences saved."), 2000);
+        if (!currentFile.isEmpty() || !currentOtbItems.items.isEmpty()) {
+             if(currentPlugin) {
+                currentPlugin->unloadClient();
                 currentPlugin = nullptr;
+             }
+            bool reloaded = loadClientForOtb();
+            if (reloaded && currentSelectedItem) {
+                updateItemDetailsView(currentSelectedItem);
+            } else if (currentSelectedItem) {
+                 updateItemDetailsView(currentSelectedItem);
+            } else if (!currentOtbItems.items.isEmpty()) {
+                 serverItemListBox->setCurrentRow(0);
             }
-        } else {
-            QMessageBox::information(this, tr("Preferences"), tr("Selected plugin has no supported clients."));
-            currentPlugin = nullptr;
         }
-    } else {
-        QMessageBox::information(this, tr("Preferences"), tr("No plugins available."));
-        currentPlugin = nullptr;
     }
 }
 
@@ -559,7 +550,6 @@ void MainWindow::createNewItem()
         QMessageBox::warning(this, tr("Create Item"), tr("Please open or create a new OTB file first."));
         return;
     }
-
     OTB::ServerItem newItem;
     quint16 newServerId = 100;
     if (!currentOtbItems.items.isEmpty()) {
@@ -577,16 +567,13 @@ void MainWindow::createNewItem()
             }
         }
     }
-
     newItem.id = newServerId;
     newItem.clientId = 100;
     newItem.name = tr("New Item %1").arg(newItem.id);
     newItem.type = OTB::ServerItemType::None;
     newItem.movable = true;
     newItem.updateFlagsFromProperties();
-
     currentOtbItems.add(newItem);
-
     OTB::ServerItem* addedItemPtr = nullptr;
     for(int i=0; i < currentOtbItems.items.count(); ++i) {
         if (currentOtbItems.items[i].id == newItem.id) {
@@ -599,11 +586,9 @@ void MainWindow::createNewItem()
         currentOtbItems.items.removeLast();
         return;
     }
-
     QListWidgetItem *listItemWidget = new QListWidgetItem(QString("[%1] %2").arg(addedItemPtr->id).arg(addedItemPtr->name), serverItemListBox);
     listItemToServerItemMap.insert(listItemWidget, addedItemPtr);
     serverItemListBox->setCurrentItem(listItemWidget);
-
     isModified = true;
     setWindowModified(true);
     itemsCountLabel->setText(tr("%1 Items").arg(currentOtbItems.items.count()));
@@ -684,7 +669,32 @@ void MainWindow::reloadCurrentItem()
     statusBar()->showMessage(tr("Item ID %1 reloaded from client data.").arg(currentSelectedItem->id), 3000);
 }
 
-void MainWindow::findItem() { QMessageBox::information(this, "Not Implemented", "Find Item placeholder."); }
+void MainWindow::findItem()
+{
+    if (currentOtbItems.items.isEmpty()) {
+        QMessageBox::information(this, tr("Find Item"), tr("No OTB file loaded to search within."));
+        return;
+    }
+    FindItemDialog findDialog(currentOtbItems, this);
+    if (findDialog.exec() == QDialog::Accepted) {
+        quint16 foundSid = findDialog.getSelectedServerId();
+        if (foundSid != 0) {
+            bool itemSelectedInList = false;
+            for (int i = 0; i < serverItemListBox->count(); ++i) {
+                QListWidgetItem* listItem = serverItemListBox->item(i);
+                auto it = listItemToServerItemMap.find(listItem);
+                if (it != listItemToServerItemMap.end() && it.value()->id == foundSid) {
+                    serverItemListBox->setCurrentItem(listItem);
+                    itemSelectedInList = true;
+                    break;
+                }
+            }
+            if (!itemSelectedInList) {
+                 QMessageBox::warning(this, tr("Find Item"), tr("Could not select item with Server ID %1 in the main list, though it was found.").arg(foundSid));
+            }
+        }
+    }
+}
 
 void MainWindow::createMissingItems()
 {
@@ -767,7 +777,10 @@ void MainWindow::toggleShowMismatched(bool) { QMessageBox::information(this, "No
 void MainWindow::toggleShowDeprecated(bool) { QMessageBox::information(this, "Not Implemented", "Toggle Show Deprecated placeholder."); }
 void MainWindow::updateItemsList() { QMessageBox::information(this, "Not Implemented", "Update Items List placeholder."); }
 void MainWindow::reloadAllItemAttributes() { QMessageBox::information(this, "Not Implemented", "Reload All Item Attributes placeholder."); }
-void MainWindow::compareOtbFiles() { QMessageBox::information(this, "Not Implemented", "Compare OTB Files placeholder."); }
+void MainWindow::compareOtbFiles() {
+    CompareOtbDialog compareDialog(this);
+    compareDialog.exec();
+}
 void MainWindow::updateOtbVersion() { QMessageBox::information(this, "Not Implemented", "Update OTB Version placeholder."); }
 void MainWindow::about()
 {
@@ -837,17 +850,33 @@ void MainWindow::clearItemDetailsView() {
     maxReadCharsLineEdit->clear();
     maxReadWriteCharsLineEdit->clear();
     wareIdLineEdit->clear();
-    // Reset styles of all editable fields
     itemNameLineEdit->setStyleSheet("");
     itemTypeComboBox->setStyleSheet("");
     stackOrderComboBox->setStyleSheet("");
-    unpassableCheckBox->setStyleSheet(""); // Checkboxes might not show text color, but good practice
+    unpassableCheckBox->setStyleSheet("");
     movableCheckBox->setStyleSheet("");
     blockMissilesCheckBox->setStyleSheet("");
-    // ... for all checkboxes and lineedits ...
+    hasElevationCheckBox->setStyleSheet("");
+    forceUseCheckBox->setStyleSheet("");
+    multiUseCheckBox->setStyleSheet("");
+    pickupableCheckBox->setStyleSheet("");
+    stackableCheckBox->setStyleSheet("");
+    readableCheckBox->setStyleSheet("");
+    rotatableCheckBox->setStyleSheet("");
+    hangableCheckBox->setStyleSheet("");
+    hookSouthCheckBox->setStyleSheet("");
+    hookEastCheckBox->setStyleSheet("");
+    ignoreLookCheckBox->setStyleSheet("");
+    fullGroundCheckBox->setStyleSheet("");
     groundSpeedLineEdit->setStyleSheet("");
     lightLevelLineEdit->setStyleSheet("");
-    // ... etc.
+    lightColorLineEdit->setStyleSheet("");
+    minimapColorLineEdit->setStyleSheet("");
+    maxReadCharsLineEdit->setStyleSheet("");
+    maxReadWriteCharsLineEdit->setStyleSheet("");
+    wareIdLineEdit->setStyleSheet("");
+    mainClientItemViewWidget->setStyleSheet("");
+
     loadingItemDetails = false;
 }
 
@@ -998,12 +1027,10 @@ void MainWindow::onClientIdChanged(int value) {
         currentSelectedItem->clientId = static_cast<quint16>(value);
         isModified = true;
         setWindowModified(isModified);
-        OTB::ClientItem cItem; // For style update
+        OTB::ClientItem cItem;
         bool clientDataAvailable = currentPlugin && currentPlugin->isClientLoaded() && currentPlugin->getClientItem(currentSelectedItem->clientId, cItem);
-        // ClientID itself isn't styled based on difference, but changing it might affect sprite view
         if (clientDataAvailable) {
             mainClientItemViewWidget->setClientItem(&cItem);
-             // Re-check sprite hash match after ClientID change
             if (currentSelectedItem->spriteHash != cItem.spriteHash) {
                  mainClientItemViewWidget->setStyleSheet("border: 1px solid red;");
             } else {
@@ -1093,7 +1120,7 @@ void MainWindow::SLOT_NAME(const QString& text) { \
             setWindowModified(isModified); \
             updatePropertyStyle(CONTROL_WIDGET, [&](const OTB::ClientItem& cItem){ return currentSelectedItem->ITEM_PROPERTY != cItem.ITEM_PROPERTY; }); \
         } else { \
-            CONTROL_WIDGET->setStyleSheet("color: orange;"); /* Indicate parsing error */ \
+            CONTROL_WIDGET->setStyleSheet("color: orange;"); \
         }\
     } \
 }
@@ -1114,13 +1141,11 @@ void MainWindow::showSpriteCandidates()
     }
     QList<const OTB::ClientItem*> candidatesList;
     int count = 0;
-    for (const auto& clientItem : currentPlugin->getClientItems()) { // Iterate over const references
+    for (const auto& clientItem : currentPlugin->getClientItems()) {
         if (clientItem.id != currentSelectedItem->clientId) {
-            // Need a const pointer to an item that lives as long as the dialog.
-            // The items in plugin's map are suitable.
             candidatesList.append(&clientItem);
             count++;
-            if (count >= 5) break; // Show up to 5 candidates like C#
+            if (count >= 5) break;
         }
     }
      if (candidatesList.isEmpty()) {
@@ -1131,11 +1156,10 @@ void MainWindow::showSpriteCandidates()
     if (dialog.exec() == QDialog::Accepted) {
         quint16 selectedId = dialog.getSelectedClientId();
         if (selectedId != 0 && currentSelectedItem) {
-            currentSelectedItem->clientId = selectedId; // This will trigger onClientIdChanged if spinbox is focused
+            currentSelectedItem->clientId = selectedId;
             isModified = true;
             setWindowModified(true);
-            // Manually update the spinbox to reflect the change if it wasn't focused
-            loadingItemDetails = true; // Prevent onClientIdChanged from re-triggering logic redundantly
+            loadingItemDetails = true;
             clientIDSpinBox->setValue(selectedId);
             loadingItemDetails = false;
             updateItemDetailsView(currentSelectedItem);
@@ -1144,42 +1168,89 @@ void MainWindow::showSpriteCandidates()
 }
 
 bool MainWindow::loadClientForOtb() {
-    if (currentOtbItems.items.isEmpty()) {
-        qWarning() << "loadClientForOtb: No OTB items loaded.";
+    if (currentOtbItems.items.isEmpty() && currentFile.isEmpty()) {
+        qWarning() << "loadClientForOtb: No OTB file context (neither loaded nor new).";
         return false;
     }
     quint32 otbClientVersionTarget = currentOtbItems.minorVersion;
     if (otbClientVersionTarget == 0 && currentOtbItems.clientVersion != 0) {
+         qWarning() << "loadClientForOtb: OTB's minorVersion (client target) is 0. Using clientVersion as fallback:" << currentOtbItems.clientVersion;
          otbClientVersionTarget = currentOtbItems.clientVersion;
     }
-    IPlugin* foundPlugin = pluginManager->findPluginForOtbVersion(otbClientVersionTarget);
-    if (foundPlugin) {
-        const OTB::SupportedClient* clientToLoad = nullptr;
-        for(const auto& sc : foundPlugin->getSupportedClients()){
-            if(sc.otbVersion == otbClientVersionTarget || sc.version == otbClientVersionTarget){
-                clientToLoad = &sc;
+    if (otbClientVersionTarget == 0) {
+        qDebug() << "loadClientForOtb: OTB does not specify a client version (minorVersion is 0). Cannot automatically select a client.";
+        return false;
+    }
+    IPlugin* compatiblePlugin = pluginManager->findPluginForOtbVersion(otbClientVersionTarget);
+    if (!compatiblePlugin) {
+         qDebug() << "loadClientForOtb: No plugin found supporting OTB version target:" << otbClientVersionTarget;
+         QMessageBox::information(this, tr("Plugin Not Found"),
+                                  tr("No installed plugin supports the client version required by this OTB file (version target: %1). "
+                                     "Please check your installed plugins or select a client manually via Preferences if you wish to load different client data.")
+                                  .arg(otbClientVersionTarget));
+        return false;
+    }
+    const OTB::SupportedClient* clientProfileToLoad = nullptr;
+    for(const auto& sc : compatiblePlugin->getSupportedClients()){
+        if(sc.otbVersion == otbClientVersionTarget) {
+            clientProfileToLoad = &sc;
+            break;
+        }
+    }
+    if (!clientProfileToLoad) {
+         for(const auto& sc : compatiblePlugin->getSupportedClients()){
+            if(sc.version == otbClientVersionTarget) {
+                clientProfileToLoad = &sc;
                 break;
             }
         }
-        if (clientToLoad) {
-            QString errorStr;
-            if (foundPlugin->loadClient(*clientToLoad, ".", true, true, true, errorStr)) {
-                currentPlugin = foundPlugin;
-                statusBar()->showMessage(tr("Client %1 automatically loaded for OTB via %2")
-                                         .arg(clientToLoad->description, currentPlugin->pluginName()), 5000);
-                return true;
-            } else {
-                QMessageBox::warning(this, tr("Plugin Error"), tr("Auto-load failed for client %1 with %2:\n%3")
-                                     .arg(clientToLoad->description, foundPlugin->pluginName(), errorStr));
-                currentPlugin = nullptr;
-            }
-        } else {
-             QMessageBox::information(this, tr("Plugin Info"), tr("Plugin %1 supports OTB version %2, but no exact client match found in its list.")
-                                     .arg(foundPlugin->pluginName()).arg(otbClientVersionTarget));
-            currentPlugin = nullptr;
+    }
+    if (!clientProfileToLoad) {
+        qDebug() << "loadClientForOtb: Plugin" << compatiblePlugin->pluginName()
+                 << "was found for OTB version target" << otbClientVersionTarget
+                 << "but no specific client profile within that plugin matched.";
+        QMessageBox::information(this, tr("Client Profile Not Found"),
+                                 tr("Plugin '%1' supports the OTB's client version, but a specific client profile for version target '%2' could not be uniquely identified within the plugin.")
+                                 .arg(compatiblePlugin->pluginName()).arg(otbClientVersionTarget));
+        return false;
+    }
+    QSettings settings;
+    QString clientDir = settings.value("Preferences/ClientDirectory", "").toString();
+    bool useExtended = settings.value("Preferences/ExtendedSprites", true).toBool();
+    bool useFrameDurations = settings.value("Preferences/FrameDurations", true).toBool();
+    bool useTransparency = settings.value("Preferences/Transparency", true).toBool();
+    quint32 preferredDatSig = settings.value("Preferences/DatSignature", 0).toUInt();
+    quint32 preferredSprSig = settings.value("Preferences/SprSignature", 0).toUInt();
+    if (clientDir.isEmpty()) {
+        qDebug() << "loadClientForOtb: Client directory not set in preferences.";
+        QMessageBox::information(this, tr("Client Directory Not Set"),
+                                 tr("The Tibia client directory is not configured in Preferences. Cannot load client data for '%1'.")
+                                 .arg(clientProfileToLoad->description));
+        return false;
+    }
+    if (clientProfileToLoad->datSignature != preferredDatSig || clientProfileToLoad->sprSignature != preferredSprSig) {
+        qDebug() << "loadClientForOtb: The client profile ('" << clientProfileToLoad->description
+                 << "') compatible with this OTB does not match the globally configured default client in Preferences. "
+                 << "Attempting to load the OTB-compatible client.";
+    }
+    QString errorStr;
+    if (currentPlugin && currentPlugin->isClientLoaded()) {
+        if (currentPlugin == compatiblePlugin && currentPlugin->getCurrentLoadedClient().version == clientProfileToLoad->version) {
+            qDebug() << "loadClientForOtb: Client" << clientProfileToLoad->description << "already loaded by the same plugin. No action needed.";
+            return true;
         }
+        currentPlugin->unloadClient();
+        currentPlugin = nullptr;
+    }
+    if (compatiblePlugin->loadClient(*clientProfileToLoad, clientDir, useExtended, useFrameDurations, useTransparency, errorStr)) {
+        currentPlugin = compatiblePlugin;
+        currentOtbItems.clientVersion = currentPlugin->getCurrentLoadedClient().version;
+        statusBar()->showMessage(tr("Client %1 automatically loaded for OTB via %2")
+                                 .arg(clientProfileToLoad->description, currentPlugin->pluginName()), 5000);
+        return true;
     } else {
-        QMessageBox::information(this, tr("Plugin Info"), tr("No plugin found that supports client version %1 (from OTB). Please check Preferences.").arg(otbClientVersionTarget));
+        QMessageBox::warning(this, tr("Client Load Error"), tr("Failed to automatically load client %1 for this OTB using plugin %2 and path %3:\n%4")
+                             .arg(clientProfileToLoad->description, compatiblePlugin->pluginName(), clientDir, errorStr));
         currentPlugin = nullptr;
     }
     return false;
@@ -1328,9 +1399,10 @@ void MainWindow::showServerListContextMenu(const QPoint& pos)
     QAction *copyNameAct = nullptr;
 
     if (itemForContext) {
-        // For simplicity, context menu actions operate on currentSelectedItem
-        // A more advanced version might pass itemForContext to the slots
-        if (currentSelectedItem == itemForContext) { // Ensure currentSelectedItem is the one right-clicked
+        if (currentSelectedItem != itemForContext) {
+             if(listItem) serverItemListBox->setCurrentItem(listItem);
+        }
+        if (currentSelectedItem) {
             duplicateActCtx = contextMenu.addAction(tr("Duplicate Item"));
             connect(duplicateActCtx, &QAction::triggered, this, &MainWindow::duplicateCurrentItem);
             reloadActCtx = contextMenu.addAction(tr("Reload Item"));
@@ -1342,29 +1414,6 @@ void MainWindow::showServerListContextMenu(const QPoint& pos)
             connect(copyClientIdAct, &QAction::triggered, this, &MainWindow::copyClientId);
             copyNameAct = contextMenu.addAction(tr("Copy Name"));
             connect(copyNameAct, &QAction::triggered, this, &MainWindow::copyItemName);
-        } else { // Item under cursor is not the currently globally selected one
-            // Offer to select it, or just show copy actions for it?
-            // For now, let's just offer copy for the item under cursor
-            // (This requires copy actions to take an item or use itemForContext somehow)
-            // To keep it simple: user must select an item first for full context menu.
-            // If right-click doesn't select, this menu might be less useful.
-            // A common behavior: right-click selects the item.
-            if(listItem) serverItemListBox->setCurrentItem(listItem); // Make right-clicked item current
-
-            // Now currentSelectedItem should be itemForContext
-             if (currentSelectedItem) { // Re-check after potential selection change
-                duplicateActCtx = contextMenu.addAction(tr("Duplicate Item"));
-                connect(duplicateActCtx, &QAction::triggered, this, &MainWindow::duplicateCurrentItem);
-                reloadActCtx = contextMenu.addAction(tr("Reload Item"));
-                connect(reloadActCtx, &QAction::triggered, this, &MainWindow::reloadCurrentItem);
-                contextMenu.addSeparator();
-                copyServerIdAct = contextMenu.addAction(tr("Copy Server ID"));
-                connect(copyServerIdAct, &QAction::triggered, this, &MainWindow::copyServerId);
-                copyClientIdAct = contextMenu.addAction(tr("Copy Client ID"));
-                connect(copyClientIdAct, &QAction::triggered, this, &MainWindow::copyClientId);
-                copyNameAct = contextMenu.addAction(tr("Copy Name"));
-                connect(copyNameAct, &QAction::triggered, this, &MainWindow::copyItemName);
-            }
         }
     } else {
         QAction *createActCtx = contextMenu.addAction(tr("Create New Item"));

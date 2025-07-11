@@ -30,7 +30,9 @@ add_executable(ItemEditorQt
     otb/item.cpp
     mainwindow.cpp
     dialogs/aboutdialog.cpp
-    dialogs/spritecandidatesdialog.cpp # Add SpriteCandidatesDialog
+    dialogs/spritecandidatesdialog.cpp
+    dialogs/finditemdialog.cpp
+    dialogs/preferencesdialog.cpp  # Add PreferencesDialog
     plugins/iplugin.cpp
     plugins/dummyplugin.cpp
     widgets/clientitemview.cpp
