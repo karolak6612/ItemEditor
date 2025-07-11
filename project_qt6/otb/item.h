@@ -29,12 +29,12 @@ struct Sprite {
     Sprite() = default;
 
     // Methods to be implemented later, matching C# Sprite.cs
-    // QByteArray getRGBData(quint8 transparentRgbColor = 0x11) const;
-    // QByteArray getPixelsARGB() const; // Returns ARGB
-    // QImage getBitmap() const;
+    QByteArray getRGBData(quint8 transparentRgbColor = 0x11) const;
+    QByteArray getPixelsARGB() const; // Returns ARGB
+    QImage getBitmap() const;
 
-    // static QByteArray blankRGBSprite;
-    // static QByteArray blankARGBSprite;
+    static QByteArray blankRGBSprite;
+    static QByteArray blankARGBSprite;
     // static void createBlankSprite(); // Call once at app startup
 };
 
@@ -113,11 +113,11 @@ struct ClientItem : public ItemBase {
     ClientItem() : ItemBase() {}
 
     // Override spriteHash calculation if needed (C# ClientItem calculates it on demand)
-    // const QByteArray& getSpriteHash(); // Calculates if not already set
+    const QByteArray& getSpriteHash(); // Calculates if not already set
 
     // Methods to be implemented later, matching C# ClientItem.cs
-    // QImage getBitmap() const;
-    // void generateSignature(); // Calculates SpriteSignature
+    QImage getBitmap() const;
+    void generateSignature(); // Calculates SpriteSignature
 };
 
 

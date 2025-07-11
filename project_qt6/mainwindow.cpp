@@ -1,7 +1,11 @@
 #include "mainwindow.h"
-#include "otb/otbtypes.h" // For OTB::ServerItem etc. (will be needed in slots)
-#include "dialogs/aboutdialog.h" // Include the AboutDialog header
-// #include "clientitemview.h" // Will be needed when ClientItemView is created
+#include "otb/otbtypes.h"
+#include "dialogs/aboutdialog.h"
+#include "dialogs/spritecandidatesdialog.h" // Added
+#include "otb/otbreader.h"
+#include "otb/otbwriter.h"
+#include "plugins/dummyplugin.h"
+#include "widgets/clientitemview.h"
 
 #include <QApplication>
 #include <QMenuBar>
@@ -24,33 +28,28 @@
 #include <QLineEdit>
 #include <QProgressBar>
 #include <QDebug>
+#include <QFileInfo>
+#include <QInputDialog>
 
-
-#include "otb/otbreader.h" // For OtbReader
-#include "plugins/dummyplugin.h" // Include DummyPlugin for instantiation
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), isModified(false), currentSelectedItem(nullptr), pluginManager(nullptr), currentPlugin(nullptr)
+    : QMainWindow(parent), isModified(false), currentSelectedItem(nullptr), pluginManager(nullptr), currentPlugin(nullptr), loadingItemDetails(false)
 {
     setWindowTitle(tr("ItemEditor Qt"));
-    setMinimumSize(800, 600); // Initial size, can be adjusted
+    setMinimumSize(800, 700);
 
     pluginManager = new PluginManager(this);
-    // Register the dummy plugin for now
-    // In future, this would involve scanning a directory for plugin DLLs
-    DummyPlugin* dummy = new DummyPlugin(this); // QObject parentage for auto-cleanup if needed
+    DummyPlugin* dummy = new DummyPlugin(this);
     pluginManager->registerPlugin(dummy);
-
 
     createActions();
     createMenus();
     createToolBars();
     createStatusBar();
-    createCentralWidget(); // Setup the main layout and widgets
-    // createDockWidgets(); // If needed later
+    createCentralWidget();
 
-    setCurrentFile(QString()); // No file loaded initially
-    clearItemDetailsView(); // Ensure details view is cleared and disabled
+    setCurrentFile(QString());
+    clearItemDetailsView();
     editMenu->setEnabled(false);
     viewMenu->setEnabled(false);
     toolsMenu->setEnabled(false);
@@ -59,7 +58,6 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    // Qt handles child widget deletion automatically
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -87,13 +85,13 @@ void MainWindow::createActions()
     saveAct = new QAction(tr("&Save"), this);
     saveAct->setShortcuts(QKeySequence::Save);
     saveAct->setStatusTip(tr("Save the current OTB file"));
-    saveAct->setEnabled(false); // Initially disabled
+    saveAct->setEnabled(false);
     connect(saveAct, &QAction::triggered, this, &MainWindow::saveFile);
 
     saveAsAct = new QAction(tr("Save &As..."), this);
     saveAsAct->setShortcuts(QKeySequence::SaveAs);
     saveAsAct->setStatusTip(tr("Save the current OTB file under a new name"));
-    saveAsAct->setEnabled(false); // Initially disabled
+    saveAsAct->setEnabled(false);
     connect(saveAsAct, &QAction::triggered, this, &MainWindow::saveFileAs);
 
     preferencesAct = new QAction(tr("&Preferences..."), this);
@@ -107,19 +105,16 @@ void MainWindow::createActions()
 
     // Edit Actions
     createItemAct = new QAction(tr("&Create Item"), this);
-    // createItemAct->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_I)); // Example shortcut
     createItemAct->setStatusTip(tr("Create a new item"));
     createItemAct->setEnabled(false);
     connect(createItemAct, &QAction::triggered, this, &MainWindow::createNewItem);
 
     duplicateItemAct = new QAction(tr("&Duplicate Item"), this);
-    // duplicateItemAct->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_D));
     duplicateItemAct->setStatusTip(tr("Duplicate the selected item"));
     duplicateItemAct->setEnabled(false);
     connect(duplicateItemAct, &QAction::triggered, this, &MainWindow::duplicateCurrentItem);
 
     reloadItemAct = new QAction(tr("&Reload Item"), this);
-    // reloadItemAct->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_R));
     reloadItemAct->setStatusTip(tr("Reload attributes for the selected item"));
     reloadItemAct->setEnabled(false);
     connect(reloadItemAct, &QAction::triggered, this, &MainWindow::reloadCurrentItem);
@@ -134,7 +129,6 @@ void MainWindow::createActions()
     createMissingItemsAct->setStatusTip(tr("Create items that are in client but not OTB"));
     createMissingItemsAct->setEnabled(false);
     connect(createMissingItemsAct, &QAction::triggered, this, &MainWindow::createMissingItems);
-
 
     // View Actions
     showMismatchedAct = new QAction(tr("Show &Mismatched Items"), this);
@@ -154,7 +148,6 @@ void MainWindow::createActions()
     updateItemsListAct->setEnabled(false);
     connect(updateItemsListAct, &QAction::triggered, this, &MainWindow::updateItemsList);
 
-
     // Tools Actions
     reloadAttributesAct = new QAction(tr("&Reload All Item Attributes"), this);
     reloadAttributesAct->setStatusTip(tr("Reload attributes for all items from client data"));
@@ -169,7 +162,6 @@ void MainWindow::createActions()
     updateVersionAct->setStatusTip(tr("Update the OTB to a new client version"));
     updateVersionAct->setEnabled(false);
     connect(updateVersionAct, &QAction::triggered, this, &MainWindow::updateOtbVersion);
-
 
     // Help Actions
     aboutAct = new QAction(tr("&About ItemEditor"), this);
@@ -202,7 +194,6 @@ void MainWindow::createMenus()
     editMenu->addSeparator();
     editMenu->addAction(createMissingItemsAct);
 
-
     viewMenu = menuBar()->addMenu(tr("&View"));
     viewMenu->addAction(showMismatchedAct);
     viewMenu->addAction(showDeprecatedAct);
@@ -227,19 +218,11 @@ void MainWindow::createToolBars()
     fileToolBar->addAction(newAct);
     fileToolBar->addAction(openAct);
     fileToolBar->addAction(saveAct);
-    // Add SaveAs, Compare, Find to toolbar as in C#
-    // toolStripSaveAsButton -> saveAsAct (if icon needed)
-    // toolStripCompareButton -> compareOtbAct
-    // toolStripFindItemButton -> findItemAct
-
-    // editToolBar = addToolBar(tr("Edit"));
-    // editToolBar->addAction(createItemAct);
-    // editToolBar->addAction(duplicateItemAct);
 }
 
 void MainWindow::createStatusBar()
 {
-    statusBar()->showMessage(tr("Ready"));
+    // itemsCountLabel and loadingProgressBar are now in createCentralWidget's bottom area
 }
 
 void MainWindow::createCentralWidget()
@@ -247,139 +230,325 @@ void MainWindow::createCentralWidget()
     QWidget *mainWidget = new QWidget(this);
     QHBoxLayout *mainLayout = new QHBoxLayout(mainWidget);
 
-    // Left Panel (Server Item List and buttons below it)
+    // Left Panel
     QVBoxLayout *leftPanelLayout = new QVBoxLayout();
     serverItemListBox = new QListWidget();
     connect(serverItemListBox, &QListWidget::currentItemChanged, this, &MainWindow::onServerItemSelectionChanged);
-    leftPanelLayout->addWidget(serverItemListBox, 1); // Stretch factor 1
+    leftPanelLayout->addWidget(serverItemListBox, 1);
 
     QHBoxLayout* itemButtonsLayout = new QHBoxLayout();
     newItemButtonMain = new QPushButton(tr("New"));
+    // connect(newItemButtonMain, &QPushButton::clicked, this, &MainWindow::createNewItem);
     duplicateItemButtonMain = new QPushButton(tr("Duplicate"));
+    duplicateItemButtonMain->setEnabled(false);
+    // connect(duplicateItemButtonMain, &QPushButton::clicked, this, &MainWindow::duplicateCurrentItem);
     reloadItemButtonMain = new QPushButton(tr("Reload"));
+    reloadItemButtonMain->setEnabled(false);
+    // connect(reloadItemButtonMain, &QPushButton::clicked, this, &MainWindow::reloadCurrentItem);
     findItemButtonMain = new QPushButton(tr("Find"));
-    // TODO: Set icons for these buttons later
-    // TODO: Enable/disable based on state
+    // connect(findItemButtonMain, &QPushButton::clicked, this, &MainWindow::findItem);
+
     itemButtonsLayout->addWidget(newItemButtonMain);
     itemButtonsLayout->addWidget(duplicateItemButtonMain);
     itemButtonsLayout->addWidget(reloadItemButtonMain);
-    itemButtonsLayout->addStretch(1); // Pushes find to the right if needed, or remove for compact
+    itemButtonsLayout->addStretch(1);
     itemButtonsLayout->addWidget(findItemButtonMain);
     leftPanelLayout->addLayout(itemButtonsLayout);
 
     QWidget* leftPanelWidget = new QWidget();
     leftPanelWidget->setLayout(leftPanelLayout);
-    leftPanelWidget->setMinimumWidth(200); // Example width
-    leftPanelWidget->setMaximumWidth(300); // Example max width
+    leftPanelWidget->setMinimumWidth(200);
+    leftPanelWidget->setMaximumWidth(300);
 
-
-    // Right Panel (Appearance, Attributes, Output Log)
+    // Right Panel
     QVBoxLayout *rightPanelLayout = new QVBoxLayout();
-
-    // Top part of Right Panel (Appearance and Attributes side-by-side)
     QHBoxLayout *topRightLayout = new QHBoxLayout();
 
     appearanceGroupBox = new QGroupBox(tr("Appearance"));
     QGridLayout *appearanceLayout = new QGridLayout(appearanceGroupBox);
-    // previousClientItemViewWidget = new ClientItemView(appearanceGroupBox); // Placeholder
-    // mainClientItemViewWidget = new ClientItemView(appearanceGroupBox);   // Placeholder
-    // appearanceLayout->addWidget(new QLabel(tr("Previous:")), 0, 0);
-    // appearanceLayout->addWidget(previousClientItemViewWidget, 1, 0, 1, 2); // Spanning 2 columns for view
-    // appearanceLayout->addWidget(new QLabel(tr("Current:")), 2, 0);
-    // appearanceLayout->addWidget(mainClientItemViewWidget, 3, 0, 1, 2);
+
+    previousClientItemViewWidget = new ClientItemView(appearanceGroupBox);
+    mainClientItemViewWidget = new ClientItemView(appearanceGroupBox);
+
+    appearanceLayout->addWidget(new QLabel(tr("Previous:")), 0, 0, 1, 2, Qt::AlignCenter);
+    appearanceLayout->addWidget(previousClientItemViewWidget, 1, 0, 1, 2, Qt::AlignCenter);
+    appearanceLayout->addWidget(new QLabel(tr("Current:")), 2, 0, 1, 2, Qt::AlignCenter);
+    appearanceLayout->addWidget(mainClientItemViewWidget, 3, 0, 1, 2, Qt::AlignCenter);
+
     appearanceLayout->addWidget(new QLabel(tr("Server ID:")), 4, 0);
     serverIDLabel_val = new QLabel(tr("0"));
     appearanceLayout->addWidget(serverIDLabel_val, 4, 1);
     appearanceLayout->addWidget(new QLabel(tr("Client ID:")), 5, 0);
     clientIDSpinBox = new QSpinBox();
+    clientIDSpinBox->setRange(0, 65535);
+    connect(clientIDSpinBox, qOverload<int>(&QSpinBox::valueChanged), this, &MainWindow::onClientIdChanged);
     appearanceLayout->addWidget(clientIDSpinBox, 5, 1);
     candidatesButton = new QPushButton(tr("Candidates"));
+    connect(candidatesButton, &QPushButton::clicked, this, &MainWindow::showSpriteCandidates); // Connected
     appearanceLayout->addWidget(candidatesButton, 6, 0, 1, 2);
-    appearanceLayout->setRowStretch(7,1); // Add stretch at the bottom
+    appearanceLayout->setRowStretch(7,1);
     topRightLayout->addWidget(appearanceGroupBox);
 
     attributesGroupBox = new QGroupBox(tr("Attributes"));
     QGridLayout *attributesLayout = new QGridLayout(attributesGroupBox);
-    // Add flag checkboxes
-    unpassableCheckBox = new QCheckBox(tr("Unpassable"));
-    attributesLayout->addWidget(unpassableCheckBox, 0, 0);
-    movableCheckBox = new QCheckBox(tr("Movable"));
-    attributesLayout->addWidget(movableCheckBox, 1, 0);
-    blockMissilesCheckBox = new QCheckBox(tr("Block Missiles"));
-    attributesLayout->addWidget(blockMissilesCheckBox, 0, 1);
-    // ... (add all other checkboxes and lineedits similarly) ...
-    attributesLayout->addWidget(new QLabel(tr("Item Type:")), 10, 0);
-    itemTypeComboBox = new QComboBox();
-    attributesLayout->addWidget(itemTypeComboBox, 10, 1);
-    attributesLayout->addWidget(new QLabel(tr("Stack Order:")), 11, 0);
-    stackOrderComboBox = new QComboBox();
-    attributesLayout->addWidget(stackOrderComboBox, 11, 1);
-    attributesLayout->addWidget(new QLabel(tr("Name:")), 12, 0);
+
+    int attr_row = 0, attr_col = 0;
+    auto addFlagCheckBox = [&](QCheckBox*& checkBox, const QString& label, void (MainWindow::*slot)(bool)) {
+        checkBox = new QCheckBox(label);
+        connect(checkBox, &QCheckBox::toggled, this, slot);
+        attributesLayout->addWidget(checkBox, attr_row, attr_col);
+        attr_col++;
+        if (attr_col >= 2) { attr_col = 0; attr_row++; }
+    };
+
+    addFlagCheckBox(unpassableCheckBox, tr("Unpassable"), &MainWindow::onUnpassableChanged);
+    addFlagCheckBox(blockMissilesCheckBox, tr("Block Missiles"), &MainWindow::onBlockMissilesChanged);
+    addFlagCheckBox(movableCheckBox, tr("Movable"), &MainWindow::onMovableChanged);
+    addFlagCheckBox(blockPathfinderCheckBox, tr("Block Pathfinder"), &MainWindow::onBlockPathfinderChanged);
+    addFlagCheckBox(pickupableCheckBox, tr("Pickupable"), &MainWindow::onPickupableChanged);
+    addFlagCheckBox(hasElevationCheckBox, tr("Has Elevation"), &MainWindow::onHasElevationChanged);
+    addFlagCheckBox(stackableCheckBox, tr("Stackable"), &MainWindow::onStackableChanged);
+    addFlagCheckBox(forceUseCheckBox, tr("Force Use"), &MainWindow::onForceUseChanged);
+    addFlagCheckBox(readableCheckBox, tr("Readable"), &MainWindow::onReadableChanged);
+    addFlagCheckBox(multiUseCheckBox, tr("Multi Use"), &MainWindow::onMultiUseChanged);
+    addFlagCheckBox(rotatableCheckBox, tr("Rotatable"), &MainWindow::onRotatableChanged);
+    addFlagCheckBox(ignoreLookCheckBox, tr("Ignore Look"), &MainWindow::onIgnoreLookChanged);
+    addFlagCheckBox(hangableCheckBox, tr("Hangable"), &MainWindow::onHangableChanged);
+    addFlagCheckBox(fullGroundCheckBox, tr("Full Ground"), &MainWindow::onFullGroundChanged);
+    addFlagCheckBox(hookSouthCheckBox, tr("Hook South"), &MainWindow::onHookSouthChanged);
+    addFlagCheckBox(hookEastCheckBox, tr("Hook East"), &MainWindow::onHookEastChanged);
+
+    if (attr_col != 0) { attr_row++; attr_col = 0; }
+
+    attributesLayout->addWidget(new QLabel(tr("Name:")), attr_row, 0);
     itemNameLineEdit = new QLineEdit();
-    attributesLayout->addWidget(itemNameLineEdit, 12, 1);
-    // Add more attributes...
-    attributesLayout->setRowStretch(13,1); // Add stretch at the bottom
+    connect(itemNameLineEdit, &QLineEdit::textChanged, this, &MainWindow::onItemNameChanged);
+    attributesLayout->addWidget(itemNameLineEdit, attr_row, 1);
+    attr_row++;
+
+    attributesLayout->addWidget(new QLabel(tr("Item Type:")), attr_row, 0);
+    itemTypeComboBox = new QComboBox();
+    connect(itemTypeComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this, &MainWindow::onItemTypeChanged);
+    attributesLayout->addWidget(itemTypeComboBox, attr_row, 1);
+    attr_row++;
+
+    attributesLayout->addWidget(new QLabel(tr("Stack Order:")), attr_row, 0);
+    stackOrderComboBox = new QComboBox();
+    connect(stackOrderComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this, &MainWindow::onStackOrderChanged);
+    attributesLayout->addWidget(stackOrderComboBox, attr_row, 1);
+    attr_row++;
+
+    auto addAttributeLineEdit = [&](QLineEdit*& lineEdit, const QString& label, void (MainWindow::*slot)(const QString&)) {
+        attributesLayout->addWidget(new QLabel(label), attr_row, 0);
+        lineEdit = new QLineEdit();
+        connect(lineEdit, &QLineEdit::textChanged, this, slot);
+        attributesLayout->addWidget(lineEdit, attr_row, 1);
+        attr_row++;
+    };
+
+    addAttributeLineEdit(groundSpeedLineEdit, tr("Ground Speed:"), &MainWindow::onGroundSpeedChanged);
+    addAttributeLineEdit(lightLevelLineEdit, tr("Light Level:"), &MainWindow::onLightLevelChanged);
+    addAttributeLineEdit(lightColorLineEdit, tr("Light Color:"), &MainWindow::onLightColorChanged);
+    addAttributeLineEdit(minimapColorLineEdit, tr("Minimap Color:"), &MainWindow::onMinimapColorChanged);
+    addAttributeLineEdit(maxReadCharsLineEdit, tr("Max Read Chars:"), &MainWindow::onMaxReadCharsChanged);
+    addAttributeLineEdit(maxReadWriteCharsLineEdit, tr("Max R/W Chars:"), &MainWindow::onMaxReadWriteCharsChanged);
+    addAttributeLineEdit(wareIdLineEdit, tr("Ware ID:"), &MainWindow::onWareIdChanged);
+
+    attributesLayout->setRowStretch(attr_row, 1);
     attributesGroupBox->setMinimumWidth(350);
-    topRightLayout->addWidget(attributesGroupBox,1); // Stretch factor for attributes box
+    topRightLayout->addWidget(attributesGroupBox,1);
 
     rightPanelLayout->addLayout(topRightLayout);
 
-    // Output Log View
     outputLogView = new QTextEdit();
     outputLogView->setReadOnly(true);
-    rightPanelLayout->addWidget(outputLogView, 1); // Stretch factor 1
+    rightPanelLayout->addWidget(outputLogView, 1);
 
-    // Status Bar items (not directly in central widget, but related to bottom area)
-    QHBoxLayout* statusBarItemsLayout = new QHBoxLayout();
+    QHBoxLayout* bottomStatusLayout = new QHBoxLayout();
     itemsCountLabel = new QLabel(tr("0 Items"));
     loadingProgressBar = new QProgressBar();
-    loadingProgressBar->setVisible(false); // Initially hidden
-    statusBarItemsLayout->addWidget(itemsCountLabel);
-    statusBarItemsLayout->addSpacing(20);
-    statusBarItemsLayout->addWidget(loadingProgressBar);
-    statusBarItemsLayout->addStretch(1);
-    // This layout would typically be added to a custom status bar widget or managed separately.
-    // For simplicity here, we'll add it to the right panel.
-    // rightPanelLayout->addLayout(statusBarItemsLayout); // Or add to actual status bar later.
+    loadingProgressBar->setVisible(false);
+    bottomStatusLayout->addWidget(itemsCountLabel);
+    bottomStatusLayout->addSpacing(10);
+    bottomStatusLayout->addWidget(loadingProgressBar);
+    bottomStatusLayout->addStretch(1);
+    rightPanelLayout->addLayout(bottomStatusLayout);
 
-
-    // Main Layout Assembly
     mainLayout->addWidget(leftPanelWidget);
-    mainLayout->addLayout(rightPanelLayout, 1); // Right panel takes more stretch
+    mainLayout->addLayout(rightPanelLayout, 1);
 
     setCentralWidget(mainWidget);
+    appearanceGroupBox->setEnabled(false);
+    attributesGroupBox->setEnabled(false);
 }
 
 void MainWindow::createDockWidgets()
 {
-    // Example:
-    // QDockWidget *dock = new QDockWidget(tr("Output Log"), this);
-    // dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
-    // outputLogView = new QTextEdit(dock);
-    // outputLogView->setReadOnly(true);
-    // dock->setWidget(outputLogView);
-    // addDockWidget(Qt::BottomDockWidgetArea, dock);
-    // viewMenu->addAction(dock->toggleViewAction());
 }
 
+// --- Action Slot Implementations ---
+void MainWindow::newFile()
+{
+    if (maybeSave()) {
+        currentOtbItems.clear();
+        serverItemListBox->clear();
+        listItemToServerItemMap.clear();
+        if(currentPlugin) {
+            currentPlugin->unloadClient();
+            currentPlugin = nullptr;
+        }
+        clearItemDetailsView();
+        setCurrentFile(QString());
 
-// --- Placeholder Slot Implementations ---
-void MainWindow::newFile() { QMessageBox::information(this, "Not Implemented", "New File placeholder."); }
+        isModified = false;
+        setWindowModified(false);
+
+        if (!pluginManager || pluginManager->availablePlugins().isEmpty()) {
+            QMessageBox::warning(this, tr("New OTB"), tr("No plugins available to determine client versions. Cannot create new OTB."));
+            return;
+        }
+        IPlugin* chosenPlugin = pluginManager->availablePlugins().first();
+        if (chosenPlugin->getSupportedClients().isEmpty()) {
+            QMessageBox::warning(this, tr("New OTB"), tr("Selected plugin (%1) has no defined client versions.").arg(chosenPlugin->pluginName()));
+            return;
+        }
+
+        QStringList clientDescriptions;
+        for(const auto& sc : chosenPlugin->getSupportedClients()) {
+            clientDescriptions.append(sc.description);
+        }
+
+        bool ok;
+        QString chosenDesc = QInputDialog::getItem(this, tr("Select Client Version"),
+                                                   tr("Choose a client version for the new OTB:"),
+                                                   clientDescriptions, 0, false, &ok);
+        if (ok && !chosenDesc.isEmpty()) {
+            const OTB::SupportedClient* selectedSc = nullptr;
+            for(const auto& sc : chosenPlugin->getSupportedClients()) {
+                if (sc.description == chosenDesc) {
+                    selectedSc = &sc;
+                    break;
+                }
+            }
+
+            if (selectedSc) {
+                currentOtbItems.majorVersion = 3;
+                currentOtbItems.minorVersion = selectedSc->otbVersion;
+                currentOtbItems.buildNumber = 1;
+                currentOtbItems.clientVersion = selectedSc->version;
+                currentOtbItems.description = QString("OTB for Tibia Client %1").arg(selectedSc->description);
+
+                OTB::ServerItem defaultItem;
+                defaultItem.id = 100;
+                defaultItem.clientId = 100;
+                defaultItem.name = "New Item";
+                defaultItem.type = OTB::ServerItemType::None;
+                defaultItem.updateFlagsFromProperties();
+                currentOtbItems.add(defaultItem);
+
+                OTB::ServerItem* sItemPtr = &currentOtbItems.items[0];
+                QListWidgetItem *listItemWidget = new QListWidgetItem(QString("[%1] %2").arg(sItemPtr->id).arg(sItemPtr->name), serverItemListBox);
+                listItemToServerItemMap.insert(listItemWidget, sItemPtr);
+                serverItemListBox->setCurrentRow(0);
+
+                itemsCountLabel->setText(tr("%1 Items").arg(currentOtbItems.items.count()));
+                statusBar()->showMessage(tr("New OTB created for %1. Save to keep changes.").arg(selectedSc->description), 5000);
+
+                saveAct->setEnabled(true);
+                saveAsAct->setEnabled(true);
+                editMenu->setEnabled(true);
+                viewMenu->setEnabled(true);
+                toolsMenu->setEnabled(true);
+                createItemAct->setEnabled(true);
+                findItemAct->setEnabled(true);
+
+                QString errorStr;
+                if (chosenPlugin->loadClient(*selectedSc, ".", true, true, true, errorStr)) {
+                    currentPlugin = chosenPlugin;
+                } else {
+                    QMessageBox::warning(this, tr("Plugin Error"), tr("Could not load client %1 with %2 for new OTB:\n%3")
+                                         .arg(selectedSc->description, chosenPlugin->pluginName(), errorStr));
+                }
+                 updateItemDetailsView(sItemPtr);
+
+            } else {
+                 QMessageBox::critical(this, tr("Error"), tr("Selected client description not found."));
+            }
+        } else {
+            statusBar()->showMessage(tr("New OTB creation cancelled."), 2000);
+        }
+        saveAct->setEnabled(true);
+        saveAsAct->setEnabled(true);
+    }
+}
 
 void MainWindow::openFile()
 {
     if (maybeSave()) {
         QString fileName = QFileDialog::getOpenFileName(this,
-                                   tr("Open OTB File"), currentFile, // Or last opened directory
+                                   tr("Open OTB File"), currentFile.isEmpty() ? QDir::homePath() : QFileInfo(currentFile).path(),
                                    tr("OTB Files (*.otb);;All Files (*)"));
         if (!fileName.isEmpty())
             loadFile(fileName);
     }
 }
 
-bool MainWindow::saveFile() { QMessageBox::information(this, "Not Implemented", "Save File placeholder."); return false; }
-bool MainWindow::saveFileAs() { QMessageBox::information(this, "Not Implemented", "Save File As placeholder."); return false; }
-void MainWindow::showPreferences() { QMessageBox::information(this, "Not Implemented", "Preferences placeholder."); }
+bool MainWindow::saveFile()
+{
+    if (currentFile.isEmpty()) {
+        return saveFileAs();
+    } else {
+        if (isModified) {
+            return saveFile(currentFile);
+        }
+        return true;
+    }
+}
+
+bool MainWindow::saveFileAs()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save OTB As"),
+                                                    currentFile.isEmpty() ? QDir::homePath() : QFileInfo(currentFile).path(),
+                                                    tr("OTB Files (*.otb);;All Files (*)"));
+    if (fileName.isEmpty())
+        return false;
+
+    return saveFile(fileName);
+}
+
+void MainWindow::showPreferences() {
+    if (pluginManager && !pluginManager->availablePlugins().isEmpty()) {
+        IPlugin* selectedPlugin = pluginManager->availablePlugins().first();
+        if (!selectedPlugin->getSupportedClients().isEmpty()) {
+            const OTB::SupportedClient& clientToLoad = selectedPlugin->getSupportedClients().first();
+            QString errorStr;
+            QString dummyClientPath = ".";
+
+            if (currentPlugin && currentPlugin->isClientLoaded() && currentPlugin->getCurrentLoadedClient().version == clientToLoad.version) {
+                 QMessageBox::information(this, tr("Preferences"), tr("Client %1 is already loaded.").arg(clientToLoad.description));
+                return;
+            }
+
+            if (selectedPlugin->loadClient(clientToLoad, dummyClientPath, true, true, true, errorStr)) {
+                currentPlugin = selectedPlugin;
+                statusBar()->showMessage(tr("Client %1 loaded via %2").arg(clientToLoad.description, currentPlugin->pluginName()), 5000);
+                 if (currentSelectedItem) {
+                    updateItemDetailsView(currentSelectedItem);
+                }
+            } else {
+                QMessageBox::warning(this, tr("Plugin Error"), tr("Could not load client %1 with %2:\n%3")
+                                     .arg(clientToLoad.description, selectedPlugin->pluginName(), errorStr));
+                currentPlugin = nullptr;
+            }
+        } else {
+            QMessageBox::information(this, tr("Preferences"), tr("Selected plugin has no supported clients."));
+            currentPlugin = nullptr;
+        }
+    } else {
+        QMessageBox::information(this, tr("Preferences"), tr("No plugins available."));
+        currentPlugin = nullptr;
+    }
+}
 void MainWindow::createNewItem() { QMessageBox::information(this, "Not Implemented", "Create New Item placeholder."); }
 void MainWindow::duplicateCurrentItem() { QMessageBox::information(this, "Not Implemented", "Duplicate Current Item placeholder."); }
 void MainWindow::reloadCurrentItem() { QMessageBox::information(this, "Not Implemented", "Reload Current Item placeholder."); }
@@ -397,6 +566,7 @@ void MainWindow::about()
     aboutDialog.exec();
 }
 
+// --- UI Update Slots ---
 void MainWindow::onServerItemSelectionChanged(QListWidgetItem *current, QListWidgetItem *previous)
 {
     Q_UNUSED(previous);
@@ -410,10 +580,10 @@ void MainWindow::onServerItemSelectionChanged(QListWidgetItem *current, QListWid
     if (it != listItemToServerItemMap.end()) {
         currentSelectedItem = it.value();
         updateItemDetailsView(currentSelectedItem);
-        // Enable/disable relevant actions like duplicate, reload
         duplicateItemAct->setEnabled(true);
         reloadItemAct->setEnabled(true);
-        // Enable attribute group boxes
+        duplicateItemButtonMain->setEnabled(true);
+        reloadItemButtonMain->setEnabled(true);
         appearanceGroupBox->setEnabled(true);
         attributesGroupBox->setEnabled(true);
 
@@ -424,21 +594,25 @@ void MainWindow::onServerItemSelectionChanged(QListWidgetItem *current, QListWid
 }
 
 void MainWindow::clearItemDetailsView() {
+    loadingItemDetails = true;
+
     serverIDLabel_val->setText("0");
-    clientIDSpinBox->setValue(0); // Or min value
+    clientIDSpinBox->setValue(0);
     itemNameLineEdit->clear();
-    itemTypeComboBox->setCurrentIndex(-1); // No selection
+    itemTypeComboBox->setCurrentIndex(-1);
     stackOrderComboBox->setCurrentIndex(-1);
 
-    // Disable group boxes
+    mainClientItemViewWidget->setClientItem(nullptr);
+    previousClientItemViewWidget->setClientItem(nullptr);
+
     appearanceGroupBox->setEnabled(false);
     attributesGroupBox->setEnabled(false);
 
-    // Disable actions that require a selected item
     duplicateItemAct->setEnabled(false);
     reloadItemAct->setEnabled(false);
+    duplicateItemButtonMain->setEnabled(false);
+    reloadItemButtonMain->setEnabled(false);
 
-    // Clear checkboxes
     unpassableCheckBox->setChecked(false);
     movableCheckBox->setChecked(false);
     blockMissilesCheckBox->setChecked(false);
@@ -454,7 +628,7 @@ void MainWindow::clearItemDetailsView() {
     hookEastCheckBox->setChecked(false);
     ignoreLookCheckBox->setChecked(false);
     fullGroundCheckBox->setChecked(false);
-    // ... clear all other checkboxes and lineedits in attributesGroupBox ...
+
     groundSpeedLineEdit->clear();
     lightLevelLineEdit->clear();
     lightColorLineEdit->clear();
@@ -463,70 +637,27 @@ void MainWindow::clearItemDetailsView() {
     maxReadWriteCharsLineEdit->clear();
     wareIdLineEdit->clear();
 
-    // Reset colors from potential red highlighting (if implemented)
-    // Example: itemNameLineEdit->setStyleSheet("");
+    loadingItemDetails = false;
 }
 
-void MainWindow::showPreferences() {
-    // Placeholder for PreferencesDialog
-    // This dialog would allow selecting a client (which means selecting a plugin and one of its SupportedClient versions)
-    // For now, let's try to auto-select the first available plugin and its first client for testing.
-    if (pluginManager && !pluginManager->availablePlugins().isEmpty()) {
-        IPlugin* selectedPlugin = pluginManager->availablePlugins().first();
-        if (!selectedPlugin->getSupportedClients().isEmpty()) {
-            const OTB::SupportedClient& clientToLoad = selectedPlugin->getSupportedClients().first();
-            QString errorStr;
-            // In a real scenario, clientDirectoryPath would come from QSettings or a dialog
-            QString dummyClientPath = "."; // Dummy path, not used by DummyPlugin
-
-            if (currentPlugin && currentPlugin->isClientLoaded() && currentPlugin->getCurrentLoadedClient().version == clientToLoad.version) {
-                 QMessageBox::information(this, tr("Preferences"), tr("Client %1 is already loaded.").arg(clientToLoad.description));
-                return;
-            }
-
-            if (selectedPlugin->loadClient(clientToLoad, dummyClientPath, true, true, true, errorStr)) {
-                currentPlugin = selectedPlugin; // Set the active plugin
-                statusBar()->showMessage(tr("Client %1 loaded via %2").arg(clientToLoad.description, currentPlugin->pluginName()), 5000);
-                 if (currentSelectedItem) { // Refresh view if an item is selected
-                    updateItemDetailsView(currentSelectedItem);
-                }
-            } else {
-                QMessageBox::warning(this, tr("Plugin Error"), tr("Could not load client %1 with %2:\n%3")
-                                     .arg(clientToLoad.description, selectedPlugin->pluginName(), errorStr));
-                currentPlugin = nullptr;
-            }
-        } else {
-            QMessageBox::information(this, tr("Preferences"), tr("Selected plugin has no supported clients."));
-            currentPlugin = nullptr;
-        }
-    } else {
-        QMessageBox::information(this, tr("Preferences"), tr("No plugins available."));
-        currentPlugin = nullptr;
-    }
-}
-
-
-// Slot for future use when a ServerItem object itself is passed (e.g. if not using QListWidget directly)
 void MainWindow::currentServerItemChanged(OTB::ServerItem* item) {
     currentSelectedItem = item;
     updateItemDetailsView(item);
-     // This slot might not be directly connected if QListWidget::currentItemChanged is used primarily.
-    // It's here for conceptual similarity to C# or if we change list view implementation.
 }
 
 void MainWindow::updateItemDetailsView(OTB::ServerItem* item) {
+    loadingItemDetails = true;
+
     if (!item) {
         clearItemDetailsView();
+        loadingItemDetails = false;
         return;
     }
     serverIDLabel_val->setText(QString::number(item->id));
     clientIDSpinBox->setValue(item->clientId);
     itemNameLineEdit->setText(item->name);
 
-    // Populate itemTypeComboBox and stackOrderComboBox if not already done
-    // This should ideally happen once after an OTB is loaded or client data is known.
     if (itemTypeComboBox->count() == 0) {
-        // Example: Manually populate from OTB::ServerItemType enum
         itemTypeComboBox->addItem(tr("None"), QVariant::fromValue(static_cast<int>(OTB::ServerItemType::None)));
         itemTypeComboBox->addItem(tr("Ground"), QVariant::fromValue(static_cast<int>(OTB::ServerItemType::Ground)));
         itemTypeComboBox->addItem(tr("Container"), QVariant::fromValue(static_cast<int>(OTB::ServerItemType::Container)));
@@ -538,7 +669,6 @@ void MainWindow::updateItemDetailsView(OTB::ServerItem* item) {
     itemTypeComboBox->setCurrentIndex(typeIndex);
 
     if (stackOrderComboBox->count() == 0) {
-        // Example: Manually populate from OTB::TileStackOrder enum
         stackOrderComboBox->addItem(tr("None"), QVariant::fromValue(static_cast<int>(OTB::TileStackOrder::None)));
         stackOrderComboBox->addItem(tr("Border"), QVariant::fromValue(static_cast<int>(OTB::TileStackOrder::Border)));
         stackOrderComboBox->addItem(tr("Ground"), QVariant::fromValue(static_cast<int>(OTB::TileStackOrder::Ground)));
@@ -549,26 +679,23 @@ void MainWindow::updateItemDetailsView(OTB::ServerItem* item) {
     int stackOrderIndex = stackOrderComboBox->findData(QVariant::fromValue(static_cast<int>(item->stackOrder)));
     stackOrderComboBox->setCurrentIndex(stackOrderIndex);
 
+    item->updatePropertiesFromFlags();
 
-    // Set checkboxes based on item->flags
-    // Ensure ServerItem::updatePropertiesFromFlags() was called after loading if you rely on bool members.
-    // Or directly use item->hasFlag()
-    unpassableCheckBox->setChecked(item->hasFlag(OTB::ServerItemFlag::Unpassable));
-    movableCheckBox->setChecked(item->hasFlag(OTB::ServerItemFlag::Movable));
-    blockMissilesCheckBox->setChecked(item->hasFlag(OTB::ServerItemFlag::BlockMissiles));
-    hasElevationCheckBox->setChecked(item->hasFlag(OTB::ServerItemFlag::HasElevation));
-    forceUseCheckBox->setChecked(item->hasFlag(OTB::ServerItemFlag::ForceUse));
-    multiUseCheckBox->setChecked(item->hasFlag(OTB::ServerItemFlag::MultiUse));
-    pickupableCheckBox->setChecked(item->hasFlag(OTB::ServerItemFlag::Pickupable));
-    stackableCheckBox->setChecked(item->hasFlag(OTB::ServerItemFlag::Stackable));
-    readableCheckBox->setChecked(item->hasFlag(OTB::ServerItemFlag::Readable));
-    rotatableCheckBox->setChecked(item->hasFlag(OTB::ServerItemFlag::Rotatable));
-    hangableCheckBox->setChecked(item->hasFlag(OTB::ServerItemFlag::Hangable));
-    hookSouthCheckBox->setChecked(item->hasFlag(OTB::ServerItemFlag::HookSouth));
-    hookEastCheckBox->setChecked(item->hasFlag(OTB::ServerItemFlag::HookEast));
-    ignoreLookCheckBox->setChecked(item->hasFlag(OTB::ServerItemFlag::IgnoreLook));
-    fullGroundCheckBox->setChecked(item->hasFlag(OTB::ServerItemFlag::FullGround));
-
+    unpassableCheckBox->setChecked(item->unpassable);
+    movableCheckBox->setChecked(item->movable);
+    blockMissilesCheckBox->setChecked(item->blockMissiles);
+    hasElevationCheckBox->setChecked(item->hasElevation);
+    forceUseCheckBox->setChecked(item->forceUse);
+    multiUseCheckBox->setChecked(item->multiUse);
+    pickupableCheckBox->setChecked(item->pickupable);
+    stackableCheckBox->setChecked(item->stackable);
+    readableCheckBox->setChecked(item->readable);
+    rotatableCheckBox->setChecked(item->rotatable);
+    hangableCheckBox->setChecked(item->hangable);
+    hookSouthCheckBox->setChecked(item->hookSouth);
+    hookEastCheckBox->setChecked(item->hookEast);
+    ignoreLookCheckBox->setChecked(item->ignoreLook);
+    fullGroundCheckBox->setChecked(item->fullGround);
 
     groundSpeedLineEdit->setText(QString::number(item->groundSpeed));
     lightLevelLineEdit->setText(QString::number(item->lightLevel));
@@ -578,56 +705,187 @@ void MainWindow::updateItemDetailsView(OTB::ServerItem* item) {
     maxReadWriteCharsLineEdit->setText(QString::number(item->maxReadWriteChars));
     wareIdLineEdit->setText(QString::number(item->tradeAs));
 
-    // TODO: Handle sprite display in mainClientItemViewWidget and previousClientItemViewWidget
-
-    // If a plugin is loaded, try to get ClientItem info
     if (currentPlugin && currentPlugin->isClientLoaded() && item) {
         OTB::ClientItem clientItem;
         if (currentPlugin->getClientItem(item->clientId, clientItem)) {
-            // Successfully got client item, update relevant UI parts
-            // Example: Update a label with client item's name or type if different
-            // For now, just log it.
             qDebug() << "Selected ServerItem ID:" << item->id << " (ClientID:" << item->clientId << ")";
             qDebug() << "Corresponding ClientItem Name (from plugin):" << clientItem.name;
-            // TODO: Update ClientItemView widgets (pictureBox, previousPictureBox equivalents)
-            // mainClientItemViewWidget->setClientItem(&clientItem);
+            mainClientItemViewWidget->setClientItem(&clientItem);
         } else {
             qDebug() << "ClientItem with ID" << item->clientId << "not found in current plugin.";
-            // mainClientItemViewWidget->setClientItem(nullptr);
+            mainClientItemViewWidget->setClientItem(nullptr);
         }
     } else {
-        // No plugin loaded or no item selected, clear client specific views
-        // mainClientItemViewWidget->setClientItem(nullptr);
-        // previousClientItemViewWidget->setClientItem(nullptr);
+        mainClientItemViewWidget->setClientItem(nullptr);
+    }
+    previousClientItemViewWidget->setClientItem(nullptr); // Clear previous for now
+
+    loadingItemDetails = false;
+}
+
+void MainWindow::updateClientItemView(OTB::ClientItem* clientItem) {
+    mainClientItemViewWidget->setClientItem(clientItem);
+}
+void MainWindow::updatePreviousClientItemView(OTB::ClientItem* prevClientItem) {
+    previousClientItemViewWidget->setClientItem(prevClientItem);
+}
+
+
+// --- Slots for Item Property Changes ---
+void MainWindow::onClientIdChanged(int value) {
+    if (currentSelectedItem && !loadingItemDetails) {
+        currentSelectedItem->clientId = static_cast<quint16>(value);
+        isModified = true;
+        setWindowModified(isModified);
+        if (currentPlugin && currentPlugin->isClientLoaded()) {
+            OTB::ClientItem cItem;
+            if (currentPlugin->getClientItem(currentSelectedItem->clientId, cItem)) {
+                mainClientItemViewWidget->setClientItem(&cItem);
+            } else {
+                mainClientItemViewWidget->setClientItem(nullptr);
+            }
+        }
     }
 }
 
-void MainWindow::updateClientItemView(OTB::ClientItem* clientItem) { /* ... */ }
-void MainWindow::updatePreviousClientItemView(OTB::ClientItem* prevClientItem) { /* ... */ }
+void MainWindow::onItemNameChanged(const QString& text) {
+    if (currentSelectedItem && !loadingItemDetails) {
+        currentSelectedItem->name = text;
+        isModified = true;
+        setWindowModified(isModified);
+        QListWidgetItem* listItem = serverItemListBox->currentItem();
+        if (listItem) {
+            listItem->setText(QString("[%1] %2").arg(currentSelectedItem->id).arg(currentSelectedItem->name));
+        }
+    }
+}
+
+void MainWindow::onItemTypeChanged(int index) {
+    if (currentSelectedItem && !loadingItemDetails && index >=0) {
+        QVariant typeData = itemTypeComboBox->itemData(index);
+        if (typeData.isValid()) {
+            currentSelectedItem->type = static_cast<OTB::ServerItemType>(typeData.toInt());
+            isModified = true;
+            setWindowModified(isModified);
+        }
+    }
+}
+
+void MainWindow::onStackOrderChanged(int index) {
+    if (currentSelectedItem && !loadingItemDetails && index >=0) {
+        QVariant stackData = stackOrderComboBox->itemData(index);
+        if (stackData.isValid()) {
+            OTB::TileStackOrder newOrder = static_cast<OTB::TileStackOrder>(stackData.toInt());
+            currentSelectedItem->stackOrder = newOrder;
+            currentSelectedItem->hasStackOrder = (newOrder != OTB::TileStackOrder::None);
+            isModified = true;
+            setWindowModified(isModified);
+        }
+    }
+}
+
+#define IMPLEMENT_FLAG_SLOT(SLOT_NAME, ITEM_PROPERTY, ITEM_FLAG) \
+void MainWindow::SLOT_NAME(bool checked) { \
+    if (currentSelectedItem && !loadingItemDetails) { \
+        currentSelectedItem->ITEM_PROPERTY = checked; \
+        isModified = true; \
+        setWindowModified(isModified); \
+    } \
+}
+
+IMPLEMENT_FLAG_SLOT(onUnpassableChanged, unpassable, OTB::ServerItemFlag::Unpassable)
+IMPLEMENT_FLAG_SLOT(onBlockMissilesChanged, blockMissiles, OTB::ServerItemFlag::BlockMissiles)
+IMPLEMENT_FLAG_SLOT(onBlockPathfinderChanged, blockPathfinder, OTB::ServerItemFlag::BlockPathfinder)
+IMPLEMENT_FLAG_SLOT(onHasElevationChanged, hasElevation, OTB::ServerItemFlag::HasElevation)
+IMPLEMENT_FLAG_SLOT(onForceUseChanged, forceUse, OTB::ServerItemFlag::ForceUse)
+IMPLEMENT_FLAG_SLOT(onMultiUseChanged, multiUse, OTB::ServerItemFlag::MultiUse)
+IMPLEMENT_FLAG_SLOT(onPickupableChanged, pickupable, OTB::ServerItemFlag::Pickupable)
+IMPLEMENT_FLAG_SLOT(onMovableChanged, movable, OTB::ServerItemFlag::Movable)
+IMPLEMENT_FLAG_SLOT(onStackableChanged, stackable, OTB::ServerItemFlag::Stackable)
+IMPLEMENT_FLAG_SLOT(onReadableChanged, readable, OTB::ServerItemFlag::Readable)
+IMPLEMENT_FLAG_SLOT(onRotatableChanged, rotatable, OTB::ServerItemFlag::Rotatable)
+IMPLEMENT_FLAG_SLOT(onHangableChanged, hangable, OTB::ServerItemFlag::Hangable)
+IMPLEMENT_FLAG_SLOT(onHookSouthChanged, hookSouth, OTB::ServerItemFlag::HookSouth)
+IMPLEMENT_FLAG_SLOT(onHookEastChanged, hookEast, OTB::ServerItemFlag::HookEast)
+IMPLEMENT_FLAG_SLOT(onIgnoreLookChanged, ignoreLook, OTB::ServerItemFlag::IgnoreLook)
+IMPLEMENT_FLAG_SLOT(onFullGroundChanged, fullGround, OTB::ServerItemFlag::FullGround)
+
+#define IMPLEMENT_UINT16_ATTR_SLOT(SLOT_NAME, ITEM_PROPERTY) \
+void MainWindow::SLOT_NAME(const QString& text) { \
+    if (currentSelectedItem && !loadingItemDetails) { \
+        bool ok; \
+        quint16 value = text.toUShort(&ok); \
+        if (ok) { \
+            currentSelectedItem->ITEM_PROPERTY = value; \
+            isModified = true; \
+            setWindowModified(isModified); \
+        } \
+    } \
+}
+
+IMPLEMENT_UINT16_ATTR_SLOT(onGroundSpeedChanged, groundSpeed)
+IMPLEMENT_UINT16_ATTR_SLOT(onLightLevelChanged, lightLevel)
+IMPLEMENT_UINT16_ATTR_SLOT(onLightColorChanged, lightColor)
+IMPLEMENT_UINT16_ATTR_SLOT(onMinimapColorChanged, minimapColor)
+IMPLEMENT_UINT16_ATTR_SLOT(onMaxReadCharsChanged, maxReadChars)
+IMPLEMENT_UINT16_ATTR_SLOT(onMaxReadWriteCharsChanged, maxReadWriteChars)
+IMPLEMENT_UINT16_ATTR_SLOT(onWareIdChanged, tradeAs)
+
+void MainWindow::showSpriteCandidates()
+{
+    if (!currentPlugin || !currentPlugin->isClientLoaded() || !currentSelectedItem) {
+        QMessageBox::information(this, tr("Sprite Candidates"), tr("Please load an OTB and select an item, and ensure a client is active."));
+        return;
+    }
+
+    QList<const OTB::ClientItem*> candidatesList;
+    // Simulate finding candidates: take up to 3 other items from the dummy plugin
+    // In a real scenario, this would involve image similarity search.
+    int count = 0;
+    for (const auto& clientItem : currentPlugin->getClientItems()) {
+        if (clientItem.id != currentSelectedItem->clientId) { // Don't list itself
+            candidatesList.append(&clientItem); // Need const OTB::ClientItem*
+            count++;
+            if (count >= 3) break;
+        }
+    }
+     if (candidatesList.isEmpty()) {
+        QMessageBox::information(this, tr("Sprite Candidates"), tr("No other sprite candidates found in the current dummy client data."));
+        return;
+    }
+
+
+    SpriteCandidatesDialog dialog(candidatesList, this);
+    if (dialog.exec() == QDialog::Accepted) {
+        quint16 selectedId = dialog.getSelectedClientId();
+        if (selectedId != 0 && currentSelectedItem) {
+            currentSelectedItem->clientId = selectedId;
+            isModified = true;
+            setWindowModified(true);
+            // Refresh the main view for the selected item
+            updateItemDetailsView(currentSelectedItem);
+            // The clientIDSpinBox should also update via updateItemDetailsView
+        }
+    }
+}
 
 
 bool MainWindow::loadClientForOtb() {
     if (currentOtbItems.items.isEmpty()) {
         qWarning() << "loadClientForOtb: No OTB items loaded.";
-        return false; // No OTB loaded, or it's empty
+        return false;
     }
-
-    // Try to find a plugin that supports the OTB's client version
-    // OTB stores client version in currentOtbItems.minorVersion (as per C# OtbReader)
-    // or currentOtbItems.clientVersion (which is set from minorVersion in C# MainForm.LoadClient)
-    // Let's assume currentOtbItems.minorVersion is the OTB's target client version identifier for plugins.
     quint32 otbClientVersionTarget = currentOtbItems.minorVersion;
     if (otbClientVersionTarget == 0 && currentOtbItems.clientVersion != 0) {
-         otbClientVersionTarget = currentOtbItems.clientVersion; // Fallback if minorVersion wasn't the primary one
+         otbClientVersionTarget = currentOtbItems.clientVersion;
     }
-
 
     IPlugin* foundPlugin = pluginManager->findPluginForOtbVersion(otbClientVersionTarget);
 
     if (foundPlugin) {
         const OTB::SupportedClient* clientToLoad = nullptr;
         for(const auto& sc : foundPlugin->getSupportedClients()){
-            if(sc.otbVersion == otbClientVersionTarget || sc.version == otbClientVersionTarget){ // Match OTB or direct client version
+            if(sc.otbVersion == otbClientVersionTarget || sc.version == otbClientVersionTarget){
                 clientToLoad = &sc;
                 break;
             }
@@ -635,7 +893,6 @@ bool MainWindow::loadClientForOtb() {
 
         if (clientToLoad) {
             QString errorStr;
-            // Dummy path, actual path would come from settings/dialog
             if (foundPlugin->loadClient(*clientToLoad, ".", true, true, true, errorStr)) {
                 currentPlugin = foundPlugin;
                 statusBar()->showMessage(tr("Client %1 automatically loaded for OTB via %2")
@@ -674,7 +931,7 @@ bool MainWindow::maybeSave()
         return saveFile();
     case QMessageBox::Cancel:
         return false;
-    default: // QMessageBox::Discard
+    default:
         break;
     }
     return true;
@@ -682,43 +939,29 @@ bool MainWindow::maybeSave()
 
 void MainWindow::loadFile(const QString &fileName)
 {
-    // Placeholder for actual file loading logic using OtbReader
-    QFile file(fileName);
-    if (!file.open(QFile::ReadOnly | QFile::Text)) { // Adjust for binary OTB
-        QMessageBox::warning(this, tr("Application"),
-                             tr("Cannot read file %1:\n%2.")
-                             .arg(QDir::toNativeSeparators(fileName), file.errorString()));
-        return;
-    }
-    // QTextStream in(&file); // Replace with OTB parsing
-    // QApplication::setOverrideCursor(Qt::WaitCursor);
-    // textEdit->setPlainText(in.readAll()); // Replace with populating item list
-    // QApplication::restoreOverrideCursor();
-
     OTB::OtbReader reader;
     QString errorString;
-    currentOtbItems.clear(); // Clear previous data
+    currentOtbItems.clear();
     serverItemListBox->clear();
     listItemToServerItemMap.clear();
     clearItemDetailsView();
-    if(currentPlugin) { // Unload previously loaded client if any
+    if(currentPlugin) {
         currentPlugin->unloadClient();
         currentPlugin = nullptr;
     }
-
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
     bool success = reader.read(fileName, currentOtbItems, errorString);
     QApplication::restoreOverrideCursor();
 
     if (success) {
-        setCurrentFile(fileName); // Set current file early
-        loadClientForOtb(); // Attempt to load a client based on OTB version
+        setCurrentFile(fileName);
+        loadClientForOtb();
 
         for (int i = 0; i < currentOtbItems.items.size(); ++i) {
             OTB::ServerItem* serverItem = &currentOtbItems.items[i];
-            QListWidgetItem *listItem = new QListWidgetItem(QString("[%1] %2").arg(serverItem->id).arg(serverItem->name), serverItemListBox);
-            listItemToServerItemMap.insert(listItem, serverItem);
+            QListWidgetItem *listItemWidget = new QListWidgetItem(QString("[%1] %2").arg(serverItem->id).arg(serverItem->name), serverItemListBox);
+            listItemToServerItemMap.insert(listItemWidget, serverItem);
         }
 
         statusBar()->showMessage(tr("File loaded: %1 items").arg(currentOtbItems.items.count()), 5000);
@@ -737,11 +980,12 @@ void MainWindow::loadFile(const QString &fileName)
         updateVersionAct->setEnabled(true);
 
         isModified = false;
+        setWindowModified(false);
         itemsCountLabel->setText(tr("%1 Items").arg(currentOtbItems.items.count()));
         if (serverItemListBox->count() > 0) {
             serverItemListBox->setCurrentRow(0);
         } else {
-            clearItemDetailsView(); // Ensure view is clear if OTB is empty
+            clearItemDetailsView();
         }
     } else {
         QMessageBox::critical(this, tr("Error Loading File"),
@@ -750,7 +994,6 @@ void MainWindow::loadFile(const QString &fileName)
         statusBar()->showMessage(tr("Error loading file"), 5000);
         saveAct->setEnabled(false);
         saveAsAct->setEnabled(false);
-        // Disable relevant actions
         editMenu->setEnabled(false);
         viewMenu->setEnabled(false);
         toolsMenu->setEnabled(false);
@@ -761,23 +1004,28 @@ void MainWindow::loadFile(const QString &fileName)
 
 bool MainWindow::saveFile(const QString &fileName)
 {
-    // Placeholder for actual file saving logic using OtbWriter
-    QFile file(fileName);
-    if (!file.open(QFile::WriteOnly | QFile::Text)) { // Adjust for binary OTB
-        QMessageBox::warning(this, tr("Application"),
-                             tr("Cannot write file %1:\n%2.")
-                             .arg(QDir::toNativeSeparators(fileName), file.errorString()));
+    OTB::OtbWriter writer;
+    QString errorString;
+
+    for(OTB::ServerItem &item : currentOtbItems.items) {
+        item.updateFlagsFromProperties();
+    }
+
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    bool success = writer.write(fileName, currentOtbItems, errorString);
+    QApplication::restoreOverrideCursor();
+
+    if (success) {
+        setCurrentFile(fileName);
+        statusBar()->showMessage(tr("File saved successfully"), 2000);
+        return true;
+    } else {
+        QMessageBox::critical(this, tr("Error Saving File"),
+                             tr("Could not save file %1:\n%2.")
+                             .arg(QDir::toNativeSeparators(fileName), errorString));
+        statusBar()->showMessage(tr("Error saving file"), 5000);
         return false;
     }
-    // QTextStream out(&file); // Replace with OTB serialization
-    // QApplication::setOverrideCursor(Qt::WaitCursor);
-    // out << textEdit->toPlainText(); // Replace with serializing item data
-    // QApplication::restoreOverrideCursor();
-
-    setCurrentFile(fileName);
-    statusBar()->showMessage(tr("File saved"), 2000);
-    isModified = false;
-    return true;
 }
 
 void MainWindow::setCurrentFile(const QString &fileName)
@@ -790,6 +1038,8 @@ void MainWindow::setCurrentFile(const QString &fileName)
     if (currentFile.isEmpty())
         shownName = "untitled.otb";
     setWindowFilePath(shownName);
+
+    saveAct->setEnabled(!currentFile.isEmpty());
 }
 
 QString MainWindow::strippedName(const QString &fullFileName)

@@ -24,10 +24,12 @@ QT_END_NAMESPACE
 
 namespace OTB {
     struct ServerItem; // Forward declare from otbtypes.h
-    struct ClientItem; // Forward declare from item.h
+    struct ClientItem;
 }
 
-class ClientItemView; // Custom widget for displaying item sprites (to be created)
+// class ClientItemView; // No longer forward-declaring, will include the header
+#include "widgets/clientitemview.h"
+
 
 class MainWindow : public QMainWindow
 {
@@ -68,10 +70,44 @@ private slots:
     // ...
 
     // UI update slots
-    void currentServerItemChanged(OTB::ServerItem* item); // When item selection changes in list
+    void currentServerItemChanged(OTB::ServerItem* item); // When item selection changes in list (conceptual)
+    void onServerItemSelectionChanged(QListWidgetItem *current, QListWidgetItem *previous); // Actual slot for QListWidget
     void updateItemDetailsView(OTB::ServerItem* item);
     void updateClientItemView(OTB::ClientItem* clientItem); // For the main sprite view
     void updatePreviousClientItemView(OTB::ClientItem* prevClientItem); // For the 'previous' sprite view
+
+    // Slots for handling item property changes from UI
+    void onClientIdChanged(int value);
+    void onItemNameChanged(const QString& text);
+    void onItemTypeChanged(int index);
+    void onStackOrderChanged(int index);
+    // Flag checkboxes
+    void onUnpassableChanged(bool checked);
+    void onBlockMissilesChanged(bool checked);
+    void onBlockPathfinderChanged(bool checked);
+    void onHasElevationChanged(bool checked);
+    void onForceUseChanged(bool checked);
+    void onMultiUseChanged(bool checked);
+    void onPickupableChanged(bool checked);
+    void onMovableChanged(bool checked);
+    void onStackableChanged(bool checked);
+    void onReadableChanged(bool checked);
+    void onRotatableChanged(bool checked);
+    void onHangableChanged(bool checked);
+    void onHookSouthChanged(bool checked);
+    void onHookEastChanged(bool checked);
+    void onIgnoreLookChanged(bool checked);
+    void onFullGroundChanged(bool checked);
+    // Attribute LineEdits/SpinBoxes
+    void onGroundSpeedChanged(const QString& text);
+    void onLightLevelChanged(const QString& text);
+    void onLightColorChanged(const QString& text);
+    void onMinimapColorChanged(const QString& text);
+    void onMaxReadCharsChanged(const QString& text);
+    void onMaxReadWriteCharsChanged(const QString& text);
+    void onWareIdChanged(const QString& text);
+
+    void showSpriteCandidates();
 
 
 private:
@@ -192,6 +228,7 @@ private:
 
     PluginManager* pluginManager;
     IPlugin* currentPlugin; // The currently active plugin instance
+    bool loadingItemDetails; // Guard flag
 
     void clearItemDetailsView();
     bool loadClientForOtb(); // Helper to load client data via plugin

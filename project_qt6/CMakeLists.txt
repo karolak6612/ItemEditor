@@ -26,18 +26,23 @@ add_executable(ItemEditorQt
     otb/binarytree.cpp
     otb/otbreader.cpp
     otb/otbwriter.cpp
+    otb/otbtypes.cpp      # Add otbtypes.cpp
+    otb/item.cpp
     mainwindow.cpp
     dialogs/aboutdialog.cpp
-    plugins/iplugin.cpp       # Add iplugin.cpp
-    plugins/dummyplugin.cpp   # Add dummyplugin.cpp
+    dialogs/spritecandidatesdialog.cpp # Add SpriteCandidatesDialog
+    plugins/iplugin.cpp
+    plugins/dummyplugin.cpp
+    widgets/clientitemview.cpp
 )
 
-# Add include directories for subfolders like 'dialogs', 'otb', and 'plugins'
+# Add include directories for subfolders
 target_include_directories(ItemEditorQt PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/otb
     ${CMAKE_CURRENT_SOURCE_DIR}/dialogs
     ${CMAKE_CURRENT_SOURCE_DIR}/plugins
+    ${CMAKE_CURRENT_SOURCE_DIR}/widgets # Add widgets include path
 )
 
 

@@ -63,29 +63,43 @@ bool DummyPlugin::loadClient(const OTB::SupportedClient& client,
     item100.height = 1;
     item100.layers = 1;
     item100.frames = 1;
-    item100.numSprites = 1;
-    // item100.spriteHash will be default (zeros) or could be set
+    item100.numSprites = 1; // width * height * layers * frames
+    item100.spriteHash = QByteArray::fromHex("11111111111111111111111111111111"); // Dummy hash
+    OTB::Sprite defaultSprite100; defaultSprite100.id = 1000; item100.spriteList.append(defaultSprite100);
     m_clientItems.insert(item100.id, item100);
 
     OTB::ClientItem item101;
     item101.id = 101; // Client ID
     item101.name = "Another Dummy (CID 101)";
     item101.type = OTB::ServerItemType::Container;
+    item101.movable = true;
+    item101.pickupable = true;
     item101.width = 1;
     item101.height = 1;
     item101.layers = 1;
     item101.frames = 1;
     item101.numSprites = 1;
+    item101.spriteHash = QByteArray::fromHex("22222222222222222222222222222222"); // Dummy hash
+    OTB::Sprite defaultSprite101; defaultSprite101.id = 1001; item101.spriteList.append(defaultSprite101);
     m_clientItems.insert(item101.id, item101);
 
-    // Example for an item that might be in OTB but not have a direct client counterpart initially
-    // Or, an item that ServerItem refers to by ClientID
     OTB::ClientItem item3039; // Example from C# test OTB (stone tile)
     item3039.id = 3039;
     item3039.name = "Stone Tile (Dummy Client)";
     item3039.type = OTB::ServerItemType::Ground;
+    item3039.groundSpeed = 150;
+    item3039.width = 1;
+    item3039.height = 1;
+    item3039.layers = 1;
+    item3039.frames = 1;
+    item3039.numSprites = 1;
+    item3039.spriteHash = QByteArray::fromHex("39303930393039303930393039303930"); // Dummy hash
+    OTB::Sprite defaultSprite3039; defaultSprite3039.id = 3000; item3039.spriteList.append(defaultSprite3039);
     m_clientItems.insert(item3039.id, item3039);
 
+    // Add a client item that a ServerItem might point to but doesn't exist in this dummy set by default,
+    // to test how the main app handles missing client items from plugin.
+    // (No, this is for populating the plugin's known items. Missing items test is different)
 
     qDebug() << "DummyPlugin: Simulated loading client" << client.description;
     m_isClientLoaded = true;
