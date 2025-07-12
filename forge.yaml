@@ -1,0 +1,6 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/antinomyhq/forge/refs/heads/main/forge.schema.json
+model: anthropic/claude-sonnet-4
+max_walker_depth: 3
+custom_rules: "1. Always use \"context7-mcp\" MCP for code documentation. For example use Context7 \"qt-6-docs\" for qt6 framework code documentation.\n2. Always use \"shrimp-task-manager\" MCP for planning task and code implementation. Use \t\"process_thought\", \"reflect_task\" and \"research_mode\"  for  Step-by-step reasoning for complex problems and planning tasks.\n1. Always use \"desktop-commander \" MCP for navigating through the code.\n"
+max_tokens: 50000
+max_requests_per_turn: 9999

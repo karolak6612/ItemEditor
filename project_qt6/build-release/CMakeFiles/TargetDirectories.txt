@@ -1,0 +1,4 @@
+C:/Users/karol/Documents/Github_OLD/item editor/project_qt6/build-release/CMakeFiles/ItemEditorQt.dir
+C:/Users/karol/Documents/Github_OLD/item editor/project_qt6/build-release/CMakeFiles/INSTALL.dir
+C:/Users/karol/Documents/Github_OLD/item editor/project_qt6/build-release/CMakeFiles/ALL_BUILD.dir
+C:/Users/karol/Documents/Github_OLD/item editor/project_qt6/build-release/CMakeFiles/ZERO_CHECK.dir

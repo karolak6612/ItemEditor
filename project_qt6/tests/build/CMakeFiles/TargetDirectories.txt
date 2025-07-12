@@ -1,0 +1,9 @@
+C:/Users/karol/Documents/Github_OLD/item editor/project_qt6/tests/build/CMakeFiles/BuildTest.dir
+C:/Users/karol/Documents/Github_OLD/item editor/project_qt6/tests/build/CMakeFiles/DemoOtbBackup.dir
+C:/Users/karol/Documents/Github_OLD/item editor/project_qt6/tests/build/CMakeFiles/OTBComprehensiveTests.dir
+C:/Users/karol/Documents/Github_OLD/item editor/project_qt6/tests/build/CMakeFiles/TestOtbValidator.dir
+C:/Users/karol/Documents/Github_OLD/item editor/project_qt6/tests/build/CMakeFiles/TestBinaryTree.dir
+C:/Users/karol/Documents/Github_OLD/item editor/project_qt6/tests/build/CMakeFiles/TestOtbBackup.dir
+C:/Users/karol/Documents/Github_OLD/item editor/project_qt6/tests/build/CMakeFiles/TestOtbPerformance.dir
+C:/Users/karol/Documents/Github_OLD/item editor/project_qt6/tests/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/karol/Documents/Github_OLD/item editor/project_qt6/tests/build/CMakeFiles/ZERO_CHECK.dir

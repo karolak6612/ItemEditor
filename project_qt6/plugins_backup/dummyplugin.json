@@ -1,0 +1,9 @@
+{
+    "Keys": ["DummyPlugin"],
+    "IID": "IPlugin",
+    "MetaData": {
+        "name": "Dummy Plugin",
+        "description": "A dummy plugin for testing purposes",
+        "version": "1.0.0"
+    }
+}

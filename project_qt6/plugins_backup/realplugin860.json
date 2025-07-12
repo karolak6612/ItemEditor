@@ -1,0 +1,10 @@
+{
+    "Keys": ["RealPlugin860"],
+    "IID": "IPlugin",
+    "MetaData": {
+        "name": "Real Plugin 860",
+        "description": "Plugin for Tibia client version 8.60",
+        "version": "1.0.0",
+        "clientVersion": "8.60"
+    }
+}
