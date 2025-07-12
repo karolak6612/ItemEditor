@@ -33,6 +33,7 @@ add_executable(ItemEditorQt
     plugins/iplugin.cpp
     plugins/dummyplugin.cpp
     plugins/realplugin770.cpp
+    plugins/realplugin860.cpp  # Add RealPlugin860
     widgets/clientitemview.cpp
     tibiadata/sprparser.cpp
     tibiadata/datparser.cpp

@@ -39,15 +39,14 @@ bool DatParser::loadDat(const QString& filePath, quint32 clientVersion, QString&
         return false;
     }
 
-    // In a real scenario, this flag would be determined by client version and used to select a parsing path.
-    bool extendedFormat = (m_clientVersion >= 780);
+    // This flag helps select the parsing path inside parseThing
+    bool isExtended = (m_clientVersion >= 780);
 
-    // Loop from Client ID 100 up to itemCount - 1.
     for (quint16 clientId = 100; clientId < m_itemCount; ++clientId) {
         OTB::ClientItem currentClientItem;
-        currentClientItem.id = clientId;
+        currentClientItem.id = clientId; // Pass the ID to the parser
 
-        if (!parseThing(stream, currentClientItem, extendedFormat)) {
+        if (!parseThing(stream, currentClientItem, isExtended)) {
             if (stream.atEnd()) {
                 errorString = QObject::tr("Unexpected end of DAT file while parsing item %1.").arg(clientId);
                 m_file.close();
@@ -82,16 +81,15 @@ quint16 DatParser::getEffectCount() const { return m_effectCount; }
 quint16 DatParser::getMissileCount() const { return m_missileCount; }
 
 
-bool DatParser::parseThing(QDataStream& stream, OTB::ClientItem& outItem, bool extendedFormat) const
+bool DatParser::parseThing(QDataStream& stream, OTB::ClientItem& outItem, bool isExtended) const
 {
-    // This implementation is for attribute-based DAT files (>= 7.8)
-    if (!extendedFormat) {
-        // TODO: Implement fixed-structure parsing for older clients
-        qWarning() << "DAT Parser: Fixed-structure DAT format for clients < 7.8 not yet supported. Skipping item" << outItem.id;
-        // Need to know the fixed size to skip, or this will fail.
+    if (!isExtended) {
+        qWarning() << "DAT Parser: Fixed-structure DAT format for clients < 7.80 not yet supported. Skipping item" << outItem.id;
+        // Without knowing the fixed size, we cannot reliably skip. This will likely fail.
         return false;
     }
 
+    // --- Attribute-based parsing (clients >= 7.8) ---
     bool hasMoreAttributes = true;
     while(hasMoreAttributes && !stream.atEnd()) {
         quint8 attributeCode;
@@ -104,24 +102,9 @@ bool DatParser::parseThing(QDataStream& stream, OTB::ClientItem& outItem, bool e
 
         DatAttribute attr = static_cast<DatAttribute>(attributeCode);
 
-        // For attributes that have data, we read it here.
-        // This is a more complete implementation based on known DAT format structures.
+        // This switch handles attributes that have data following them.
+        // If an attribute is just a flag, its presence is handled by the default case.
         switch(attr) {
-            case DatAttribute::Unpassable:          outItem.unpassable = true; break;
-            case DatAttribute::BlockProjectile:     outItem.blockMissiles = true; break;
-            case DatAttribute::BlockPath:           outItem.blockPathfinder = true; break;
-            case DatAttribute::IsUsable:            outItem.multiUse = true; break;
-            case DatAttribute::Take:                outItem.pickupable = true; break;
-            case DatAttribute::Unmovable:           outItem.movable = false; break; // Note: sets to false
-            case DatAttribute::Stackable:           outItem.stackable = true; break;
-            case DatAttribute::Rotatable:           outItem.rotatable = true; break;
-            case DatAttribute::Hangable:            outItem.hangable = true; break;
-            case DatAttribute::HookSouth:           outItem.hookSouth = true; break;
-            case DatAttribute::HookEast:            outItem.hookEast = true; break;
-            case DatAttribute::IgnoreLook:          outItem.ignoreLook = true; break;
-            case DatAttribute::FullGround:          outItem.fullGround = true; break;
-            case DatAttribute::AnimateAlways:       outItem.isAnimation = true; break;
-
             case DatAttribute::Ground:              stream >> outItem.groundSpeed; break;
             case DatAttribute::MinimapColor:        stream >> outItem.minimapColor; break;
             case DatAttribute::Light: {
@@ -132,41 +115,46 @@ bool DatParser::parseThing(QDataStream& stream, OTB::ClientItem& outItem, bool e
                 break;
             }
             case DatAttribute::Height: {
-                outItem.hasElevation = true;
                 quint16 elevation;
-                stream >> elevation;
-                // OTB::ClientItem doesn't store elevation value, just the flag.
-                // This is consistent with how OTB handles it.
+                stream >> elevation; // Read the data
                 break;
             }
-
-            // Attributes that are often part of server logic but might appear in custom DATs
-            // case DatAttribute::Writable: { quint16 maxLen; stream >> maxLen; outItem.maxReadWriteChars = maxLen; break; }
-            // case DatAttribute::WritableOnce: { quint16 maxLen; stream >> maxLen; outItem.maxReadChars = maxLen; break; }
-
+            // Add cases for other attributes that have data...
             default:
-                // For unknown attributes, we can't know how many bytes to skip.
-                // This is a fundamental difficulty of parsing DAT without a complete spec for every version.
-                // A robust solution would have a table of attribute sizes for the specific client version.
-                // For now, we stop parsing this item to avoid corrupting the stream position.
-                qWarning() << "DAT: Unknown attribute code" << Qt::hex << attributeCode
-                           << "for ClientID" << outItem.id << "at pos" << stream.device()->pos() - 1 << ". Stopping parse for this item.";
-                // Scan until we find the 0xFF terminator for this item to recover.
-                quint8 nextByte;
-                while(!stream.atEnd()) {
-                    stream >> nextByte;
-                    if (nextByte == 0xFF) break;
-                }
-                return false;
+                // This is a flag-like attribute. We set the property and continue.
+                break;
+        }
+
+        // Set boolean properties based on flags
+        switch(attr) {
+            case DatAttribute::Unpassable:          outItem.unpassable = true; break;
+            case DatAttribute::BlockProjectile:     outItem.blockMissiles = true; break;
+            case DatAttribute::BlockPath:           outItem.blockPathfinder = true; break;
+            case DatAttribute::IsUsable:            outItem.multiUse = true; break;
+            case DatAttribute::Take:                outItem.pickupable = true; break;
+            case DatAttribute::Unmovable:           outItem.movable = false; break;
+            case DatAttribute::Stackable:           outItem.stackable = true; break;
+            case DatAttribute::Rotatable:           outItem.rotatable = true; break;
+            case DatAttribute::Hangable:            outItem.hangable = true; break;
+            case DatAttribute::HookSouth:           outItem.hookSouth = true; break;
+            case DatAttribute::HookEast:            outItem.hookEast = true; break;
+            case DatAttribute::IgnoreLook:          outItem.ignoreLook = true; break;
+            case DatAttribute::FullGround:          outItem.fullGround = true; break;
+            case DatAttribute::AnimateAlways:       outItem.isAnimation = true; break;
+            case DatAttribute::ForceUse:            outItem.forceUse = true; break;
+            case DatAttribute::MultiUse:            outItem.multiUse = true; break;
+            case DatAttribute::IsReadable:          outItem.readable = true; break;
+            case DatAttribute::Height:              outItem.hasElevation = true; break;
+            default: break; // Unknown flags are ignored for now
         }
     }
 
-    // After attributes, sprite/dimension info follows
     if (stream.atEnd()) {
         qWarning() << "DAT: Stream ended before sprite information for ClientID" << outItem.id;
         return false;
     }
 
+    // After attributes, sprite info follows
     stream >> outItem.width;
     stream >> outItem.height;
     if (outItem.width > 1 || outItem.height > 1) {
@@ -176,10 +164,9 @@ bool DatParser::parseThing(QDataStream& stream, OTB::ClientItem& outItem, bool e
     stream >> outItem.patternX;
     stream >> outItem.patternY;
 
-    if (m_clientVersion >= 820) { // Example: patternZ introduced in later versions
+    // patternZ and frame count reading varies by version
+    if (m_clientVersion >= 820) {
         stream >> outItem.patternZ;
-    } else {
-        outItem.patternZ = 0;
     }
     stream >> outItem.frames;
 

@@ -113,13 +113,11 @@ bool SprParser::getSprite(quint32 spriteId, OTB::Sprite& outSprite, bool transpa
 
 
 // This is where the core SPR RLE-like decompression logic from C# Sprite.cs needs to be ported.
-// byte[] Sprite.GetRGBData(byte transparentColor) or byte[] Sprite.GetPixels()
 bool SprParser::parseSpriteData(quint32 spriteId, QDataStream& stream, OTB::Sprite& outSprite, bool isTransparentByDefault) const
 {
-    // Read color key (RGB, 3 bytes) - C# does not seem to use this for ItemEditor's purposes.
-    // It's usually 0xFF00FF (magenta) for transparency in some contexts, but ItemEditor's
-    // Sprite.cs GetRGBData/GetPixels uses a fixed transparent color (0x11) or alpha=0.
-    // stream.skipRawData(3); // Skip 3 bytes of color key.
+    // The C# code seeks to address + 3, implying a 3-byte color key is skipped.
+    // We will replicate that behavior here.
+    stream.skipRawData(3);
 
     quint16 pixelDataSize; // This is the size of the *compressed* pixel data that follows.
     stream >> pixelDataSize;
