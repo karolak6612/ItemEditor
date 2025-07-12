@@ -38,10 +38,10 @@ set(CORE_SOURCES
 
 # UI sources
 set(UI_SOURCES
-    src/ui/mainwindow.cpp
+    src/ui/mainwindow_enhanced.cpp
     src/ui/widgets/clientitemview.cpp
-    # src/ui/widgets/itempropertyeditor.cpp  # TODO: Fix implementation
-    # src/ui/widgets/spritebrowser.cpp       # TODO: Fix implementation
+    src/ui/widgets/itempropertyeditor.cpp
+    src/ui/widgets/spritebrowser.cpp
     src/ui/dialogs/aboutdialog.cpp
     src/ui/dialogs/finditemdialog.cpp
     src/ui/dialogs/enhancedfinditems.cpp
@@ -55,8 +55,8 @@ set(UI_SOURCES
 set(UI_HEADERS
     include/ui/mainwindow.h
     include/ui/widgets/clientitemview.h
-    # include/ui/widgets/itempropertyeditor.h  # TODO: Fix implementation
-    # include/ui/widgets/spritebrowser.h       # TODO: Fix implementation
+    include/ui/widgets/itempropertyeditor.h
+    include/ui/widgets/spritebrowser.h
     include/ui/dialogs/aboutdialog.h
     include/ui/dialogs/finditemdialog.h
     include/ui/dialogs/enhancedfinditems.h

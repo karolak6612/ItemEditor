@@ -228,9 +228,9 @@ private:
     void hideLoadingProgress();
     void showStatusMessage(const QString& message, int timeout = 0);
     
-    // Advanced UI components - TODO: Implement these widgets
-    // UI::Widgets::ItemPropertyEditor* m_propertyEditor;
-    // UI::Widgets::SpriteBrowser* m_spriteBrowser;
+    // Advanced UI components
+    UI::Widgets::ItemPropertyEditor* m_propertyEditor;
+    UI::Widgets::SpriteBrowser* m_spriteBrowser;
 };
 
 #endif // MAINWINDOW_H
