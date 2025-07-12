@@ -7,7 +7,7 @@ SprParser::SprParser() : m_signature(0), m_spriteCount(0)
 {
 }
 
-bool SprParser::loadSpr(const QString& filePath, QString& errorString)
+bool SprParser::loadSpr(const QString& filePath, bool isExtended, QString& errorString)
 {
     m_file.setFileName(filePath);
     if (!m_file.open(QIODevice::ReadOnly)) {
@@ -18,39 +18,19 @@ bool SprParser::loadSpr(const QString& filePath, QString& errorString)
     QDataStream stream(&m_file);
     stream.setByteOrder(QDataStream::LittleEndian);
 
-    // Read signature (4 bytes)
     stream >> m_signature;
 
-    // Read sprite count
-    // C# Sprite.LoadSprites uses reader.ReadUInt16() for non-extended (older clients)
-    // and reader.ReadUInt32() for extended.
-    // For now, let's assume extended format or make it a parameter.
-    // The C# version of ItemEditor seems to handle this based on client version.
-    // Let's default to UInt16 for wider compatibility with older SPRs first.
-    // This will need to be configurable or detected.
-    // For a generic parser, it might be safer to assume UInt16 unless a flag indicates extended.
-    // The C# `extended` flag in `Sprite.LoadSprites` is passed based on client version.
-    // We'll need a similar mechanism. For now, let's try reading as quint16
-    // and if it's a known extended signature, re-read or adjust.
-    // Or, for simplicity in this initial step, assume quint16. This is a known point of variation.
-
-    // quint16 spriteCount16;
-    // stream >> spriteCount16;
-    // m_spriteCount = spriteCount16;
-
-    // The C# code in ItemEditor.PluginInterface.Sprite.cs, the `extended` parameter for `LoadSprites`
-    // is true if client.Version >= 960.
-    // This implies the sprite count is quint32 for newer clients.
-    // Let's assume for now we need to pass an 'isExtended' flag to loadSpr,
-    // or the parser tries to guess. A common pattern for SPR is that if the first
-    // two bytes (quint16 count) are 0xFFFF, it might indicate a quint32 count follows.
-    // For this initial step, let's read as quint32 as newer formats are more likely.
-    // This will be a point to refine based on specific client version handling.
-    stream >> m_spriteCount;
-
+    // Handle extended (uint32) vs non-extended (uint16) sprite count
+    if (isExtended) {
+        stream >> m_spriteCount;
+    } else {
+        quint16 spriteCount16;
+        stream >> spriteCount16;
+        m_spriteCount = spriteCount16;
+    }
 
     qDebug() << "SPR Signature:" << Qt::hex << m_signature;
-    qDebug() << "SPR Sprite Count:" << m_spriteCount;
+    qDebug() << "SPR Sprite Count:" << m_spriteCount << "(isExtended:" << isExtended << ")";
 
     if (m_spriteCount == 0 || m_spriteCount > 100000) { // Sanity check
         errorString = QObject::tr("Invalid sprite count in SPR file: %1").arg(m_spriteCount);

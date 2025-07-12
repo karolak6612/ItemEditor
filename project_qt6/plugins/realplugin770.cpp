@@ -91,15 +91,12 @@ bool RealPlugin770::loadClient(
     // --- Load SPR File ---
     // The 'extended' flag for SPR count (uint16 vs uint32) depends on client version.
     // For 7.70, it's typically uint16 (not extended).
-    // This should be derived from client version (e.g. client.version < 960)
-    bool isSprExtended = (m_currentlyLoadedClient.version >= 960); // Example threshold from C#
-                                                               // For 7.70, this will be false.
-                                                               // SprParser's loadSpr needs to handle this.
-                                                               // For now, SprParser assumes uint32 count. This needs fix in SprParser.
-                                                               // Let's pass 'isSprExtended' to sprParser if it supports it.
-                                                               // (Currently SprParser doesn't take this flag)
+    // The C# `extended` parameter passed to `LoadSprites` is a combination of user preference and client version.
+    // `extended = extended || client.Version >= 960;`
+    // We will use the same logic here.
+    bool isSprExtended = extended || (m_currentlyLoadedClient.version >= 960);
 
-    if (!m_sprParser.loadSpr(sprPath, errorString)) {
+    if (!m_sprParser.loadSpr(sprPath, isSprExtended, errorString)) {
         // errorString is set by sprParser
         return false;
     }
@@ -198,46 +195,34 @@ void RealPlugin770::populateSpriteDataForClientItems() {
     }
 
     // The `transparency` option from preferences should be used here.
-    // For now, hardcoding true.
-    bool useTransparency = true; // This should come from loadClient options.
+    // For now, hardcoding true. This should be passed from loadClient.
+    bool useTransparency = true;
 
     for (auto it = m_clientItems.begin(); it != m_clientItems.end(); ++it) {
         OTB::ClientItem& clientItem = it.value(); // Get a modifiable reference
-        clientItem.spriteList.clear();
 
-        // ClientItem stores width, height, layers, patternX,Y,Z, frames.
-        // NumSprites is width * height * layers * frames.
-        // The actual sprite IDs to fetch from SPR file are often sequential starting from some base ID,
-        // or listed explicitly in the DAT format for complex items.
-        // This logic is highly version-dependent and part of detailed DAT parsing.
-        // The C# ClientItem.SpriteList is populated during DAT parsing.
-        // Our current DatParser.parseThing is too simple and doesn't extract sprite IDs.
+        // DatParser should have populated the spriteList with placeholder Sprites containing only their IDs.
+        // Now we need to load the actual compressed pixel data for each of those sprites.
 
-        // For now, as a placeholder: if numSprites is 1, try to load sprite ID `clientItem.id`.
-        // This is a gross oversimplification. A real DAT parser gives the list of sprite IDs.
-        if (clientItem.numSprites == 0 && clientItem.width > 0 && clientItem.height > 0 && clientItem.layers > 0 && clientItem.frames > 0) {
-             clientItem.numSprites = clientItem.width * clientItem.height * clientItem.layers * clientItem.frames;
-        }
-
-
-        if (clientItem.numSprites > 0) {
-            // Placeholder: Assume the *first* sprite ID for this item is its own client ID.
-            // This is often NOT the case. Real DATs have lists of sprite IDs.
-            // For items with numSprites > 1, this will only load one placeholder sprite.
-            OTB::Sprite tempSprite;
-            if (m_sprParser.getSprite(clientItem.id, tempSprite, useTransparency)) {
-                clientItem.spriteList.append(tempSprite);
+        QList<OTB::Sprite> loadedSprites;
+        for (const OTB::Sprite& placeholderSprite : clientItem.spriteList) {
+            OTB::Sprite fullSpriteData;
+            // Get the full sprite data from the parser using the ID from the placeholder
+            if (m_sprParser.getSprite(placeholderSprite.id, fullSpriteData, useTransparency)) {
+                loadedSprites.append(fullSpriteData);
             } else {
-                // If sprite ID (clientItem.id) not found, add a blank/default sprite
-                // This can happen if DAT lists an item but SPR has no graphics for it.
+                // If a sprite can't be loaded, append a blank one to keep indices correct.
                 OTB::Sprite blankSprite;
-                blankSprite.id = clientItem.id; // Still associate with client ID
-                // blankSprite.compressedPixels could be from OTB::Sprite::blankRGBSprite or similar
-                clientItem.spriteList.append(blankSprite);
-                qWarning() << "RealPlugin770: Could not load sprite ID" << clientItem.id << "for ClientItem" << clientItem.id;
+                blankSprite.id = placeholderSprite.id; // Keep the original requested ID
+                loadedSprites.append(blankSprite);
+                qWarning() << "RealPlugin770: Could not load sprite with ID" << placeholderSprite.id
+                           << "for ClientItem" << clientItem.id;
             }
         }
+        // Replace the list of placeholder sprites with the list of fully loaded sprites.
+        clientItem.spriteList = loadedSprites;
+
         // After populating spriteList, ClientItem::getSpriteHash() and ClientItem::getBitmap()
-        // would use this list. Their current stub implementations need updating to use spriteList.
+        // can now work with the actual data.
     }
 }

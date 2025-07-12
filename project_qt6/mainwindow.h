@@ -2,9 +2,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "plugins/iplugin.h" // Include IPlugin for PluginManager and currentPlugin
+#include "plugins/iplugin.h"
+#include "widgets/clientitemview.h"
+#include <functional> // For std::function
 
-// Forward declarations
 QT_BEGIN_NAMESPACE
 class QAction;
 class QMenu;
@@ -13,23 +14,23 @@ class QToolBar;
 class QStatusBar;
 class QTextEdit;
 class QListWidget;
+class QListWidgetItem;
 class QGroupBox;
 class QLabel;
 class QComboBox;
 class QSpinBox;
 class QCheckBox;
 class QPushButton;
+class QLineEdit;
 class QProgressBar;
 QT_END_NAMESPACE
 
 namespace OTB {
-    struct ServerItem; // Forward declare from otbtypes.h
+    struct ServerItem;
     struct ClientItem;
 }
 
-// class ClientItemView; // No longer forward-declaring, will include the header
-#include "widgets/clientitemview.h"
-
+struct UpdateOptions; // Forward declaration from updateotbdialog.h
 
 class MainWindow : public QMainWindow
 {
@@ -56,9 +57,9 @@ private slots:
     void findItem();
     void createMissingItems();
     // View menu actions
-    void toggleShowMismatched(bool checked);
-    void toggleShowDeprecated(bool checked);
-    void updateItemsList();
+    void onShowMismatchedToggled(bool checked);
+    void onShowDeprecatedToggled(bool checked);
+    void buildFilteredItemsList(); // Renamed from updateItemsList
     // Tools menu actions
     void reloadAllItemAttributes();
     void compareOtbFiles();
@@ -66,15 +67,9 @@ private slots:
     // Help menu actions
     void about();
 
-    // Toolbar button actions (many can reuse menu action slots)
-    // ...
-
     // UI update slots
-    void currentServerItemChanged(OTB::ServerItem* item); // When item selection changes in list (conceptual)
-    void onServerItemSelectionChanged(QListWidgetItem *current, QListWidgetItem *previous); // Actual slot for QListWidget
+    void onServerItemSelectionChanged(QListWidgetItem *current, QListWidgetItem *previous);
     void updateItemDetailsView(OTB::ServerItem* item);
-    void updateClientItemView(OTB::ClientItem* clientItem); // For the main sprite view
-    void updatePreviousClientItemView(OTB::ClientItem* prevClientItem); // For the 'previous' sprite view
 
     // Slots for handling item property changes from UI
     void onClientIdChanged(int value);
@@ -107,9 +102,9 @@ private slots:
     void onMaxReadWriteCharsChanged(const QString& text);
     void onWareIdChanged(const QString& text);
 
+    // Other UI slots
     void showSpriteCandidates();
     void showServerListContextMenu(const QPoint& pos);
-    // Context menu action slots
     void copyServerId();
     void copyClientId();
     void copyItemName();
@@ -120,128 +115,65 @@ private:
     void createMenus();
     void createToolBars();
     void createStatusBar();
-    void createCentralWidget(); // Main layout of the application
-    void createDockWidgets(); // Or just arrange within central widget for now
+    void createCentralWidget();
+    void createDockWidgets();
 
-    bool maybeSave(); // Prompts to save if document is modified
+    bool maybeSave();
     void loadFile(const QString &fileName);
     bool saveFile(const QString &fileName);
     void setCurrentFile(const QString &fileName);
     QString strippedName(const QString &fullFileName);
 
     // --- UI Elements ---
-    // Menus
     QMenu *fileMenu;
     QMenu *editMenu;
     QMenu *viewMenu;
     QMenu *toolsMenu;
     QMenu *helpMenu;
-
-    // Toolbars
     QToolBar *fileToolBar;
-    QToolBar *editToolBar; // Or combine as needed
-
     // Actions
-    // File
-    QAction *newAct;
-    QAction *openAct;
-    QAction *saveAct;
-    QAction *saveAsAct;
-    QAction *preferencesAct;
-    QAction *exitAct;
-    // Edit
-    QAction *createItemAct;
-    QAction *duplicateItemAct;
-    QAction *reloadItemAct;
-    QAction *findItemAct;
-    QAction *createMissingItemsAct;
-    // View
-    QAction *showMismatchedAct;
-    QAction *showDeprecatedAct;
-    QAction *updateItemsListAct;
-    // Tools
-    QAction *reloadAttributesAct;
-    QAction *compareOtbAct;
-    QAction *updateVersionAct;
-    // Help
-    QAction *aboutAct;
-    QAction *aboutQtAct; // Standard Qt about dialog
-
-    // Central Widget Components (mirroring C# MainForm)
-    QListWidget *serverItemListBox; // Placeholder for custom ServerItemListBox
-
-    // Appearance GroupBox
-    QGroupBox *appearanceGroupBox;
-    ClientItemView *previousClientItemViewWidget; // Custom widget for previous sprite
-    ClientItemView *mainClientItemViewWidget;     // Custom widget for current sprite
-    QLabel *serverIDLabel_val; // Value for Server ID
+    QAction *newAct, *openAct, *saveAct, *saveAsAct, *preferencesAct, *exitAct;
+    QAction *createItemAct, *duplicateItemAct, *reloadItemAct, *findItemAct, *createMissingItemsAct;
+    QAction *showMismatchedAct, *showDeprecatedAct, *updateItemsListAct; // updateItemsListAct now calls buildFilteredItemsList
+    QAction *reloadAttributesAct, *compareOtbAct, *updateVersionAct;
+    QAction *aboutAct, *aboutQtAct;
+    // Central Widget Components
+    QListWidget *serverItemListBox;
+    QGroupBox *appearanceGroupBox, *attributesGroupBox;
+    ClientItemView *previousClientItemViewWidget, *mainClientItemViewWidget;
+    QLabel *serverIDLabel_val;
     QSpinBox *clientIDSpinBox;
-    QPushButton *candidatesButton; // For sprite candidates
-
-    // Attributes GroupBox
-    QGroupBox *attributesGroupBox;
-    QComboBox *itemTypeComboBox;
-    QComboBox *stackOrderComboBox;
-    QLineEdit *itemNameLineEdit;
-    // ... many QCheckBoxes for flags ...
-    QCheckBox *unpassableCheckBox;
-    QCheckBox *blockMissilesCheckBox;
-    QCheckBox *blockPathfinderCheckBox;
-    QCheckBox *hasElevationCheckBox;
-    QCheckBox *forceUseCheckBox;
-    QCheckBox *multiUseCheckBox;
-    QCheckBox *pickupableCheckBox;
-    QCheckBox *movableCheckBox;
-    QCheckBox *stackableCheckBox;
-    QCheckBox *readableCheckBox;
-    QCheckBox *rotatableCheckBox;
-    QCheckBox *hangableCheckBox;
-    QCheckBox *hookSouthCheckBox;
-    QCheckBox *hookEastCheckBox;
-    QCheckBox *ignoreLookCheckBox;
-    QCheckBox *fullGroundCheckBox;
-
-    // ... QLineEdits for attributes ...
-    QLineEdit *groundSpeedLineEdit;
-    QLineEdit *lightLevelLineEdit;
-    QLineEdit *lightColorLineEdit;
-    QLineEdit *minimapColorLineEdit;
-    QLineEdit *maxReadCharsLineEdit;
-    QLineEdit *maxReadWriteCharsLineEdit;
-    QLineEdit *wareIdLineEdit;
-
-
-    // Bottom area
+    QPushButton *candidatesButton;
+    QComboBox *itemTypeComboBox, *stackOrderComboBox;
+    QLineEdit *itemNameLineEdit, *groundSpeedLineEdit, *lightLevelLineEdit, *lightColorLineEdit, *minimapColorLineEdit, *maxReadCharsLineEdit, *maxReadWriteCharsLineEdit, *wareIdLineEdit;
+    QCheckBox *unpassableCheckBox, *blockMissilesCheckBox, *blockPathfinderCheckBox, *hasElevationCheckBox, *forceUseCheckBox, *multiUseCheckBox, *pickupableCheckBox, *movableCheckBox, *stackableCheckBox, *readableCheckBox, *rotatableCheckBox, *hangableCheckBox, *hookSouthCheckBox, *hookEastCheckBox, *ignoreLookCheckBox, *fullGroundCheckBox;
     QTextEdit *outputLogView;
     QLabel *itemsCountLabel;
     QProgressBar *loadingProgressBar;
-
-    // Buttons below serverItemListBox (from C# form)
-    QPushButton *newItemButtonMain;
-    QPushButton *duplicateItemButtonMain;
-    QPushButton *reloadItemButtonMain;
-    QPushButton *findItemButtonMain;
-
+    QPushButton *newItemButtonMain, *duplicateItemButtonMain, *reloadItemButtonMain, *findItemButtonMain;
 
     // --- Data members ---
     QString currentFile;
-    bool isModified; // To track unsaved changes
-
-    OTB::ServerItemList currentOtbItems; // The loaded OTB data
-    OTB::ServerItem* currentSelectedItem; // Pointer to the currently selected item in currentOtbItems.list
-    QMap<QListWidgetItem*, OTB::ServerItem*> listItemToServerItemMap; // Map QListWidgetItems to ServerItems
-
+    bool isModified;
+    OTB::ServerItemList currentOtbItems;
+    OTB::ServerItem* currentSelectedItem;
+    QMap<QListWidgetItem*, OTB::ServerItem*> listItemToServerItemMap;
     PluginManager* pluginManager;
-    IPlugin* currentPlugin; // The currently active plugin instance
-    bool loadingItemDetails; // Guard flag
+    IPlugin* currentPlugin;
+    bool loadingItemDetails;
+    bool m_showOnlyMismatched; // New filter flag
+    bool m_showOnlyDeprecated; // New filter flag
 
+    // Helpers
     void clearItemDetailsView();
-    bool loadClientForOtb(); // Helper to load client data via plugin
-
-    // Helper for styling changed properties
+    bool loadClientForOtb();
     void updatePropertyStyle(QWidget* control, const std::function<bool(const OTB::ClientItem&)>& comparisonLambda);
-    template<typename T_Server, typename T_Client> // Not used yet, but could be for simpler cases
-    void updatePropertyStyleSimple(QWidget* control, const T_Server& serverValue, const T_Client& clientValue, bool clientDataAvailable);
+    void performOtbUpdate(const UpdateOptions& options,
+                          const QMap<quint16, OTB::ClientItem>& currentClientItems,
+                          const QMap<quint16, OTB::ClientItem>& targetClientItems);
+
+    // Helper for item comparison
+    bool compareItems(const OTB::ServerItem* serverItem, const OTB::ClientItem* clientItem, bool compareHash);
 };
 
 #endif // MAINWINDOW_H

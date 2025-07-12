@@ -1,6 +1,6 @@
 #include "compareotbdialog.h"
-#include "otb/otbreader.h"   // For OtbReader
-#include "otb/otbtypes.h"  // For ServerItemList and ServerItem
+#include "otb/otbreader.h"
+#include "otb/otbtypes.h"
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -11,18 +11,20 @@
 #include <QPushButton>
 #include <QTextEdit>
 #include <QFileDialog>
-#include <QFileInfo> // To get file names for display
+#include <QFileInfo>
 #include <QMessageBox>
 #include <QMap>
+#include <QSet>
+#include <algorithm>
 
 CompareOtbDialog::CompareOtbDialog(QWidget *parent)
     : QDialog(parent)
 {
     setWindowTitle(tr("Compare OTB Files"));
-    setMinimumSize(600, 400);
+    setMinimumSize(700, 500); // Increased size for better results display
     setupUi();
 
-    compareButton->setEnabled(false); // Enabled when both files are selected
+    compareButton->setEnabled(false);
     connect(file1LineEdit, &QLineEdit::textChanged, this, [this](){ compareButton->setEnabled(!file1LineEdit->text().isEmpty() && !file2LineEdit->text().isEmpty()); });
     connect(file2LineEdit, &QLineEdit::textChanged, this, [this](){ compareButton->setEnabled(!file1LineEdit->text().isEmpty() && !file2LineEdit->text().isEmpty()); });
 }
@@ -66,17 +68,14 @@ void CompareOtbDialog::setupUi()
     compareButtonLayout->addStretch();
     mainLayout->addLayout(compareButtonLayout);
 
-
     // Results Group
     resultsGroupBox = new QGroupBox(tr("Comparison Results"), this);
     QVBoxLayout* resultsLayout = new QVBoxLayout(resultsGroupBox);
     resultsTextEdit = new QTextEdit(this);
     resultsTextEdit->setReadOnly(true);
-    resultsTextEdit->setLineWrapMode(QTextEdit::NoWrap); // Good for structured text
+    resultsTextEdit->setLineWrapMode(QTextEdit::NoWrap);
     resultsLayout->addWidget(resultsTextEdit);
     mainLayout->addWidget(resultsGroupBox);
-    resultsGroupBox->setMinimumHeight(200);
-
 
     // Close Button
     closeButton = new QPushButton(tr("Close"), this);
@@ -144,39 +143,21 @@ void CompareOtbDialog::performComparison()
     }
 
     QString results = formatComparisonResults(list1, QFileInfo(path1).fileName(), list2, QFileInfo(path2).fileName());
-    resultsTextEdit->setHtml(results); // Use setHtml for rich text formatting
+    resultsTextEdit->setHtml(results);
 }
 
-// Stub for formatting results, will be complex.
 QString CompareOtbDialog::formatComparisonResults(
     const OTB::ServerItemList& list1, const QString& list1Name,
     const OTB::ServerItemList& list2, const QString& list2Name)
 {
-    // This is a placeholder. A detailed comparison is complex.
-    // It needs to:
-    // 1. Map items by Server ID from both lists.
-    // 2. Iterate and find items only in list1, only in list2.
-    // 3. For common items, compare each property using ServerItem::equals or field-by-field.
-    //    The ServerItem::equals method needs to be robust.
-    // For now, a very basic comparison:
     QString htmlResult = "<h1>OTB Comparison Results</h1>";
     htmlResult += QString("<h2>Comparing: <font color='blue'>%1</font> vs <font color='green'>%2</font></h2>").arg(list1Name, list2Name);
 
-    htmlResult += QString("<p><b>%1 items in %3:</b> %4</p>").arg(list1Name).arg(list1.items.count()).arg(list1Name).arg(list1.items.count());
-    htmlResult += QString("<p><b>%1 items in %3:</b> %4</p>").arg(list2Name).arg(list2.items.count()).arg(list2Name).arg(list2.items.count());
-
-    if (list1.items.count() != list2.items.count()) {
-         htmlResult += "<p><font color='red'>Item counts differ.</font></p>";
-    } else {
-         htmlResult += "<p>Item counts are the same.</p>";
-    }
-
-    // Simple version info comparison
     htmlResult += "<h3>Version Info:</h3>";
-    htmlResult += "<table border='1' cellspacing='0' cellpadding='3'>";
+    htmlResult += "<table border='1' cellspacing='0' cellpadding='3' width='100%'>";
     htmlResult += "<tr><th>Property</th><th>" + list1Name + "</th><th>" + list2Name + "</th></tr>";
     auto addRow = [&](const QString& prop, const QString& val1, const QString& val2) {
-        htmlResult += "<tr><td>" + prop + "</td>";
+        htmlResult += "<tr><td><b>" + prop + "</b></td>";
         if (val1 == val2) {
             htmlResult += "<td>" + val1 + "</td><td>" + val2 + "</td>";
         } else {
@@ -185,13 +166,84 @@ QString CompareOtbDialog::formatComparisonResults(
         htmlResult += "</tr>";
     };
     addRow("OTB Major Version", QString::number(list1.majorVersion), QString::number(list2.majorVersion));
-    addRow("OTB Minor Version (Client Target)", QString::number(list1.minorVersion), QString::number(list2.minorVersion));
+    addRow("OTB Minor Version", QString::number(list1.minorVersion), QString::number(list2.minorVersion));
     addRow("OTB Build Number", QString::number(list1.buildNumber), QString::number(list2.buildNumber));
-    addRow("OTB Description", list1.description, list2.description);
     addRow("Internal Client Version", QString::number(list1.clientVersion), QString::number(list2.clientVersion));
+    addRow("Description", list1.description, list2.description);
     htmlResult += "</table>";
 
-    htmlResult += "<p><i>Detailed item-by-item comparison not yet implemented.</i></p>";
+    htmlResult += "<h3>Item Differences:</h3>";
+
+    QMap<quint16, const OTB::ServerItem*> map1, map2;
+    for (const auto& item : list1.items) map1.insert(item.id, &item);
+    for (const auto& item : list2.items) map2.insert(item.id, &item);
+
+    QList<quint16> allKeys = QSet<quint16>::fromList(map1.keys()).unite(QSet<quint16>::fromList(map2.keys())).values();
+    std::sort(allKeys.begin(), allKeys.end());
+
+    QString diffs;
+    for (quint16 id : allKeys) {
+        const OTB::ServerItem* item1 = map1.value(id, nullptr);
+        const OTB::ServerItem* item2 = map2.value(id, nullptr);
+        QString itemDiff;
+
+        if (item1 && !item2) {
+            itemDiff = QString("<tr><td>%1</td><td><font color='blue'>Present</font></td><td><font color='red'>Missing</font></td><td>-</td></tr>")
+                       .arg(id);
+        } else if (!item1 && item2) {
+            itemDiff = QString("<tr><td>%1</td><td><font color='red'>Missing</font></td><td><font color='green'>Present</font></td><td>-</td></tr>")
+                       .arg(id);
+        } else if (item1 && item2) {
+            // Compare items field by field
+            OTB::ServerItem mutableItem1 = *item1;
+            OTB::ServerItem mutableItem2 = *item2;
+            mutableItem1.updatePropertiesFromFlags(); // Ensure booleans are synced
+            mutableItem2.updatePropertiesFromFlags();
+
+            QString differences;
+            auto check = [&](const QString& prop, const auto& val1, const auto& val2) {
+                if (val1 != val2) {
+                    differences += QString("<li><b>%1:</b> '%2' vs '%3'</li>").arg(prop, QString::number(val1), QString::number(val2));
+                }
+            };
+             auto checkStr = [&](const QString& prop, const QString& val1, const QString& val2) {
+                if (val1 != val2) {
+                    differences += QString("<li><b>%1:</b> \"%2\" vs \"%3\"</li>").arg(prop, val1, val2);
+                }
+            };
+            auto checkHex = [&](const QString& prop, const QByteArray& val1, const QByteArray& val2) {
+                if (val1 != val2) {
+                    differences += QString("<li><b>%1:</b> %2 vs %3</li>").arg(prop, QString(val1.toHex()), QString(val2.toHex()));
+                }
+            };
+
+            checkStr("Name", mutableItem1.name, mutableItem2.name);
+            check("Client ID", mutableItem1.clientId, mutableItem2.clientId);
+            check("Type", static_cast<int>(mutableItem1.type), static_cast<int>(mutableItem2.type));
+            check("Ground Speed", mutableItem1.groundSpeed, mutableItem2.groundSpeed);
+            check("Minimap Color", mutableItem1.minimapColor, mutableItem2.minimapColor);
+            check("Light Level", mutableItem1.lightLevel, mutableItem2.lightLevel);
+            check("Light Color", mutableItem1.lightColor, mutableItem2.lightColor);
+            check("Trade As", mutableItem1.tradeAs, mutableItem2.tradeAs);
+            check("Flags", mutableItem1.flags, mutableItem2.flags);
+            checkHex("Sprite Hash", mutableItem1.spriteHash, mutableItem2.spriteHash);
+
+            if (!differences.isEmpty()) {
+                itemDiff = QString("<tr><td>%1</td><td>Same</td><td>Same</td><td><ul>%2</ul></td></tr>")
+                           .arg(id, differences);
+            }
+        }
+        diffs += itemDiff;
+    }
+
+    if (diffs.isEmpty()) {
+        htmlResult += "<p>No differences found in items present in both files.</p>";
+    } else {
+        htmlResult += "<table border='1' cellspacing='0' cellpadding='3' width='100%'>";
+        htmlResult += "<tr><th>Server ID</th><th>In " + list1Name + "</th><th>In " + list2Name + "</th><th>Details</th></tr>";
+        htmlResult += diffs;
+        htmlResult += "</table>";
+    }
 
     return htmlResult;
 }

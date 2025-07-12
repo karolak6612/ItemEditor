@@ -1,20 +1,49 @@
 #include "imagesimilarity.h"
 #include <QDebug>
-#include <cmath> // For std::log10, std::pow, std::sqrt
-#include <algorithm> // For std::max_element if needed
+#include <cmath>
+#include <algorithm>
+#include <QtMath> // For qCos, qSin, M_PI
 
 namespace TibiaData {
 namespace ImageSimilarity {
 
 // --- Complex struct methods if any non-inline ---
-// (Currently all are inline in header)
+// (All are inline in header)
 
 
 // --- Fourier namespace ---
 namespace Fourier {
 
+// Recursive 1D FFT implementation based on Cooley-Tukey algorithm, ported from C# Fourier.cs
+QVector<Complex> FFT(const QVector<Complex>& x)
+{
+    int N = x.size();
+    if (N <= 1) {
+        return x;
+    }
+
+    // Recurse on even and odd parts
+    QVector<Complex> even(N / 2);
+    QVector<Complex> odd(N / 2);
+    for (int i = 0; i < N / 2; ++i) {
+        even[i] = x[i * 2];
+        odd[i] = x[i * 2 + 1];
+    }
+    QVector<Complex> q = FFT(even);
+    QVector<Complex> r = FFT(odd);
+
+    // Combine
+    QVector<Complex> y(N);
+    for (int k = 0; k < N / 2; ++k) {
+        double kth = -2 * k * M_PI / N;
+        Complex wk(qCos(kth), qSin(kth));
+        y[k] = q[k] + wk * r[k];
+        y[k + N / 2] = q[k] - wk * r[k];
+    }
+    return y;
+}
+
 // Helper to convert QImage to a 2D QVector of doubles (grayscale intensity)
-// This is a simplified grayscale conversion. C# might use specific weights.
 QVector<QVector<double>> ImageToGrayscaleDoubles(const QImage& image) {
     QVector<QVector<double>> result(image.height(), QVector<double>(image.width()));
     if (image.isNull()) return result;
@@ -29,25 +58,53 @@ QVector<QVector<double>> ImageToGrayscaleDoubles(const QImage& image) {
     return result;
 }
 
-// Placeholder for 2D FFT on a single channel (grayscale)
+// 2D FFT on a single channel (grayscale)
 QVector<QVector<Complex>> FFT2D(const QVector<QVector<double>>& input, bool shift) {
-    Q_UNUSED(shift);
-    // STUB: Actual FFT2D algorithm is complex and needs to be ported.
-    // For now, return a dummy complex array based on input size.
-    QVector<QVector<Complex>> dummyResult;
-    if (input.isEmpty() || input[0].isEmpty()) return dummyResult;
-
     int height = input.size();
+    if (height == 0) return {};
     int width = input[0].size();
-    dummyResult.resize(height);
-    for (int i = 0; i < height; ++i) {
-        dummyResult[i].resize(width);
-        for (int j = 0; j < width; ++j) {
-            dummyResult[i][j] = Complex(input[i][j], 0.0); // Just copy real part for now
+    if (width == 0) return {};
+
+    QVector<QVector<Complex>> output(height, QVector<Complex>(width));
+
+    // FFT on rows
+    for (int y = 0; y < height; ++y) {
+        QVector<Complex> row(width);
+        for (int x = 0; x < width; ++x) {
+            row[x] = Complex(input[y][x], 0);
+        }
+        output[y] = FFT(row);
+    }
+
+    // FFT on columns
+    for (int x = 0; x < width; ++x) {
+        QVector<Complex> col(height);
+        for (int y = 0; y < height; ++y) {
+            col[y] = output[y][x];
+        }
+        QVector<Complex> fftCol = FFT(col);
+        for (int y = 0; y < height; ++y) {
+            output[y][x] = fftCol[y];
         }
     }
-    qWarning() << "Fourier::FFT2D is a STUB and does not perform actual FFT.";
-    return dummyResult;
+
+    if (shift) {
+        // Perform FFT shift (swap quadrants)
+        QVector<QVector<Complex>> shiftedOutput(height, QVector<Complex>(width));
+        int h2 = height / 2;
+        int w2 = width / 2;
+        for(int y=0; y<h2; ++y) {
+            for(int x=0; x<w2; ++x) {
+                shiftedOutput[y][x] = output[y+h2][x+w2];
+                shiftedOutput[y+h2][x+w2] = output[y][x];
+                shiftedOutput[y][x+w2] = output[y+h2][x];
+                shiftedOutput[y+h2][x] = output[y][x+w2];
+            }
+        }
+        return shiftedOutput;
+    }
+
+    return output;
 }
 
 QVector<QVector<double>> GetMagnitudeSpectrum(const QVector<QVector<Complex>>& fftResult) {
@@ -60,8 +117,6 @@ QVector<QVector<double>> GetMagnitudeSpectrum(const QVector<QVector<Complex>>& f
     for (int y = 0; y < height; ++y) {
         magnitude[y].resize(width);
         for (int x = 0; x < width; ++x) {
-            // Standard magnitude: sqrt(real^2 + imag^2)
-            // Often displayed on a log scale: log(1 + magnitude)
             magnitude[y][x] = std::log10(1.0 + fftResult[y][x].magnitude());
         }
     }
@@ -69,32 +124,55 @@ QVector<QVector<double>> GetMagnitudeSpectrum(const QVector<QVector<Complex>>& f
 }
 
 
-// Placeholder for 2D FFT on RGB channels separately, returning an image of magnitudes
 QImage FFT2D_RGB(const QImage& inputImage, bool shift) {
-    Q_UNUSED(shift);
-    // STUB: This should perform FFT on R, G, B channels, get magnitudes, and reconstruct an image.
-    // For now, return a modified copy of the input.
     if (inputImage.isNull()) return QImage();
 
-    QImage resultImage = inputImage.convertToFormat(QImage::Format_RGB888); // Ensure it's RGB
+    int width = inputImage.width();
+    int height = inputImage.height();
+    QImage image = inputImage.convertToFormat(QImage::Format_RGB32);
 
-    // Dummy operation: Invert colors as a placeholder for FFT processing visual change
-    // for (int y = 0; y < resultImage.height(); ++y) {
-    //     QRgb *line = reinterpret_cast<QRgb*>(resultImage.scanLine(y));
-    //     for (int x = 0; x < resultImage.width(); ++x) {
-    //         line[x] = qRgb(255 - qRed(line[x]), 255 - qGreen(line[x]), 255 - qBlue(line[x]));
-    //     }
-    // }
-    // More accurate stub: create a grayscale magnitude-like image
-    QImage gray = inputImage.convertToFormat(QImage::Format_Grayscale8);
-    QVector<QRgb> colorTable(256);
-    for(int i=0; i<256; ++i) colorTable[i] = qRgb(i,i,i);
-    resultImage = gray.convertToFormat(QImage::Format_RGB32);
-    resultImage.setColorTable(colorTable);
+    QVector<QVector<double>> r(height, QVector<double>(width));
+    QVector<QVector<double>> g(height, QVector<double>(width));
+    QVector<QVector<double>> b(height, QVector<double>(width));
 
+    for (int y = 0; y < height; ++y) {
+        const QRgb* line = reinterpret_cast<const QRgb*>(image.constScanLine(y));
+        for (int x = 0; x < width; ++x) {
+            r[y][x] = qRed(line[x]);
+            g[y][x] = qGreen(line[x]);
+            b[y][x] = qBlue(line[x]);
+        }
+    }
 
-    qWarning() << "Fourier::FFT2D_RGB is a STUB and does not perform actual FFT processing.";
-    return resultImage.copy(); // Return a copy
+    QVector<QVector<Complex>> fft_r = FFT2D(r, shift);
+    QVector<QVector<Complex>> fft_g = FFT2D(g, shift);
+    QVector<QVector<Complex>> fft_b = FFT2D(b, shift);
+
+    QImage resultImage(width, height, QImage::Format_RGB32);
+    double max_r = 0, max_g = 0, max_b = 0;
+
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            double mag_r = fft_r[y][x].magnitude();
+            double mag_g = fft_g[y][x].magnitude();
+            double mag_b = fft_b[y][x].magnitude();
+            if (mag_r > max_r) max_r = mag_r;
+            if (mag_g > max_g) max_g = mag_g;
+            if (mag_b > max_b) max_b = mag_b;
+        }
+    }
+
+    for (int y = 0; y < height; ++y) {
+        QRgb* line = reinterpret_cast<QRgb*>(resultImage.scanLine(y));
+        for (int x = 0; x < width; ++x) {
+            int r_val = (max_r > 0) ? static_cast<int>(255.0 * (fft_r[y][x].magnitude() / max_r)) : 0;
+            int g_val = (max_g > 0) ? static_cast<int>(255.0 * (fft_g[y][x].magnitude() / max_g)) : 0;
+            int b_val = (max_b > 0) ? static_cast<int>(255.0 * (fft_b[y][x].magnitude() / max_b)) : 0;
+            line[x] = qRgb(r_val, g_val, b_val);
+        }
+    }
+
+    return resultImage;
 }
 
 
@@ -104,11 +182,7 @@ QImage FFT2D_RGB(const QImage& inputImage, bool shift) {
 // --- ImageUtils namespace ---
 namespace Utils {
 
-// Placeholder for CalculateEuclideanDistanceSignature
 QVariantMap CalculateEuclideanDistanceSignature(const QImage& fftMagnitudeImage, int regions) {
-    // STUB: This should divide fftMagnitudeImage into (regions x regions) blocks,
-    // calculate average intensity for each, and return as a 2D structure.
-    // C# `ImageUtils.CalculateEuclideanDistance` is the reference.
     QVariantMap signature;
     if (fftMagnitudeImage.isNull() || regions <= 0) return signature;
 
@@ -120,63 +194,52 @@ QVariantMap CalculateEuclideanDistanceSignature(const QImage& fftMagnitudeImage,
         return signature;
     }
 
+    QImage grayImage = fftMagnitudeImage.convertToFormat(QImage::Format_Grayscale8);
+
     for (int r = 0; r < regions; ++r) {
         QVariantMap rowMap;
         for (int c = 0; c < regions; ++c) {
-            // Dummy value: average of a few pixels or just coordinates
-            // A real implementation would average pixels in rect (c*blockWidth, r*blockHeight, blockWidth, blockHeight)
-            double avgIntensity = static_cast<double>((r * regions + c) * 10) / (regions*regions*10.0); // Dummy
-            if (!fftMagnitudeImage.isNull() && blockWidth > 0 && blockHeight > 0) {
-                 // Calculate actual average for the block
-                double sum = 0;
-                int count = 0;
-                for(int y = r * blockHeight; y < (r+1) * blockHeight && y < fftMagnitudeImage.height(); ++y) {
-                    for(int x = c * blockWidth; x < (c+1) * blockWidth && x < fftMagnitudeImage.width(); ++x) {
-                        sum += qGray(fftMagnitudeImage.pixel(x,y)); // Assuming fftMagnitudeImage is grayscale or effectively
-                        count++;
-                    }
+            double sum = 0;
+            int count = 0;
+            int startX = c * blockWidth;
+            int startY = r * blockHeight;
+
+            for (int y = startY; y < startY + blockHeight; ++y) {
+                if(y >= grayImage.height()) continue;
+                const uchar* line = grayImage.constScanLine(y);
+                for (int x = startX; x < startX + blockWidth; ++x) {
+                     if(x >= grayImage.width()) continue;
+                    sum += line[x];
+                    count++;
                 }
-                if (count > 0) avgIntensity = sum / count;
             }
+            double avgIntensity = (count > 0) ? (sum / count) : 0.0;
             rowMap.insert(QString("col_%1").arg(c), avgIntensity);
         }
         signature.insert(QString("row_%1").arg(r), rowMap);
     }
-
-    qWarning() << "ImageUtils::CalculateEuclideanDistanceSignature is a STUB (using simplified block average).";
     return signature;
 }
 
-// Placeholder for CompareSignatures
 double CompareSignatures(const QVariantMap& sig1, const QVariantMap& sig2) {
-    // STUB: This should calculate the Euclidean distance between two signatures.
-    // Assumes sig1 and sig2 have the same structure (e.g., "row_X" -> QVariantMap of "col_Y" -> double).
     double sumOfSquares = 0.0;
-    int N = 0; // Number of elements
+    int N = 0;
 
-    if (sig1.keys().isEmpty() || sig2.keys().isEmpty() || sig1.keys().size() != sig2.keys().size()) {
-        qWarning() << "ImageUtils::CompareSignatures: Signatures are empty or have different row counts.";
-        return 1.0e6; // Return a large distance indicating no match
+    if (sig1.keys().size() != sig2.keys().size() || sig1.keys().isEmpty()) {
+        return 1.0e6;
     }
 
     for (const QString& rowKey : sig1.keys()) {
-        if (!sig2.contains(rowKey)) {
-            qWarning() << "ImageUtils::CompareSignatures: Signature 2 missing row" << rowKey;
-            return 1.0e6;
-        }
+        if (!sig2.contains(rowKey)) return 1.0e6;
+
         QVariantMap row1 = sig1.value(rowKey).toMap();
         QVariantMap row2 = sig2.value(rowKey).toMap();
 
-        if (row1.keys().isEmpty() || row2.keys().isEmpty() || row1.keys().size() != row2.keys().size()) {
-            qWarning() << "ImageUtils::CompareSignatures: Signatures have different col counts for row" << rowKey;
-            return 1.0e6;
-        }
+        if (row1.keys().size() != row2.keys().size() || row1.keys().isEmpty()) return 1.0e6;
 
         for (const QString& colKey : row1.keys()) {
-            if (!row2.contains(colKey)) {
-                 qWarning() << "ImageUtils::CompareSignatures: Signature 2 missing col" << colKey << "in row" << rowKey;
-                return 1.0e6;
-            }
+            if (!row2.contains(colKey)) return 1.0e6;
+
             double val1 = row1.value(colKey).toDouble();
             double val2 = row2.value(colKey).toDouble();
             sumOfSquares += std::pow(val1 - val2, 2.0);
@@ -184,9 +247,8 @@ double CompareSignatures(const QVariantMap& sig1, const QVariantMap& sig2) {
         }
     }
 
-    if (N == 0) return 1.0e6; // No elements to compare
+    if (N == 0) return 1.0e6;
 
-    qWarning() << "ImageUtils::CompareSignatures is a STUB (using simplified Euclidean distance).";
     return std::sqrt(sumOfSquares);
 }
 

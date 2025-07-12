@@ -15,7 +15,8 @@ class SprParser
 public:
     SprParser();
 
-    bool loadSpr(const QString& filePath, QString& errorString);
+    // The isExtended flag determines if sprite count is read as UInt16 or UInt32
+    bool loadSpr(const QString& filePath, bool isExtended, QString& errorString);
 
     // Gets a single sprite by its ID (1-based index from SPR file)
     // Populates the passed OTB::Sprite object.
