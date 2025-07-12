@@ -5,7 +5,9 @@
 #include <QString>
 #include <QList>
 #include <QMap>
-#include <QObject> // For Q_DECLARE_INTERFACE
+#include <QObject> // For Q_DECLARE_INTERFACE, QPluginLoader parent
+#include <QPluginLoader> // For dynamic plugin loading
+#include <QDir>        // For scanning plugin directory
 
 namespace OTB {
     class ServerItemList; // Forward declaration
@@ -70,8 +72,10 @@ public:
     IPlugin* findPluginForClientVersion(quint32 clientVersion); // Helper
 
 private:
-    QList<IPlugin*> m_plugins;
-    // QList<QPluginLoader*> m_pluginLoaders; // For dynamic plugins
+    QList<IPlugin*> m_staticPlugins; // For plugins compiled in or manually registered
+    QList<QPluginLoader*> m_pluginLoaders; // For dynamically loaded plugins
+    QList<IPlugin*> m_loadedPluginsCache; // Combined list, rebuild when needed
+    void rebuildLoadedPluginsCache();
 };
 
 

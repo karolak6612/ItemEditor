@@ -20,22 +20,28 @@ target_include_directories(ItemEditorQt PUBLIC
     $<TARGET_PROPERTY:Qt::Widgets,INTERFACE_INCLUDE_DIRECTORIES>
 )
 
-# Add source files
+# Add source files, including the resource file
 add_executable(ItemEditorQt
+    resources.qrc # Added QRC file
     main.cpp
     otb/binarytree.cpp
     otb/otbreader.cpp
     otb/otbwriter.cpp
-    otb/otbtypes.cpp      # Add otbtypes.cpp
+    otb/otbtypes.cpp
     otb/item.cpp
     mainwindow.cpp
     dialogs/aboutdialog.cpp
     dialogs/spritecandidatesdialog.cpp
     dialogs/finditemdialog.cpp
-    dialogs/preferencesdialog.cpp  # Add PreferencesDialog
+    dialogs/preferencesdialog.cpp
+    dialogs/updateotbdialog.cpp    # Add UpdateOtbDialog
     plugins/iplugin.cpp
     plugins/dummyplugin.cpp
+    plugins/realplugin770.cpp
     widgets/clientitemview.cpp
+    tibiadata/sprparser.cpp
+    tibiadata/datparser.cpp
+    tibiadata/imagesimilarity.cpp # Added ImageSimilarity
 )
 
 # Add include directories for subfolders
@@ -44,7 +50,8 @@ target_include_directories(ItemEditorQt PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/otb
     ${CMAKE_CURRENT_SOURCE_DIR}/dialogs
     ${CMAKE_CURRENT_SOURCE_DIR}/plugins
-    ${CMAKE_CURRENT_SOURCE_DIR}/widgets # Add widgets include path
+    ${CMAKE_CURRENT_SOURCE_DIR}/widgets
+    ${CMAKE_CURRENT_SOURCE_DIR}/tibiadata
 )
 
 
