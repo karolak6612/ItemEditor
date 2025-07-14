@@ -97,6 +97,7 @@ private slots:
     // File menu actions - exact mirror of C# MainForm menu handlers
     void onFileNew();
     void onFileOpen();
+    void onFileOpenSprites();
     void onFileSave();
     void onFileSaveAs();
     void onFileCompareOtb();
@@ -157,6 +158,7 @@ private:
     bool saveOtbFile(const QString& filePath);
     bool saveOtbFileAs();
     void newOtbFile();
+    bool openSpriteFile(const QString& filePath);
     
     // Sprite operations - sprite file management
     bool openSpriteFile(const QString& filePath);
@@ -201,6 +203,9 @@ private:
     bool validatePluginIntegration();
     bool validateUIControls();
     bool validateDataBinding();
+
+    // Search methods
+    OTLib::Collections::ServerItemList* findItems(const QVariantMap& searchParameters);
     
     // Helper methods for enhanced updateItemProperties()
     void clearItemProperties();
@@ -267,6 +272,7 @@ private:
     QMenu* m_fileMenu;
     QAction* m_newAction;
     QAction* m_openAction;
+    QAction* m_openSpriteAction;
     QAction* m_saveAction;
     QAction* m_saveAsAction;
     QAction* m_compareOtbAction;

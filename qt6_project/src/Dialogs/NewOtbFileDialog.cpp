@@ -1,22 +1,82 @@
+/**
+ * Item Editor Qt6 - New OTB File Dialog Implementation
+ * Exact mirror of Legacy_App/csharp/Source/Dialogs/NewOtbFileForm.cs
+ *
+ * Copyright © 2014-2019 OTTools <https://github.com/ottools/ItemEditor/>
+ * Licensed under MIT License
+ */
+
 #include "NewOtbFileDialog.h"
 #include "ui_NewOtbFileDialog.h"
-#include <QTemporaryDir>
-#include "../Host/PluginCollection.h"
-#include "../Host/Plugin.h"
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QStandardPaths>
+#include <QTemporaryFile>
+#include <QDir>
+#include <algorithm>
 
-extern PluginCollection g_plugins;
+namespace ItemEditor {
 
-NewOtbFileDialog::NewOtbFileDialog(QWidget *parent) :
+NewOtbFileDialog::NewOtbFileDialog(PluginServices* pluginServices, QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::NewOtbFileDialog)
+    ui(new Ui::NewOtbFileDialog),
+    m_pluginServices(pluginServices)
 {
     ui->setupUi(this);
-    loadPlugins();
+    setupUi();
+    populateClientVersions();
 }
 
 NewOtbFileDialog::~NewOtbFileDialog()
 {
     delete ui;
+}
+
+void NewOtbFileDialog::setupUi()
+{
+    setWindowTitle("New OTB");
+    setFixedSize(181, 78);
+
+    QVBoxLayout* mainLayout = new QVBoxLayout(this);
+    m_clientVersionComboBox = new QComboBox(this);
+    mainLayout->addWidget(m_clientVersionComboBox);
+
+    QHBoxLayout* buttonLayout = new QHBoxLayout();
+    m_createButton = new QPushButton("Create", this);
+    m_cancelButton = new QPushButton("Cancel", this);
+    buttonLayout->addWidget(m_createButton);
+    buttonLayout->addWidget(m_cancelButton);
+    mainLayout->addLayout(buttonLayout);
+
+    connect(m_createButton, &QPushButton::clicked, this, &NewOtbFileDialog::onCreateClicked);
+    connect(m_cancelButton, &QPushButton::clicked, this, &NewOtbFileDialog::onCancelClicked);
+    connect(m_clientVersionComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &NewOtbFileDialog::onClientVersionChanged);
+}
+
+void NewOtbFileDialog::populateClientVersions()
+{
+    QList<SupportedClient> clientList;
+    if (m_pluginServices) {
+        for (Plugin* plugin : *m_pluginServices->availablePlugins()) {
+            if (plugin && plugin->instance()) {
+                for (const SupportedClient& client : plugin->instance()->supportedClients()) {
+                    clientList.append(client);
+                }
+            }
+        }
+    }
+
+    if (!clientList.isEmpty()) {
+        std::sort(clientList.begin(), clientList.end(), [](const SupportedClient& a, const SupportedClient& b) {
+            return a.getOtbVersion() < b.getOtbVersion();
+        });
+
+        for (const SupportedClient& client : clientList) {
+            m_clientVersionComboBox->addItem(client.getDescription(), QVariant::fromValue(client));
+        }
+        m_clientVersionComboBox->setCurrentIndex(clientList.size() - 1);
+    }
+    onClientVersionChanged(m_clientVersionComboBox->currentIndex());
 }
 
 QString NewOtbFileDialog::getFilePath() const
@@ -29,51 +89,28 @@ SupportedClient NewOtbFileDialog::getSelectedClient() const
     return m_selectedClient;
 }
 
-void NewOtbFileDialog::on_clientVersionComboBox_currentIndexChanged(int index)
+void NewOtbFileDialog::onCreateClicked()
 {
-    ui->createButton->setEnabled(!m_filePath.isEmpty() && ui->clientVersionComboBox->currentIndex() != -1);
-}
-
-void NewOtbFileDialog::on_createButton_clicked()
-{
-    if (ui->clientVersionComboBox->currentIndex() != -1)
-    {
-        m_selectedClient = ui->clientVersionComboBox->currentData().value<SupportedClient>();
-        QTemporaryDir dir;
-        if (dir.isValid()) {
-            m_filePath = dir.path() + "/new.otb";
+    if (m_clientVersionComboBox->currentIndex() != -1) {
+        m_selectedClient = m_clientVersionComboBox->currentData().value<SupportedClient>();
+        QTemporaryFile tempFile;
+        if (tempFile.open()) {
+            m_filePath = tempFile.fileName();
+        } else {
+            m_filePath = QDir::temp().filePath("new.otb");
         }
-        setResult(QDialog::Accepted);
-        close();
+        accept();
     }
 }
 
-void NewOtbFileDialog::on_cancelButton_clicked()
+void NewOtbFileDialog::onCancelClicked()
 {
-    close();
+    reject();
 }
 
-void NewOtbFileDialog::loadPlugins()
+void NewOtbFileDialog::onClientVersionChanged(int index)
 {
-    QList<SupportedClient> list;
-
-    for (const auto& plugin : g_plugins.getAvailablePlugins())
-    {
-        for (const auto& client : plugin->getInstance()->supportedClients())
-        {
-            list.append(client);
-        }
-    }
-
-    if (!list.isEmpty())
-    {
-        std::sort(list.begin(), list.end(), [](const SupportedClient &a, const SupportedClient &b) {
-            return a.otbVersion < b.otbVersion;
-        });
-
-        for (const auto& client : list) {
-            ui->clientVersionComboBox->addItem(client.clientVersion, QVariant::fromValue(client));
-        }
-        ui->clientVersionComboBox->setCurrentIndex(list.count() - 1);
-    }
+    m_createButton->setEnabled(index != -1);
 }
+
+} // namespace ItemEditor

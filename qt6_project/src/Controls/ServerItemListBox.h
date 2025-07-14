@@ -85,6 +85,7 @@ public:
 
     // Methods - exact mirror of C# methods
     void add(const QList<ItemEditor::ServerItem*>& itemList);
+    void addItems(const QList<ItemEditor::ServerItem*>& itemList);
     
     // Convenience methods for plugin integration
     void addItem(quint16 itemId, const QString& name);
@@ -95,6 +96,16 @@ public:
     void optimizeMemoryUsage();
     void setCacheLimit(int maxItems);
     MemoryStats getCacheStats() const;
+
+    // Filtering
+    void setShowOnlyMismatchedItems(bool show);
+
+    // ID Display
+    enum IdDisplayFormat {
+        Decimal,
+        Hexadecimal
+    };
+    void setIdDisplayFormat(IdDisplayFormat format);
 
 public slots:
     void performDeferredUpdate();

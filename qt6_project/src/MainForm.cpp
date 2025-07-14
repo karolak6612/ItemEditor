@@ -270,6 +270,10 @@ void MainForm::setupMenuBar()
     m_openAction->setShortcut(QKeySequence::Open);
     m_openAction->setStatusTip(tr("Open an existing OTB file"));
     connect(m_openAction, &QAction::triggered, this, &MainForm::onFileOpen);
+
+    m_openSpriteAction = m_fileMenu->addAction(tr("Open &Sprites..."));
+    m_openSpriteAction->setStatusTip(tr("Open a sprite file"));
+    connect(m_openSpriteAction, &QAction::triggered, this, &MainForm::onFileOpenSprites);
     
     m_fileMenu->addSeparator();
     
@@ -587,6 +591,22 @@ void MainForm::setupFlagsGroup()
     }
 }
 
+void MainForm::onFileOpenSprites()
+{
+    QString fileName = QFileDialog::getOpenFileName(
+        this,
+        tr("Open Sprite File"),
+        m_settings->value("LastSpriteDirectory", QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)).toString(),
+        tr("Sprite Files (*.spr);;All Files (*)")
+    );
+
+    if (!fileName.isEmpty()) {
+        QFileInfo fileInfo(fileName);
+        m_settings->setValue("LastSpriteDirectory", fileInfo.absolutePath());
+        openSpriteFile(fileName);
+    }
+}
+
 void MainForm::setupAttributesGroup()
 {
     // Item Attributes GroupBox
@@ -596,7 +616,25 @@ void MainForm::setupAttributesGroup()
     m_attributesLayout = new QGridLayout(m_attributesGroupBox);
     m_attributesLayout->setContentsMargins(5, 5, 5, 5);
     
-    // Attributes will be populated dynamically based on item type
+    int row = 0;
+
+    auto addAttribute = [&](const QString& label) {
+        QLabel* newLabel = new QLabel(label, m_attributesGroupBox);
+        QSpinBox* newSpinBox = new QSpinBox(m_attributesGroupBox);
+        m_attributesLayout->addWidget(newLabel, row, 0);
+        m_attributesLayout->addWidget(newSpinBox, row, 1);
+        connect(newSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &MainForm::onItemPropertyChanged);
+        row++;
+        return newSpinBox;
+    };
+
+    addAttribute("Ground Speed:");
+    addAttribute("Light Level:");
+    addAttribute("Light Color:");
+    addAttribute("Max Read Chars:");
+    addAttribute("Max Read/Write Chars:");
+    addAttribute("Minimap Color:");
+    addAttribute("Trade As:");
 }
 
 void MainForm::setupConnections()
@@ -696,7 +734,13 @@ void MainForm::onFileOpen()
     QString fileName = getOpenFileName();
     if (!fileName.isEmpty()) {
         if (confirmUnsavedChanges()) {
-            openOtbFile(fileName);
+            if (openOtbFile(fileName)) {
+                QFileInfo otbInfo(fileName);
+                QString sprPath = otbInfo.absolutePath() + "/" + otbInfo.baseName() + ".spr";
+                if (QFile::exists(sprPath)) {
+                    openSpriteFile(sprPath);
+                }
+            }
         }
     }
 }
@@ -831,37 +875,23 @@ void MainForm::onHelpAbout()
 // Item selection and editing slot implementations
 void MainForm::onServerItemSelectionChanged()
 {
-    logDiagnosticInfo("ITEM_SELECTION", "Server item selection changed event triggered");
-    
     if (m_serverItemListBox) {
-        // Get selected item ID from ServerItemListBox
-        auto selectedIndices = m_serverItemListBox->selectedIndices();
-        logDiagnosticInfo("ITEM_SELECTION", QString("Selected indices count: %1").arg(selectedIndices.size()));
-        
+        QList<int> selectedIndices = m_serverItemListBox->selectedIndices();
         if (!selectedIndices.isEmpty()) {
-            int selectedIndex = *selectedIndices.begin();
-            // Convert index to item ID - implementation will be enhanced when ServerItem class provides ID access
-            quint16 selectedId = static_cast<quint16>(selectedIndex + 1); // Placeholder conversion
-            logDiagnosticInfo("ITEM_SELECTION", QString("Selected index: %1, converted to ID: %2").arg(selectedIndex).arg(selectedId));
-            
-            if (selectedId != m_selectedServerId) {
-                m_selectedServerId = selectedId;
-                logDiagnosticInfo("ITEM_SELECTION", QString("New selection: Server ID %1").arg(selectedId));
-                updateItemProperties();
-                updateItemDisplay();
-            } else {
-                logDiagnosticInfo("ITEM_SELECTION", "Selection unchanged - same item already selected");
+            int selectedIndex = selectedIndices.first();
+            const auto& items = m_serverItemListBox->items();
+            if (selectedIndex >= 0 && selectedIndex < items.size()) {
+                auto* serverItem = items[selectedIndex];
+                if (serverItem) {
+                    m_selectedServerId = serverItem->id();
+                    updateItemProperties();
+                    updateItemDisplay();
+                }
             }
-        } else {
-            logDiagnosticInfo("ITEM_SELECTION", "No item selected - clearing selection");
-            m_selectedServerId = 0;
-            updateItemProperties();
-            updateItemDisplay();
         }
-    } else {
-        logDiagnosticInfo("ITEM_SELECTION", "ERROR: ServerItemListBox is null");
     }
 }
+
 
 void MainForm::onItemPropertyChanged()
 {
@@ -948,73 +978,17 @@ void MainForm::onErrorOccurred(const QString& error)
 // UI update slot implementations
 void MainForm::updateItemDisplay()
 {
-    logDiagnosticInfo("SPRITE_DISPLAY", QString("Updating item display for Server ID: %1").arg(m_selectedServerId));
-    
-    if (!m_clientItemView) {
-        logDiagnosticInfo("SPRITE_DISPLAY", "ERROR: ClientItemView is null");
-        return;
-    }
-    
     if (m_selectedServerId == 0) {
-        logDiagnosticInfo("SPRITE_DISPLAY", "Clearing sprite display - no item selected");
         m_clientItemView->setClientItem(nullptr);
         return;
     }
-    
-    try {
-        // Get ServerItem to find client ID
-        OTLib::Server::Items::ServerItem* serverItem = nullptr;
-        if (m_serverItemList && m_serverItemList->tryGetValue(m_selectedServerId, serverItem)) {
-            logDiagnosticInfo("SPRITE_DISPLAY", QString("Found ServerItem for ID %1, client ID: %2").arg(m_selectedServerId).arg(serverItem->clientId()));
-            
-            // Get ClientItem from plugin for sprite display
-            if (m_currentPlugin && m_currentPlugin->loaded()) {
-                ItemEditor::ClientItem* clientItem = m_currentPlugin->getClientItem(serverItem->clientId());
-                if (clientItem) {
-                    // Validate sprite data before setting
-                    if (!clientItem->spriteList().isEmpty()) {
-                        // Force bitmap generation if needed
-                        QPixmap bitmap = clientItem->getBitmap();
-                        if (!bitmap.isNull()) {
-                            logDiagnosticInfo("SPRITE_DISPLAY", QString("SUCCESS: Setting ClientItem with valid bitmap (%1x%2)").arg(bitmap.width()).arg(bitmap.height()));
-                            m_clientItemView->setClientItem(clientItem);
-                        } else {
-                            logDiagnosticInfo("SPRITE_DISPLAY", "WARNING: ClientItem has sprites but bitmap generation failed");
-                            // Try to generate bitmap manually
-                            clientItem->generateBitmap();
-                            bitmap = clientItem->getBitmap();
-                            if (!bitmap.isNull()) {
-                                logDiagnosticInfo("SPRITE_DISPLAY", "SUCCESS: Manual bitmap generation succeeded");
-                                m_clientItemView->setClientItem(clientItem);
-                            } else {
-                                logDiagnosticInfo("SPRITE_DISPLAY", "ERROR: Manual bitmap generation failed");
-                                m_clientItemView->setClientItem(nullptr);
-                            }
-                        }
-                    } else {
-                        logDiagnosticInfo("SPRITE_DISPLAY", "WARNING: ClientItem has no sprites");
-                        m_clientItemView->setClientItem(nullptr);
-                    }
-                } else {
-                    logDiagnosticInfo("SPRITE_DISPLAY", QString("WARNING: No ClientItem found for client ID %1").arg(serverItem->clientId()));
-                    m_clientItemView->setClientItem(nullptr);
-                }
-            } else {
-                logDiagnosticInfo("SPRITE_DISPLAY", "ERROR: No plugin loaded");
-                m_clientItemView->setClientItem(nullptr);
-            }
-        } else {
-            logDiagnosticInfo("SPRITE_DISPLAY", QString("ERROR: ServerItem not found for ID %1").arg(m_selectedServerId));
-            m_clientItemView->setClientItem(nullptr);
+
+    OTLib::Server::Items::ServerItem* serverItem = nullptr;
+    if (m_serverItemList && m_serverItemList->tryGetValue(m_selectedServerId, serverItem)) {
+        if (m_currentPlugin && m_currentPlugin->instance()) {
+            ItemEditor::ClientItem* clientItem = m_currentPlugin->instance()->getClientItem(serverItem->clientId());
+            m_clientItemView->setClientItem(clientItem);
         }
-    }
-    catch (const std::exception& e) {
-        logDiagnosticInfo("SPRITE_DISPLAY", QString("ERROR: Exception in updateItemDisplay: %1").arg(e.what()));
-        m_clientItemView->setClientItem(nullptr);
-    }
-    catch (...) {
-        logDiagnosticInfo("SPRITE_DISPLAY", "ERROR: Unknown exception in updateItemDisplay");
-        m_clientItemView->setClientItem(nullptr);
     }
 }
 
@@ -1323,62 +1297,28 @@ void MainForm::newOtbFile()
     updateStatusBar();
 }
 
-// Sprite operations implementation
 bool MainForm::openSpriteFile(const QString& filePath)
 {
     if (!m_spriteManager) {
         QMessageBox::warning(this, tr("Error"), tr("Sprite manager not initialized"));
         return false;
     }
-    
-    // Get current plugin for client information
-    IPlugin* plugin = getCurrentPlugin();
-    if (!plugin) {
-        QMessageBox::warning(this, tr("Error"), tr("No plugin selected. Please select a client version first."));
+
+    QFileInfo sprInfo(filePath);
+    QString datPath = sprInfo.absolutePath() + "/" + sprInfo.baseName() + ".dat";
+
+    if (!QFile::exists(datPath)) {
+        QMessageBox::warning(this, tr("Error"), tr(".dat file not found for %1").arg(filePath));
         return false;
     }
-    
-    SupportedClient client;
-    QList<SupportedClient> clients = plugin->supportedClients();
-    if (!clients.isEmpty()) {
-        client = clients.first(); // Use first supported client
-    } else {
-        QMessageBox::warning(this, tr("Error"), tr("Plugin has no supported clients."));
-        return false;
-    }
-    
-    // Show progress dialog
-    QProgressDialog progressDialog(tr("Loading sprites..."), tr("Cancel"), 0, 100, this);
-    progressDialog.setWindowModality(Qt::WindowModal);
-    progressDialog.show();
-    
-    // Connect progress signals
-    connect(m_spriteManager, &SpriteManager::loadingProgress,
-            [&progressDialog](int current, int total) {
-                if (total > 0) {
-                    progressDialog.setValue((current * 100) / total);
-                }
-                QApplication::processEvents();
-            });
-    
-    // Load sprites
-    bool success = m_spriteManager->loadSpriteFile(filePath, client, false, false);
-    
-    progressDialog.close();
-    
-    if (success) {
-        statusBar()->showMessage(tr("Sprites loaded: %1 (%2 sprites)")
-                               .arg(QFileInfo(filePath).fileName())
-                               .arg(m_spriteManager->spriteCount()), 3000);
-        
-        // Update UI to reflect sprite availability
-        updateMenuStates();
+
+    if (m_currentPlugin && m_currentPlugin->instance()) {
+        m_currentPlugin->instance()->loadClient(m_currentPlugin->instance()->supportedClients().first(), true, true, true, datPath, filePath);
+        m_serverItemListBox->refreshSprites();
         return true;
-    } else {
-        QMessageBox::critical(this, tr("Error"), 
-                            tr("Failed to load sprite file: %1").arg(filePath));
-        return false;
     }
+
+    return false;
 }
 
 void MainForm::unloadSprites()
@@ -1559,75 +1499,25 @@ void MainForm::selectServerItem(quint16 itemId)
 
 void MainForm::updateItemProperties()
 {
-    logDiagnosticInfo("ITEM_PROPERTIES", QString("Updating properties for Server ID: %1").arg(m_selectedServerId));
-    
     if (m_selectedServerId == 0) {
-        logDiagnosticInfo("ITEM_PROPERTIES", "Clearing properties - no item selected");
         clearItemProperties();
         return;
     }
-    
+
     m_isLoading = true;
-    
-    // Declare ClientItem variable at the beginning
-    ItemEditor::ClientItem* clientItem = nullptr;
-    
-    try {
-        // 1. Retrieve complete ServerItem data from m_serverItemList
-        OTLib::Server::Items::ServerItem* serverItem = nullptr;
-        if (m_serverItemList) {
-            if (m_serverItemList->tryGetValue(m_selectedServerId, serverItem)) {
-                logDiagnosticInfo("ITEM_PROPERTIES", QString("SUCCESS: Retrieved ServerItem for ID %1").arg(m_selectedServerId));
-            } else {
-                logDiagnosticInfo("ITEM_PROPERTIES", QString("WARNING: ServerItem not found for ID %1").arg(m_selectedServerId));
-            }
-        } else {
-            logDiagnosticInfo("ITEM_PROPERTIES", "ERROR: ServerItemList is null");
-        }
-        
-        // Get ClientItem for comparison and visual feedback
-        if (m_currentPlugin && m_currentPlugin->loaded() && serverItem) {
-            clientItem = m_currentPlugin->getClientItem(serverItem->clientId());
-            if (clientItem) {
-                logDiagnosticInfo("ITEM_PROPERTIES", QString("SUCCESS: Retrieved ClientItem for client ID %1").arg(serverItem->clientId()));
-            } else {
-                logDiagnosticInfo("ITEM_PROPERTIES", QString("WARNING: ClientItem not found for client ID %1").arg(serverItem->clientId()));
-            }
-        }
-        
-        // 2. Populate all basic properties
-        populateBasicProperties(serverItem, clientItem);
-        
-        // 3. Implement flag checkbox population using existing FlagCheckBox infrastructure
-        populateFlagCheckboxes(serverItem, clientItem);
-        
-        // 4. Populate attribute controls
-        populateAttributeControls(serverItem, clientItem);
-        
-        // 5. Update ClientItemView with current item
-        if (m_clientItemView && clientItem) {
-            clientItem = m_currentPlugin->getClientItem(serverItem->clientId());
-            if (clientItem) {
-                logDiagnosticInfo("ITEM_PROPERTIES", QString("SUCCESS: Retrieved ClientItem for client ID %1").arg(serverItem->clientId()));
-            } else {
-                logDiagnosticInfo("ITEM_PROPERTIES", QString("WARNING: ClientItem not found for client ID %1").arg(serverItem->clientId()));
-            }
-        }
-        
-        // 6. Update sprite display
-        updateSpriteDisplay(clientItem);
-        
-        logDiagnosticInfo("ITEM_PROPERTIES", "SUCCESS: Item properties updated successfully");
+
+    OTLib::Server::Items::ServerItem* serverItem = nullptr;
+    if (m_serverItemList && m_serverItemList->tryGetValue(m_selectedServerId, serverItem)) {
+        m_serverIdSpinBox->setValue(serverItem->id());
+        m_clientIdSpinBox->setValue(serverItem->clientId());
+        m_nameLineEdit->setText(serverItem->name());
+        m_descriptionTextEdit->setText(serverItem->nameXml());
+
+        populateFlagCheckboxes(serverItem, nullptr);
+        populateAttributeControls(serverItem, nullptr);
+        updateSpriteDisplay(nullptr);
     }
-    catch (const std::exception& e) {
-        logDiagnosticInfo("ITEM_PROPERTIES", QString("ERROR: Exception in updateItemProperties: %1").arg(e.what()));
-        showErrorMessage(tr("Error updating item properties: %1").arg(e.what()));
-    }
-    catch (...) {
-        logDiagnosticInfo("ITEM_PROPERTIES", "ERROR: Unknown exception in updateItemProperties");
-        showErrorMessage(tr("Unknown error updating item properties"));
-    }
-    
+
     m_isLoading = false;
     updateMenuStates();
 }
@@ -1637,9 +1527,59 @@ void MainForm::applyItemChanges()
     if (m_selectedServerId == 0 || m_isLoading) {
         return;
     }
+
+    OTLib::Server::Items::ServerItem* serverItem = nullptr;
+    if (m_serverItemList && m_serverItemList->tryGetValue(m_selectedServerId, serverItem)) {
+        serverItem->setClientId(m_clientIdSpinBox->value());
+        serverItem->setName(m_nameLineEdit->text());
+
+        for (FlagCheckBox* flagCheckBox : m_flagCheckBoxes) {
+            if (!flagCheckBox) continue;
+
+            QString flagName = flagCheckBox->text();
+            bool isChecked = flagCheckBox->isChecked();
+
+            if (flagName == "Blocking") {
+                serverItem->setUnpassable(isChecked);
+            } else if (flagName == "Moveable") {
+                serverItem->setMovable(isChecked);
+            } else if (flagName == "Pickupable") {
+                serverItem->setPickupable(isChecked);
+            } else if (flagName == "Stackable") {
+                serverItem->setStackable(isChecked);
+            } else if (flagName == "Useable") {
+                serverItem->setMultiUse(isChecked);
+            } else if (flagName == "Readable") {
+                serverItem->setReadable(isChecked);
+            } else if (flagName == "Writable") {
+                serverItem->setWritable(isChecked);
+            } else if (flagName == "LookThrough") {
+                serverItem->setIgnoreLook(isChecked);
+            }
+        }
+
+        auto getAttributeValue = [&](const QString& label) {
+            for (int i = 0; i < m_attributesLayout->rowCount(); ++i) {
+                if (auto labelWidget = qobject_cast<QLabel*>(m_attributesLayout->itemAtPosition(i, 0)->widget())) {
+                    if (labelWidget->text() == label) {
+                        if (auto spinBox = qobject_cast<QSpinBox*>(m_attributesLayout->itemAtPosition(i, 1)->widget())) {
+                            return spinBox->value();
+                        }
+                    }
+                }
+            }
+            return 0;
+        };
+
+        serverItem->setGroundSpeed(getAttributeValue("Ground Speed:"));
+        serverItem->setLightLevel(getAttributeValue("Light Level:"));
+        serverItem->setLightColor(getAttributeValue("Light Color:"));
+        serverItem->setMaxReadChars(getAttributeValue("Max Read Chars:"));
+        serverItem->setMaxReadWriteChars(getAttributeValue("Max Read/Write Chars:"));
+        serverItem->setMinimapColor(getAttributeValue("Minimap Color:"));
+        serverItem->setTradeAs(getAttributeValue("Trade As:"));
+    }
     
-    // Apply changes to selected server item - implementation will be enhanced when ServerItem class provides property setters
-    // For now, just mark as having unsaved changes
     m_hasUnsavedChanges = true;
     updateWindowTitle();
 }
@@ -1830,6 +1770,37 @@ void MainForm::logDiagnosticInfo(const QString& stage, const QString& message)
     if (m_statusLabel) {
         m_statusLabel->setText(QString("[%1] %2").arg(stage).arg(message));
     }
+}
+
+OTLib::Collections::ServerItemList* MainForm::findItems(const QVariantMap& searchParameters)
+{
+    OTLib::Collections::ServerItemList* results = new OTLib::Collections::ServerItemList(this);
+    if (!m_serverItemList) {
+        return results;
+    }
+
+    QString searchMode = searchParameters["searchMode"].toString();
+    if (searchMode == "sid") {
+        quint16 id = searchParameters["id"].toUInt();
+        QList<OTLib::Server::Items::ServerItem*> items = m_serverItemList->findByServerId(id);
+        for (OTLib::Server::Items::ServerItem* item : items) {
+            results->add(item);
+        }
+    } else if (searchMode == "cid") {
+        quint16 id = searchParameters["id"].toUInt();
+        QList<OTLib::Server::Items::ServerItem*> items = m_serverItemList->findByClientId(id);
+        for (OTLib::Server::Items::ServerItem* item : items) {
+            results->add(item);
+        }
+    } else if (searchMode == "properties") {
+        OTLib::Server::Items::ServerItemFlags properties = static_cast<OTLib::Server::Items::ServerItemFlag>(searchParameters["properties"].toInt());
+        QList<OTLib::Server::Items::ServerItem*> items = m_serverItemList->findByProperties(properties);
+        for (OTLib::Server::Items::ServerItem* item : items) {
+            results->add(item);
+        }
+    }
+
+    return results;
 }
 
 bool MainForm::validateOtbLoading()
@@ -2151,10 +2122,7 @@ void MainForm::populateBasicProperties(OTLib::Server::Items::ServerItem* serverI
 
 void MainForm::populateFlagCheckboxes(OTLib::Server::Items::ServerItem* serverItem, ItemEditor::ClientItem* clientItem)
 {
-    logDiagnosticInfo("ITEM_PROPERTIES", QString("Populating %1 flag checkboxes").arg(m_flagCheckBoxes.size()));
-    
     if (!serverItem) {
-        logDiagnosticInfo("ITEM_PROPERTIES", "WARNING: ServerItem is null - clearing all flags");
         for (FlagCheckBox* flagCheckBox : m_flagCheckBoxes) {
             if (flagCheckBox) {
                 flagCheckBox->setChecked(false);
@@ -2162,15 +2130,13 @@ void MainForm::populateFlagCheckboxes(OTLib::Server::Items::ServerItem* serverIt
         }
         return;
     }
-    
-    // Iterate through m_flagCheckBoxes and set each checkbox state based on ServerItem properties
+
     for (FlagCheckBox* flagCheckBox : m_flagCheckBoxes) {
         if (!flagCheckBox) continue;
-        
+
         QString flagName = flagCheckBox->text();
         bool flagValue = false;
-        
-        // Map flag names to ServerItem properties
+
         if (flagName == "Blocking") {
             flagValue = serverItem->unpassable();
         } else if (flagName == "Moveable") {
@@ -2184,118 +2150,62 @@ void MainForm::populateFlagCheckboxes(OTLib::Server::Items::ServerItem* serverIt
         } else if (flagName == "Readable") {
             flagValue = serverItem->readable();
         } else if (flagName == "Writable") {
-            // Writable is typically derived from readable and other conditions
-            flagValue = serverItem->readable();
+            flagValue = serverItem->writable();
         } else if (flagName == "LookThrough") {
-            flagValue = !serverItem->ignoreLook();
+            flagValue = serverItem->ignoreLook();
         } else if (flagName == "Container") {
             flagValue = (serverItem->type() == OTLib::Server::Items::ServerItemType::Container);
         } else if (flagName == "Weapon") {
-            // Weapon detection logic would go here
-            flagValue = false; // Placeholder
+            flagValue = (serverItem->type() == OTLib::Server::Items::ServerItemType::Weapon);
         } else if (flagName == "Ammunition") {
-            // Ammunition detection logic would go here
-            flagValue = false; // Placeholder
+            flagValue = (serverItem->type() == OTLib::Server::Items::ServerItemType::Ammunition);
         } else if (flagName == "Armor") {
-            // Armor detection logic would go here
-            flagValue = false; // Placeholder
+            flagValue = (serverItem->type() == OTLib::Server::Items::ServerItemType::Armor);
         } else if (flagName == "MagicField") {
-            flagValue = (serverItem->type() == OTLib::Server::Items::ServerItemType::Splash);
+            flagValue = (serverItem->type() == OTLib::Server::Items::ServerItemType::MagicField);
         } else if (flagName == "Teleport") {
-            // Teleport detection logic would go here
-            flagValue = false; // Placeholder
+            flagValue = (serverItem->type() == OTLib::Server::Items::ServerItemType::Teleport);
         } else if (flagName == "Key") {
-            // Key detection logic would go here
-            flagValue = false; // Placeholder
+            flagValue = (serverItem->type() == OTLib::Server::Items::ServerItemType::Key);
         } else if (flagName == "Splash") {
             flagValue = (serverItem->type() == OTLib::Server::Items::ServerItemType::Splash);
         }
         
         flagCheckBox->setChecked(flagValue);
-        
-        // Add visual feedback for flag comparison
-        if (clientItem) {
-            bool clientFlagValue = false;
-            
-            // Get corresponding client flag value
-            if (flagName == "Blocking") {
-                clientFlagValue = clientItem->unpassable();
-            } else if (flagName == "Moveable") {
-                clientFlagValue = clientItem->movable();
-            } else if (flagName == "Pickupable") {
-                clientFlagValue = clientItem->pickupable();
-            } else if (flagName == "Stackable") {
-                clientFlagValue = clientItem->stackable();
-            } else if (flagName == "Useable") {
-                clientFlagValue = clientItem->multiUse();
-            } else if (flagName == "Readable") {
-                clientFlagValue = clientItem->readable();
-            } else if (flagName == "Writable") {
-                clientFlagValue = clientItem->readable();
-            } else if (flagName == "LookThrough") {
-                clientFlagValue = !clientItem->ignoreLook();
-            }
-            
-            // Apply visual feedback
-            bool matches = (flagValue == clientFlagValue);
-            QString styleSheet = matches ? "" : "color: red;";
-            flagCheckBox->setStyleSheet(styleSheet);
-            
-            if (!matches) {
-                flagCheckBox->setToolTip(tr("Client value: %1").arg(clientFlagValue ? "true" : "false"));
-            } else {
-                flagCheckBox->setToolTip("");
-            }
-        } else {
-            // No client item - show all as different
-            flagCheckBox->setStyleSheet("color: red;");
-            flagCheckBox->setToolTip(tr("No client data available"));
-        }
-        
-        logDiagnosticInfo("ITEM_PROPERTIES", QString("Set flag %1: %2").arg(flagName).arg(flagValue ? "true" : "false"));
     }
 }
 
 void MainForm::populateAttributeControls(OTLib::Server::Items::ServerItem* serverItem, ItemEditor::ClientItem* clientItem)
 {
-    logDiagnosticInfo("ITEM_PROPERTIES", "Populating attribute controls");
-    
     if (!serverItem) {
-        logDiagnosticInfo("ITEM_PROPERTIES", "WARNING: ServerItem is null - skipping attribute population");
+        for (int i = 0; i < m_attributesLayout->count(); ++i) {
+            if (auto spinBox = qobject_cast<QSpinBox*>(m_attributesLayout->itemAt(i)->widget())) {
+                spinBox->setValue(0);
+            }
+        }
         return;
     }
-    
-    // Attributes will be populated dynamically based on item type
-    // For now, we'll populate common attributes that are always present
-    
-    // Ground speed
-    if (serverItem->groundSpeed() > 0) {
-        logDiagnosticInfo("ITEM_PROPERTIES", QString("Ground speed: %1").arg(serverItem->groundSpeed()));
-    }
-    
-    // Light level and color
-    if (serverItem->lightLevel() > 0) {
-        logDiagnosticInfo("ITEM_PROPERTIES", QString("Light level: %1, color: %2").arg(serverItem->lightLevel()).arg(serverItem->lightColor()));
-    }
-    
-    // Read/write character limits
-    if (serverItem->maxReadChars() > 0) {
-        logDiagnosticInfo("ITEM_PROPERTIES", QString("Max read chars: %1").arg(serverItem->maxReadChars()));
-    }
-    
-    if (serverItem->maxReadWriteChars() > 0) {
-        logDiagnosticInfo("ITEM_PROPERTIES", QString("Max read/write chars: %1").arg(serverItem->maxReadWriteChars()));
-    }
-    
-    // Minimap color
-    if (serverItem->minimapColor() > 0) {
-        logDiagnosticInfo("ITEM_PROPERTIES", QString("Minimap color: %1").arg(serverItem->minimapColor()));
-    }
-    
-    // Trade as
-    if (serverItem->tradeAs() > 0) {
-        logDiagnosticInfo("ITEM_PROPERTIES", QString("Trade as: %1").arg(serverItem->tradeAs()));
-    }
+
+    auto setAttributeValue = [&](const QString& label, int value) {
+        for (int i = 0; i < m_attributesLayout->rowCount(); ++i) {
+            if (auto labelWidget = qobject_cast<QLabel*>(m_attributesLayout->itemAtPosition(i, 0)->widget())) {
+                if (labelWidget->text() == label) {
+                    if (auto spinBox = qobject_cast<QSpinBox*>(m_attributesLayout->itemAtPosition(i, 1)->widget())) {
+                        spinBox->setValue(value);
+                    }
+                    break;
+                }
+            }
+        }
+    };
+
+    setAttributeValue("Ground Speed:", serverItem->groundSpeed());
+    setAttributeValue("Light Level:", serverItem->lightLevel());
+    setAttributeValue("Light Color:", serverItem->lightColor());
+    setAttributeValue("Max Read Chars:", serverItem->maxReadChars());
+    setAttributeValue("Max Read/Write Chars:", serverItem->maxReadWriteChars());
+    setAttributeValue("Minimap Color:", serverItem->minimapColor());
+    setAttributeValue("Trade As:", serverItem->tradeAs());
 }
 
 void MainForm::updateSpriteDisplay(ItemEditor::ClientItem* clientItem)

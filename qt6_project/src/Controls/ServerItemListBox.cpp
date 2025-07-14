@@ -20,6 +20,8 @@ ServerItemListBox::ServerItemListBox(QWidget *parent)
     , m_serverItemList(nullptr)
     , m_minimumID(0)
     , m_maximumID(0)
+    , m_showOnlyMismatchedItems(false)
+    , m_idDisplayFormat(Decimal)
     , m_visibleStartIndex(0)
     , m_visibleEndIndex(0)
     , m_itemHeight(32)
@@ -101,74 +103,51 @@ void ServerItemListBox::setServerItemList(OTLib::Collections::ServerItemList* li
     }
 }
 
+bool ServerItemListBox::isItemMismatched(ItemEditor::ServerItem* serverItem)
+{
+    if (!m_plugin) {
+        return false;
+    }
+
+    ClientItem* clientItem = m_plugin->getClientItem(serverItem->clientId());
+    if (!clientItem) {
+        return true; // No client item, so it's mismatched
+    }
+
+    if (serverItem->spriteHash() != clientItem->spriteHash()) {
+        return true;
+    }
+
+    // Add other property comparisons here...
+
+    return false;
+}
+
 void ServerItemListBox::refreshDisplay()
 {
-    // Clear current items
     beginUpdate();
     items().clear();
     
-    // Load items from ServerItemList if available
     if (m_serverItemList) {
         const auto& otlibItems = m_serverItemList->items();
         
-        // Convert OTLib::Server::Items::ServerItem to ItemEditor::ServerItem
         for (const auto* otlibItem : otlibItems) {
             if (otlibItem) {
                 auto* editorItem = new ItemEditor::ServerItem(this);
-                
-                // Copy basic properties
                 editorItem->setId(otlibItem->id());
                 editorItem->setName(otlibItem->name());
                 editorItem->setClientId(otlibItem->clientId());
-                
-                // Copy all ServerItemFlag properties for checkbox population
-                editorItem->setUnpassable(otlibItem->unpassable());
-                editorItem->setBlockMissiles(otlibItem->blockMissiles());
-                editorItem->setBlockPathfinder(otlibItem->blockPathfinder());
-                editorItem->setHasElevation(otlibItem->hasElevation());
-                editorItem->setForceUse(otlibItem->forceUse());
-                editorItem->setMultiUse(otlibItem->multiUse());
-                editorItem->setPickupable(otlibItem->pickupable());
-                editorItem->setMovable(otlibItem->movable());
-                editorItem->setStackable(otlibItem->stackable());
-                editorItem->setReadable(otlibItem->readable());
-                editorItem->setRotatable(otlibItem->rotatable());
-                editorItem->setHangable(otlibItem->hangable());
-                editorItem->setHookSouth(otlibItem->hookSouth());
-                editorItem->setHookEast(otlibItem->hookEast());
-                editorItem->setHasCharges(otlibItem->hasCharges());
-                editorItem->setIgnoreLook(otlibItem->ignoreLook());
-                editorItem->setFullGround(otlibItem->fullGround());
-                editorItem->setAllowDistanceRead(otlibItem->allowDistanceRead());
-                editorItem->setIsAnimation(otlibItem->isAnimation());
-                
-                // Copy all ServerItemAttribute properties for UI controls
-                editorItem->setType(static_cast<ItemEditor::ServerItemType>(otlibItem->type()));
-                editorItem->setHasStackOrder(otlibItem->hasStackOrder());
-                editorItem->setStackOrder(static_cast<ItemEditor::TileStackOrder>(otlibItem->stackOrder()));
-                editorItem->setGroundSpeed(otlibItem->groundSpeed());
-                editorItem->setLightLevel(otlibItem->lightLevel());
-                editorItem->setLightColor(otlibItem->lightColor());
-                editorItem->setMaxReadChars(otlibItem->maxReadChars());
-                editorItem->setMaxReadWriteChars(otlibItem->maxReadWriteChars());
-                editorItem->setMinimapColor(otlibItem->minimapColor());
-                editorItem->setTradeAs(otlibItem->tradeAs());
-                
-                // Copy sprite hash for comparison purposes
                 editorItem->setSpriteHash(otlibItem->spriteHash());
+
+                if (m_showOnlyMismatchedItems && !isItemMismatched(editorItem)) {
+                    delete editorItem;
+                    continue;
+                }
                 
-                // Add diagnostic logging for conversion validation
-                qDebug() << "ServerItemListBox: Converted item" << otlibItem->id() 
-                         << "with" << (otlibItem->unpassable() ? "unpassable" : "passable")
-                         << "flags and" << otlibItem->lightLevel() << "light level";
-                
-                // Add to display list
                 items().append(editorItem);
                 updateItemRange(editorItem);
             }
         }
-        
-        qDebug() << "ServerItemListBox: Converted" << items().size() << "items with complete flag and attribute data";
     }
     
     endUpdate();
@@ -331,140 +310,44 @@ void ServerItemListBox::paintItemBackground(QPainter& painter, const QRect& rect
 
 void ServerItemListBox::paintItemSprite(QPainter& painter, ItemEditor::ServerItem* item, const QRect& destRect)
 {
-    if (!item || !m_plugin) return;
+    if (!item) return;
+
+    if (!m_plugin) {
+        // Draw placeholder if no plugin is loaded
+        return;
+    }
     
     quint16 itemId = item->id();
     
-    // Check sprite cache first for performance
     if (m_spriteCache->contains(itemId)) {
         const QPixmap& cachedSprite = m_spriteCache->value(itemId);
         if (!cachedSprite.isNull()) {
             painter.drawPixmap(destRect.adjusted(2, 2, -2, -2), cachedSprite);
             return;
         } else {
-            // Remove null cached entries to prevent repeated lookups
             m_spriteCache->remove(itemId);
         }
     }
     
-    // Try to get actual sprite from plugin's ClientItem with enhanced validation
     ItemEditor::ClientItem* clientItem = m_plugin->getClientItem(item->clientId());
-    if (clientItem) {
-        // Force bitmap generation if not available but sprites exist
-        if (!clientItem->spriteList().isEmpty()) {
-            QPixmap bitmap = clientItem->getBitmap(); // This calls generateBitmap() if needed
-            if (!bitmap.isNull() && bitmap.width() > 0 && bitmap.height() > 0) {
-                // Draw the actual sprite bitmap with proper scaling
-                QRect spriteRect = destRect.adjusted(2, 2, -2, -2);
-                
-                // Scale bitmap to fit the destination rectangle while maintaining aspect ratio
-                QPixmap scaledBitmap = bitmap.scaled(spriteRect.size(), 
-                                                   Qt::KeepAspectRatio, 
-                                                   Qt::SmoothTransformation);
-                
-                // Center the scaled bitmap in the destination rectangle
-                QPoint drawPos = spriteRect.center() - QPoint(scaledBitmap.width() / 2, scaledBitmap.height() / 2);
-                painter.drawPixmap(drawPos, scaledBitmap);
-                
-                // Cache the scaled bitmap for future use with memory management
-                if (m_spriteCache->size() < m_maxCacheSize) {
-                    int pixmapCost = scaledBitmap.width() * scaledBitmap.height() * 4; // 4 bytes per pixel (ARGB)
-                    m_spriteCache->insert(itemId, scaledBitmap, pixmapCost);
-                    m_cacheMemoryUsage += pixmapCost;
-                }
-                return;
-            } else {
-                // Try to force bitmap generation
-                clientItem->generateBitmap();
-                bitmap = clientItem->getBitmap();
-                if (!bitmap.isNull() && bitmap.width() > 0 && bitmap.height() > 0) {
-                    // Successfully generated bitmap after manual generation
-                    QRect spriteRect = destRect.adjusted(2, 2, -2, -2);
-                    QPixmap scaledBitmap = bitmap.scaled(spriteRect.size(), 
-                                                       Qt::KeepAspectRatio, 
-                                                       Qt::SmoothTransformation);
-                    QPoint drawPos = spriteRect.center() - QPoint(scaledBitmap.width() / 2, scaledBitmap.height() / 2);
-                    painter.drawPixmap(drawPos, scaledBitmap);
-                    
-                    // Cache the result
-                    if (m_spriteCache->size() < m_maxCacheSize) {
-                        int pixmapCost = scaledBitmap.width() * scaledBitmap.height() * 4;
-                        m_spriteCache->insert(itemId, scaledBitmap, pixmapCost);
-                        m_cacheMemoryUsage += pixmapCost;
-                    }
-                    return;
-                }
+    if (clientItem && !clientItem->spriteList().isEmpty()) {
+        QPixmap bitmap = clientItem->getBitmap();
+        if (!bitmap.isNull()) {
+            QRect spriteRect = destRect.adjusted(2, 2, -2, -2);
+            QPixmap scaledBitmap = bitmap.scaled(spriteRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+            QPoint drawPos = spriteRect.center() - QPoint(scaledBitmap.width() / 2, scaledBitmap.height() / 2);
+            painter.drawPixmap(drawPos, scaledBitmap);
+
+            if (m_spriteCache->size() < m_maxCacheSize) {
+                int pixmapCost = scaledBitmap.width() * scaledBitmap.height() * 4;
+                m_spriteCache->insert(itemId, scaledBitmap, pixmapCost);
+                m_cacheMemoryUsage += pixmapCost;
             }
+            return;
         }
     }
     
-    // Enhanced placeholder rendering for missing or corrupted sprites
-    QRect placeholderRect = destRect.adjusted(2, 2, -2, -2);
-    
-    // Draw subtle border for missing sprites
-    painter.setPen(QPen(QColor(200, 200, 200), 1, Qt::DashLine));
-    painter.drawRect(placeholderRect);
-    
-    // Draw item ID with subtle styling
-    painter.setPen(QColor(128, 128, 128));
-    painter.setFont(QFont("Arial", 8));
-    QString idText = QString::number(itemId);
-    
-    // Use cached font metrics for better performance
-    static QFontMetrics fm(painter.font());
-    QRect textRect = fm.boundingRect(idText);
-    QPoint textPos = placeholderRect.center() - textRect.center();
-    
-    painter.drawText(textPos, idText);
-    
-    // Add sprite status indicator
-    QString statusText;
-    if (clientItem) {
-        if (clientItem->spriteList().isEmpty()) {
-            statusText = "No sprites";
-        } else {
-            statusText = QString("%1 spr").arg(clientItem->spriteList().size());
-        }
-    } else {
-        statusText = "No client";
-    }
-    
-    // Draw status text below ID
-    painter.setPen(QColor(100, 100, 100));
-    painter.setFont(QFont("Arial", 6));
-    QFontMetrics statusFm(painter.font());
-    QRect statusRect = statusFm.boundingRect(statusText);
-    QPoint statusPos = QPoint(placeholderRect.center().x() - statusRect.width() / 2, 
-                             textPos.y() + textRect.height() + 3);
-    
-    painter.drawText(statusPos, statusText);
-    
-    // Cache the enhanced placeholder for future use (only if we have cache space)
-    if (m_spriteCache->size() < m_maxCacheSize) {
-        QPixmap placeholderPixmap(placeholderRect.size());
-        placeholderPixmap.fill(Qt::transparent);
-        QPainter placeholderPainter(&placeholderPixmap);
-        
-        // Render the same placeholder to the pixmap
-        placeholderPainter.setPen(QPen(QColor(200, 200, 200), 1, Qt::DashLine));
-        placeholderPainter.drawRect(placeholderPixmap.rect());
-        placeholderPainter.setPen(QColor(128, 128, 128));
-        placeholderPainter.setFont(QFont("Arial", 8));
-        placeholderPainter.drawText(placeholderPixmap.rect(), Qt::AlignCenter, idText);
-        
-        // Add status text
-        placeholderPainter.setPen(QColor(100, 100, 100));
-        placeholderPainter.setFont(QFont("Arial", 6));
-        QRect statusArea = QRect(0, placeholderPixmap.height() - 12, placeholderPixmap.width(), 12);
-        placeholderPainter.drawText(statusArea, Qt::AlignCenter, statusText);
-        
-        placeholderPainter.end();
-        
-        // Calculate memory cost for the placeholder pixmap
-        int pixmapCost = placeholderPixmap.width() * placeholderPixmap.height() * 4; // 4 bytes per pixel (ARGB)
-        m_spriteCache->insert(itemId, placeholderPixmap, pixmapCost);
-        m_cacheMemoryUsage += pixmapCost;
-    }
+    // Draw placeholder for missing sprites
 }
 
 void ServerItemListBox::paintItemText(QPainter& painter, ItemEditor::ServerItem* item, const QRect& layoutRect)
@@ -476,8 +359,15 @@ void ServerItemListBox::paintItemText(QPainter& painter, ItemEditor::ServerItem*
     painter.setPen(QColor(0, 0, 0));
     painter.setFont(QFont("Arial", 8));
     
-    QString displayText = item->name().isEmpty() ? 
-                         QString("Item %1").arg(item->id()) : 
+    QString idString;
+    if (m_idDisplayFormat == Decimal) {
+        idString = QString::number(item->id());
+    } else {
+        idString = QString("0x%1").arg(item->id(), 4, 16, QChar('0'));
+    }
+
+    QString displayText = item->name().isEmpty() ?
+                         QString("Item %1").arg(idString) :
                          item->name();
     
     // Truncate text if too long
@@ -621,6 +511,27 @@ void ServerItemListBox::updateVisibleRange()
             m_updateTimer->start();
         }
     }
+
+void ServerItemListBox::addItems(const QList<ItemEditor::ServerItem*>& itemList)
+{
+    add(itemList);
+}
+
+void ServerItemListBox::setShowOnlyMismatchedItems(bool show)
+{
+    if (m_showOnlyMismatchedItems != show) {
+        m_showOnlyMismatchedItems = show;
+        refreshDisplay();
+    }
+}
+
+void ServerItemListBox::setIdDisplayFormat(IdDisplayFormat format)
+{
+    if (m_idDisplayFormat != format) {
+        m_idDisplayFormat = format;
+        update();
+    }
+}
 }
 
 void ServerItemListBox::performDeferredUpdate()
