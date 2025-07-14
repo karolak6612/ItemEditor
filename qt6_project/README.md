@@ -115,8 +115,6 @@ cmake --build build
 
 ### 3. Cross-Platform Compatibility
 - Windows (primary target, matching original)
-- Linux (secondary target)
-- macOS (future consideration)
 
 ## Component Migration Strategy
 
