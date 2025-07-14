@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>AboutDialog</class>
+ <widget class="QDialog" name="AboutDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>450</width>
+    <height>244</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>About ItemEditor</string>
+  </property>
+  <widget class="QLabel" name="versionLabel">
+   <property name="geometry">
+    <rect>
+     <x>223</x>
+     <y>137</y>
+     <width>59</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>version</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="pictureBox">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>450</width>
+     <height>244</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="sourceLabel">
+   <property name="geometry">
+    <rect>
+     <x>12</x>
+     <y>221</y>
+     <width>44</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Source:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="sourceLinkLabel">
+   <property name="geometry">
+    <rect>
+     <x>58</x>
+     <y>221</y>
+     <width>183</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>&lt;a href=&quot;https://github.com/ottools/ItemEditor/&quot;&gt;https://github.com/ottools/ItemEditor/&lt;/a&gt;</string>
+   </property>
+   <property name="openExternalLinks">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="uiIconsLabel">
+   <property name="geometry">
+    <rect>
+     <x>12</x>
+     <y>205</y>
+     <width>110</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>UI Icons: Mark James</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="uiIconsLinkLabel">
+   <property name="geometry">
+    <rect>
+     <x>123</x>
+     <y>205</y>
+     <width>213</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>&lt;a href=&quot;http://www.famfamfam.com/lab/icons/silk/&quot;&gt;http://www.famfamfam.com/lab/icons/silk/&lt;/a&gt;</string>
+   </property>
+   <property name="openExternalLinks">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="appIconLabel">
+   <property name="geometry">
+    <rect>
+     <x>12</x>
+     <y>189</y>
+     <width>86</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>App Icon: Daniel</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="linkLabel2">
+   <property name="geometry">
+    <rect>
+     <x>99</x>
+     <y>189</y>
+     <width>203</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>&lt;a href=&quot;https://github.com/DANIELCAMILO2016&quot;&gt;https://github.com/DANIELCAMILO2016&lt;/a&gt;</string>
+   </property>
+   <property name="openExternalLinks">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="developerLabel">
+   <property name="geometry">
+    <rect>
+     <x>12</x>
+     <y>173</y>
+     <width>110</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Development: Mignari</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="developerLinkLabel">
+   <property name="geometry">
+    <rect>
+     <x>124</x>
+     <y>173</y>
+     <width>134</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>&lt;a href=&quot;https://github.com/Mignari&quot;&gt;https://github.com/Mignari&lt;/a&gt;</string>
+   </property>
+   <property name="openExternalLinks">
+    <bool>true</bool>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

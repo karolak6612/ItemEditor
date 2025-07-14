@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ProgressDialog</class>
+ <widget class="QDialog" name="ProgressDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>347</width>
+    <height>119</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Progress</string>
+  </property>
+  <widget class="QProgressBar" name="bar">
+   <property name="geometry">
+    <rect>
+     <x>47</x>
+     <y>56</y>
+     <width>257</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="value">
+    <number>24</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="progressLbl">
+   <property name="geometry">
+    <rect>
+     <x>44</x>
+     <y>23</y>
+     <width>51</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Progress:</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

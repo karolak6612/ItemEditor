@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PreferencesDialog</class>
+ <widget class="QDialog" name="PreferencesDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>434</width>
+    <height>221</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Preferences</string>
+  </property>
+  <widget class="QPushButton" name="cancelButton">
+   <property name="geometry">
+    <rect>
+     <x>347</x>
+     <y>183</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Cancel</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="confirmButton">
+   <property name="geometry">
+    <rect>
+     <x>266</x>
+     <y>182</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Confirm</string>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="groupBox1">
+   <property name="geometry">
+    <rect>
+     <x>12</x>
+     <y>12</y>
+     <width>411</width>
+     <height>131</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Default Client</string>
+   </property>
+   <widget class="QLineEdit" name="directoryPathTextBox">
+    <property name="geometry">
+     <rect>
+      <x>12</x>
+      <y>96</y>
+      <width>303</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="browseButton">
+    <property name="geometry">
+     <rect>
+      <x>325</x>
+      <y>94</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Browse</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="transparencyCheckBox">
+    <property name="geometry">
+     <rect>
+      <x>12</x>
+      <y>70</y>
+      <width>91</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Transparency</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="extendedCheckBox">
+    <property name="geometry">
+     <rect>
+      <x>12</x>
+      <y>24</y>
+      <width>71</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Extended</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="frameDurationsCheckBox">
+    <property name="geometry">
+     <rect>
+      <x>12</x>
+      <y>47</y>
+      <width>103</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Frame Durations</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QLabel" name="alertLabel">
+   <property name="geometry">
+    <rect>
+     <x>13</x>
+     <y>152</y>
+     <width>247</width>
+     <height>53</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>9</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: red;</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>UpdateDialog</class>
+ <widget class="QDialog" name="UpdateDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>312</width>
+    <height>178</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Update OTB</string>
+  </property>
+  <widget class="QListWidget" name="pluginsListBox">
+   <property name="geometry">
+    <rect>
+     <x>12</x>
+     <y>45</y>
+     <width>168</width>
+     <height>121</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="button1">
+   <property name="geometry">
+    <rect>
+     <x>186</x>
+     <y>74</y>
+     <width>96</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>&amp;Close</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="selectBtn">
+   <property name="geometry">
+    <rect>
+     <x>186</x>
+     <y>45</y>
+     <width>96</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>&amp;Select</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblDescription">
+   <property name="geometry">
+    <rect>
+     <x>9</x>
+     <y>9</y>
+     <width>273</width>
+     <height>33</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Select the client you wish to update to then press Select.</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>FindItemDialog</class>
+ <widget class="QDialog" name="FindItemDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>434</width>
+    <height>561</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Find Item</string>
+  </property>
+  <widget class="QGroupBox" name="groupBox1">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>3</y>
+     <width>149</width>
+     <height>95</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string/>
+   </property>
+   <widget class="QRadioButton" name="findBySidButton">
+    <property name="geometry">
+     <rect>
+      <x>13</x>
+      <y>18</y>
+      <width>108</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Find By Server ID</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="findByPropertiesButton">
+    <property name="geometry">
+     <rect>
+      <x>13</x>
+      <y>64</y>
+      <width>110</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Find By Properties</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="findByCidButton">
+    <property name="geometry">
+     <rect>
+      <x>13</x>
+      <y>41</y>
+      <width>103</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Find By Client ID</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="itemIdGroupBox">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>99</y>
+     <width>149</width>
+     <height>53</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>ID</string>
+   </property>
+   <widget class="QSpinBox" name="findIdNumericUpDown">
+    <property name="geometry">
+     <rect>
+      <x>11</x>
+      <y>19</y>
+      <width>126</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <number>100</number>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="propertiesGroupBox">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>154</y>
+     <width>149</width>
+     <height>395</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Attributes</string>
+   </property>
+   <widget class="QCheckBox" name="unpassableCheckBox">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>82</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Unpassable</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="blockMissilesCheckBox">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>62</y>
+      <width>92</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Block Missiles</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="blockPathfinderCheckBox">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>83</y>
+      <width>104</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Block Pathfinder</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="stackableCheckBox">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>129</y>
+      <width>74</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Stackable</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="moveableFlagCheckBox">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>41</y>
+      <width>73</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Moveable</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="flagCheckBox1">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>106</y>
+      <width>79</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Pickupable</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="forceUseCheckBox">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>150</y>
+      <width>75</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Force Use</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="useableCheck">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>173</y>
+      <width>70</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Multi Use</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="rotatableCheck">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>196</y>
+      <width>72</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Rotatable</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="hangableCheck">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>219</y>
+      <width>72</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Hangable</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="hookSouthCheck">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>242</y>
+      <width>83</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Hook South</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="hookEastCheck">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>265</y>
+      <width>76</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Hook East</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="hasElevationCheck">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>288</y>
+      <width>92</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Has Elevation</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="ignoreLookCheck">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>311</y>
+      <width>83</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Ignore Look</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="readableCheck">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>332</y>
+      <width>72</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Readable</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="fullGroundCheck">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>353</y>
+      <width>80</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Full Ground</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="resultGroupBox">
+   <property name="geometry">
+    <rect>
+     <x>165</x>
+     <y>3</y>
+     <width>260</width>
+     <height>518</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Result</string>
+   </property>
+   <widget class="QListWidget" name="serverItemList">
+    <property name="geometry">
+     <rect>
+      <x>7</x>
+      <y>19</y>
+      <width>244</width>
+      <height>486</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QPushButton" name="findItemButton">
+   <property name="geometry">
+    <rect>
+     <x>165</x>
+     <y>527</y>
+     <width>260</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Find</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
