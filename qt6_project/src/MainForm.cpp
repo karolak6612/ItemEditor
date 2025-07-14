@@ -303,10 +303,29 @@ void MainForm::setupMenuBar()
     // Edit Menu
     m_editMenu = m_menuBar->addMenu(tr("&Edit"));
     
+    m_createItemAction = m_editMenu->addAction(tr("Create Item"));
+    m_createItemAction->setShortcut(QKeySequence(tr("Ctrl+I")));
+    m_createItemAction->setStatusTip(tr("Create a new item"));
+    connect(m_createItemAction, &QAction::triggered, this, &MainForm::onEditCreateItem);
+
+    m_duplicateItemAction = m_editMenu->addAction(tr("Duplicate Item"));
+    m_duplicateItemAction->setShortcut(QKeySequence(tr("Ctrl+D")));
+    m_duplicateItemAction->setStatusTip(tr("Duplicate the selected item"));
+    connect(m_duplicateItemAction, &QAction::triggered, this, &MainForm::onEditDuplicateItem);
+
+    m_reloadItemAction = m_editMenu->addAction(tr("Reload Item"));
+    m_reloadItemAction->setShortcut(QKeySequence(tr("Ctrl+R")));
+    m_reloadItemAction->setStatusTip(tr("Reload the selected item"));
+    connect(m_reloadItemAction, &QAction::triggered, this, &MainForm::onEditReloadItem);
+
     m_findAction = m_editMenu->addAction(QIcon(":/icons/find.png"), tr("&Find Item..."));
     m_findAction->setShortcut(QKeySequence::Find);
     m_findAction->setStatusTip(tr("Find an item by ID or name"));
     connect(m_findAction, &QAction::triggered, this, &MainForm::onEditFind);
+
+    m_createMissingItemsAction = m_editMenu->addAction(tr("Create Missing Items"));
+    m_createMissingItemsAction->setStatusTip(tr("Create missing items"));
+    connect(m_createMissingItemsAction, &QAction::triggered, this, &MainForm::onEditCreateMissingItems);
     
     m_editMenu->addSeparator();
     
@@ -321,6 +340,15 @@ void MainForm::setupMenuBar()
     m_showOnlyMismatchedAction->setCheckable(true);
     m_showOnlyMismatchedAction->setStatusTip(tr("Show only items that don't match between server and client"));
     connect(m_showOnlyMismatchedAction, &QAction::toggled, this, &MainForm::onViewShowOnlyMismatchedItems);
+
+    m_showDeprecatedItemsAction = m_viewMenu->addAction(tr("Show &Deprecated Items"));
+    m_showDeprecatedItemsAction->setCheckable(true);
+    m_showDeprecatedItemsAction->setStatusTip(tr("Show or hide deprecated items"));
+    connect(m_showDeprecatedItemsAction, &QAction::toggled, this, &MainForm::onViewShowDeprecatedItems);
+
+    m_updateItemsListAction = m_viewMenu->addAction(tr("&Update Items List"));
+    m_updateItemsListAction->setStatusTip(tr("Refresh the item list"));
+    connect(m_updateItemsListAction, &QAction::triggered, this, &MainForm::onViewUpdateItemsList);
     
     m_viewMenu->addSeparator();
     
@@ -341,9 +369,17 @@ void MainForm::setupMenuBar()
     // Tools Menu
     m_toolsMenu = m_menuBar->addMenu(tr("&Tools"));
     
-    m_updateAction = m_toolsMenu->addAction(QIcon(":/icons/update.png"), tr("&Update..."));
-    m_updateAction->setStatusTip(tr("Check for application updates"));
-    connect(m_updateAction, &QAction::triggered, this, &MainForm::onToolsUpdate);
+    m_reloadItemAttributesAction = m_toolsMenu->addAction(tr("Reload Item Attributes"));
+    m_reloadItemAttributesAction->setStatusTip(tr("Reload the attributes of all items"));
+    connect(m_reloadItemAttributesAction, &QAction::triggered, this, &MainForm::onToolsReloadItemAttributes);
+
+    m_compareOtbAction = m_toolsMenu->addAction(tr("Compare OTB Files..."));
+    m_compareOtbAction->setStatusTip(tr("Compare two OTB files"));
+    connect(m_compareOtbAction, &QAction::triggered, this, &MainForm::onToolsCompareOtbFiles);
+
+    m_updateOtbVersionAction = m_toolsMenu->addAction(tr("Update OTB Version..."));
+    m_updateOtbVersionAction->setStatusTip(tr("Update the OTB version of the current file"));
+    connect(m_updateOtbVersionAction, &QAction::triggered, this, &MainForm::onToolsUpdateOtbVersion);
     
     m_updateSettingsAction = m_toolsMenu->addAction(QIcon(":/icons/updatesettings.png"), tr("Update &Settings..."));
     m_updateSettingsAction->setStatusTip(tr("Configure update settings"));
@@ -411,37 +447,45 @@ void MainForm::setupStatusBar()
     m_statusBar->addPermanentWidget(m_pluginLabel);
 }
 
+void MainForm::setupOutputPanel()
+{
+    m_outputTextBox = new QTextEdit();
+    m_outputTextBox->setReadOnly(true);
+    m_outputTextBox->setMinimumSize(OUTPUT_MIN_WIDTH, OUTPUT_MIN_HEIGHT);
+}
+
 void MainForm::setupCentralWidget()
 {
-    // Create central widget with splitter layout - exact mirror of C# layout
     QWidget* centralWidget = new QWidget();
     setCentralWidget(centralWidget);
-    
-    // Main horizontal splitter
-    m_mainSplitter = new QSplitter(Qt::Horizontal);
-    
-    // Create panels
+
+    QSplitter* mainSplitter = new QSplitter(Qt::Vertical);
+
+    QSplitter* topSplitter = new QSplitter(Qt::Horizontal);
     setupLeftPanel();
     setupCenterPanel();
     setupRightPanel();
-    
-    // Add panels to splitter
-    m_mainSplitter->addWidget(m_leftPanel);
-    m_mainSplitter->addWidget(m_centerPanel);
-    m_mainSplitter->addWidget(m_rightPanel);
-    
-    // Set splitter sizes - exact mirror of C# layout sizes
-    QList<int> sizes;
-    sizes << ITEM_LIST_WIDTH << APPEARANCE_WIDTH << PROPERTIES_MIN_WIDTH;
-    m_mainSplitter->setSizes(sizes);
-    
-    // Set splitter properties
-    m_mainSplitter->setChildrenCollapsible(false);
-    
-    // Set central layout
+    topSplitter->addWidget(m_leftPanel);
+    topSplitter->addWidget(m_centerPanel);
+    topSplitter->addWidget(m_rightPanel);
+    QList<int> topSizes;
+    topSizes << ITEM_LIST_WIDTH << APPEARANCE_WIDTH << PROPERTIES_MIN_WIDTH;
+    topSplitter->setSizes(topSizes);
+    topSplitter->setChildrenCollapsible(false);
+
+    setupOutputPanel();
+
+    mainSplitter->addWidget(topSplitter);
+    mainSplitter->addWidget(m_outputTextBox);
+
+    QList<int> mainSizes;
+    mainSizes << (ITEM_LIST_HEIGHT + APPEARANCE_HEIGHT + PROPERTIES_MIN_HEIGHT) << OUTPUT_MIN_HEIGHT;
+    mainSplitter->setSizes(mainSizes);
+    mainSplitter->setChildrenCollapsible(false);
+
     QHBoxLayout* centralLayout = new QHBoxLayout(centralWidget);
     centralLayout->setContentsMargins(0, 0, 0, 0);
-    centralLayout->addWidget(m_mainSplitter);
+    centralLayout->addWidget(mainSplitter);
 }
 
 void MainForm::setupLeftPanel()
@@ -771,6 +815,21 @@ void MainForm::onFileExit()
 }
 
 // Edit menu slot implementations
+void MainForm::onEditCreateItem()
+{
+    // TODO: Implement
+}
+
+void MainForm::onEditDuplicateItem()
+{
+    // TODO: Implement
+}
+
+void MainForm::onEditReloadItem()
+{
+    // TODO: Implement
+}
+
 void MainForm::onEditFind()
 {
     FindItemDialog dialog(this);
@@ -793,6 +852,11 @@ void MainForm::onEditFind()
     }
 }
 
+void MainForm::onEditCreateMissingItems()
+{
+    // TODO: Implement
+}
+
 void MainForm::onEditPreferences()
 {
     ItemEditor::PreferencesForm preferencesForm(this);
@@ -802,16 +866,21 @@ void MainForm::onEditPreferences()
 // View menu slot implementations
 void MainForm::onViewShowOnlyMismatchedItems(bool checked)
 {
-    // Filter functionality - save setting and apply to ServerItemListBox
-    m_settings->setValue("View/ShowOnlyMismatched", checked);
-    
-    // Apply filter to server item list when ServerItemListBox supports filtering
     if (m_serverItemListBox) {
-        // Implementation will be enhanced when ServerItemListBox provides filtering
-        m_serverItemListBox->update();
+        m_serverItemListBox->setShowOnlyMismatchedItems(checked);
     }
-    
-    updateStatusBar();
+}
+
+void MainForm::onViewShowDeprecatedItems(bool checked)
+{
+    // TODO: Implement
+}
+
+void MainForm::onViewUpdateItemsList()
+{
+    if (m_serverItemListBox) {
+        m_serverItemListBox->refreshDisplay();
+    }
 }
 
 void MainForm::onViewShowDecimalItemId(bool checked)
@@ -847,6 +916,25 @@ void MainForm::onViewShowHexItemId(bool checked)
 }
 
 // Tools menu slot implementations
+void MainForm::onToolsReloadItemAttributes()
+{
+    // TODO: Implement
+}
+
+void MainForm::onToolsCompareOtbFiles()
+{
+    CompareOtbDialog dialog(this);
+    dialog.exec();
+}
+
+void MainForm::onToolsUpdateOtbVersion()
+{
+    UpdateOtbDialog dialog(this, m_pluginServices);
+    if (dialog.exec() == QDialog::Accepted) {
+        // TODO: Implement update logic
+    }
+}
+
 void MainForm::onToolsUpdate()
 {
     // UpdateForm will be implemented in subsequent task

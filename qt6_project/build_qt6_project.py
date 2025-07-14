@@ -67,15 +67,13 @@ class Qt6Builder:
         self.project_dir = Path(__file__).parent.absolute()
         self.build_dir = self.project_dir / "build"
         self.deploy_dir = self.project_dir / "deploy_threestep"
-        self.qt_dir = Path(r"C:\Qt\6.9.1\msvc2022_64")
+
+        # Setup logging
+        self.setup_logging()
         
         # Build configuration
         self.plugins = ["PluginOne", "PluginTwo", "PluginThree"]
-        self.cmake_generator = "Visual Studio 17 2022"
         self.build_config = "Release"
-        
-        # Setup logging
-        self.setup_logging()
         
         # Build statistics
         self.stats = {
@@ -139,7 +137,6 @@ class Qt6Builder:
         info_table.add_row("[DIR] Project Directory:", str(self.project_dir))
         info_table.add_row("[BUILD] Build Directory:", str(self.build_dir))
         info_table.add_row("[DEPLOY] Deploy Directory:", str(self.deploy_dir))
-        info_table.add_row("[QT] Qt Directory:", str(self.qt_dir))
         info_table.add_row("[LOG] Log File:", str(self.log_file))
         info_table.add_row("[TIME] Started:", self.start_time.strftime("%Y-%m-%d %H:%M:%S"))
         
@@ -207,15 +204,6 @@ class Qt6Builder:
         
         checks = []
         
-        # Check Qt installation
-        qt_cmake = self.qt_dir / "bin" / "windeployqt.exe"
-        if qt_cmake.exists():
-            checks.append(("Qt6 Installation", True, str(self.qt_dir)))
-            self.logger.info(f"Qt6 found at: {self.qt_dir}")
-        else:
-            checks.append(("Qt6 Installation", False, f"Not found at {self.qt_dir}"))
-            self.logger.error(f"Qt6 not found at: {self.qt_dir}")
-        
         # Check CMakeLists.txt
         cmake_file = self.project_dir / "CMakeLists.txt"
         if cmake_file.exists():
@@ -225,7 +213,7 @@ class Qt6Builder:
             checks.append(("CMakeLists.txt", False, f"Not found at {cmake_file}"))
             self.logger.error(f"CMakeLists.txt not found: {cmake_file}")
         
-        # Check for Visual Studio
+        # Check for Build Tools
         success, stdout, stderr = self.run_command(
             ["cmake", "--version"], 
             "CMake availability check"
@@ -254,9 +242,9 @@ class Qt6Builder:
             self.console.print(Panel(
                 "[red][FAIL] Prerequisites check failed![/red]\n\n"
                 "Please ensure:\n"
-                "• Qt6 is installed at the correct path\n"
+                "• Qt6 is installed and in your PATH\n"
                 "• CMake is available in PATH\n"
-                "• Visual Studio 2022 is installed\n"
+                "• A compatible C++ compiler is installed\n"
                 "• CMakeLists.txt exists in project root",
                 title="[FAIL] Build Cannot Continue",
                 border_style="red"
@@ -305,7 +293,7 @@ class Qt6Builder:
         # Configure CMake
         self.console.print("[CMAKE] Configuring CMake...", style="bold blue")
         success, stdout, stderr = self.run_command(
-            ["cmake", "..", "-G", self.cmake_generator, "-A", "x64", f"-DCMAKE_BUILD_TYPE={self.build_config}"],
+            ["cmake", "..", f"-DCMAKE_BUILD_TYPE={self.build_config}"],
             "CMake configuration",
             cwd=self.build_dir
         )
@@ -534,41 +522,8 @@ class Qt6Builder:
     
     def run_qt_deployment(self) -> bool:
         """Run windeployqt to deploy Qt dependencies."""
-        # Add Qt bin to PATH for this process
-        qt_bin = self.qt_dir / "bin"
-        env = os.environ.copy()
-        env["PATH"] = str(qt_bin) + os.pathsep + env["PATH"]
-        
-        windeployqt = qt_bin / "windeployqt.exe"
-        
-        if not windeployqt.exists():
-            self.logger.warning(f"windeployqt.exe not found at: {windeployqt}")
-            self.stats["total_warnings"] += 1
-            return True  # Continue without Qt deployment
-        
-        try:
-            result = subprocess.run(
-                [str(windeployqt), "--release", "--no-translations", 
-                 "--no-system-d3d-compiler", "--no-opengl-sw", "ItemEditor.exe"],
-                cwd=self.deploy_dir,
-                env=env,
-                capture_output=True,
-                text=True,
-                timeout=120
-            )
-            
-            if result.returncode == 0:
-                self.logger.info("Qt deployment completed successfully")
-                return True
-            else:
-                self.logger.warning(f"windeployqt failed but continuing: {result.stderr}")
-                self.stats["total_warnings"] += 1
-                return True  # Continue even if windeployqt fails
-                
-        except Exception as e:
-            self.logger.warning(f"Qt deployment failed but continuing: {e}")
-            self.stats["total_warnings"] += 1
-            return True
+        self.logger.info("Skipping manual Qt deployment. CMake will handle it.")
+        return True
     
     def copy_resources(self) -> bool:
         """Copy additional resources if they exist."""

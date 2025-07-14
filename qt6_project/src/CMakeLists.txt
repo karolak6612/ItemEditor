@@ -1,3 +1,11 @@
+find_package(Qt6 REQUIRED COMPONENTS
+    Core
+    Widgets
+    Gui
+    Network
+    Xml
+)
+
 # Main application executable
 qt_add_executable(ItemEditor
     main.cpp

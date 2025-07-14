@@ -1,0 +1,42 @@
+2025-07-14 21:30:09,635 - INFO - Build session started - Log file: /app/qt6_project/logs/build_20250714_213009.log
+2025-07-14 21:30:09,640 - INFO - Project directory: /app/qt6_project
+2025-07-14 21:30:09,642 - INFO - Searching for Qt6 installation...
+2025-07-14 21:30:09,643 - DEBUG - Checking path: /home/jules/.pyenv/versions/3.12.11/bin
+2025-07-14 21:30:09,644 - DEBUG - Checking path: /home/jules/.pyenv/libexec
+2025-07-14 21:30:09,645 - DEBUG - Checking path: /home/jules/.pyenv/plugins/python-build/bin
+2025-07-14 21:30:09,647 - DEBUG - Checking path: /home/jules/.pyenv/plugins/pyenv-virtualenv/bin
+2025-07-14 21:30:09,648 - DEBUG - Checking path: /home/jules/.pyenv/plugins/pyenv-update/bin
+2025-07-14 21:30:09,649 - DEBUG - Checking path: /home/jules/.pyenv/plugins/pyenv-doctor/bin
+2025-07-14 21:30:09,650 - DEBUG - Checking path: /home/jules/.nvm/versions/node/v22.17.0/bin
+2025-07-14 21:30:09,652 - DEBUG - Checking path: /home/jules/.pyenv/shims
+2025-07-14 21:30:09,653 - DEBUG - Checking path: /home/jules/.pyenv/bin
+2025-07-14 21:30:09,654 - DEBUG - Checking path: /home/jules/.local/bin
+2025-07-14 21:30:09,655 - DEBUG - Checking path: /go/bin
+2025-07-14 21:30:09,656 - DEBUG - Checking path: /usr/local/go/bin
+2025-07-14 21:30:09,657 - DEBUG - Checking path: /usr/share/gradle/bin
+2025-07-14 21:30:09,658 - DEBUG - Checking path: /usr/share/maven/bin
+2025-07-14 21:30:09,660 - DEBUG - Checking path: /home/jules/.local/bin
+2025-07-14 21:30:09,661 - DEBUG - Checking path: /home/jules/.cargo/bin
+2025-07-14 21:30:09,662 - DEBUG - Checking path: /usr/local/sbin
+2025-07-14 21:30:09,663 - DEBUG - Checking path: /usr/local/bin
+2025-07-14 21:30:09,664 - DEBUG - Checking path: /usr/sbin
+2025-07-14 21:30:09,665 - DEBUG - Checking path: /usr/bin
+2025-07-14 21:30:09,667 - DEBUG - Checking path: /sbin
+2025-07-14 21:30:09,668 - DEBUG - Checking path: /bin
+2025-07-14 21:30:09,669 - DEBUG - Checking path: /usr/games
+2025-07-14 21:30:09,670 - DEBUG - Checking path: /usr/local/games
+2025-07-14 21:30:09,671 - DEBUG - Checking path: /snap/bin
+2025-07-14 21:30:09,672 - ERROR - Qt6 installation not found in PATH.
+2025-07-14 21:30:09,679 - ERROR - Qt6 not found in PATH
+2025-07-14 21:30:09,681 - INFO - CMakeLists.txt found: /app/qt6_project/CMakeLists.txt
+2025-07-14 21:30:09,682 - INFO - Running command: cmake --version
+2025-07-14 21:30:09,683 - INFO - Working directory: /app/qt6_project
+2025-07-14 21:30:09,699 - DEBUG - STDOUT:
+cmake version 3.28.3
+
+CMake suite maintained and supported by Kitware (kitware.com/cmake).
+2025-07-14 21:30:09,701 - INFO - Command succeeded: cmake --version
+2025-07-14 21:30:09,705 - ERROR - Prerequisites check failed
+2025-07-14 21:30:09,711 - INFO - Build completed in 0.1 seconds
+2025-07-14 21:30:09,712 - INFO - Final status: FAILED
+2025-07-14 21:30:09,713 - INFO - Log file saved to: /app/qt6_project/logs/build_20250714_213009.log

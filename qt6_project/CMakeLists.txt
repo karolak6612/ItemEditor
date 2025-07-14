@@ -36,14 +36,6 @@ if(MSVC)
     set(CMAKE_VS_INCLUDE_INSTALL_TO_DEFAULT_BUILD 1)
 endif()
 
-# Find required Qt6 components
-find_package(Qt6 REQUIRED COMPONENTS 
-    Core 
-    Widgets 
-    Gui
-    Network
-    Xml
-)
 
 # Build type configurations
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)

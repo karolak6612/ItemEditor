@@ -104,15 +104,24 @@ private slots:
     void onFileExit();
     
     // Edit menu actions
+    void onEditCreateItem();
+    void onEditDuplicateItem();
+    void onEditReloadItem();
     void onEditFind();
+    void onEditCreateMissingItems();
     void onEditPreferences();
     
     // View menu actions
     void onViewShowOnlyMismatchedItems(bool checked);
+    void onViewShowDeprecatedItems(bool checked);
+    void onViewUpdateItemsList();
     void onViewShowDecimalItemId(bool checked);
     void onViewShowHexItemId(bool checked);
     
     // Tools menu actions
+    void onToolsReloadItemAttributes();
+    void onToolsCompareOtbFiles();
+    void onToolsUpdateOtbVersion();
     void onToolsUpdate();
     void onToolsUpdateSettings();
     void onToolsDiagnostics();
@@ -241,6 +250,9 @@ private:
     // Right panel - Item Properties (exact mirror of C# layout)
     QWidget* m_rightPanel;
     QVBoxLayout* m_rightLayout;
+
+    // Output panel
+    QTextEdit* m_outputTextBox;
     
     // Item Properties Group
     QGroupBox* m_propertiesGroupBox;
@@ -279,16 +291,25 @@ private:
     QAction* m_exitAction;
     
     QMenu* m_editMenu;
+    QAction* m_createItemAction;
+    QAction* m_duplicateItemAction;
+    QAction* m_reloadItemAction;
     QAction* m_findAction;
+    QAction* m_createMissingItemsAction;
     QAction* m_preferencesAction;
     
     QMenu* m_viewMenu;
     QAction* m_showOnlyMismatchedAction;
+    QAction* m_showDeprecatedItemsAction;
+    QAction* m_updateItemsListAction;
     QActionGroup* m_itemIdDisplayGroup;
     QAction* m_showDecimalIdAction;
     QAction* m_showHexIdAction;
     
     QMenu* m_toolsMenu;
+    QAction* m_reloadItemAttributesAction;
+    QAction* m_compareOtbAction;
+    QAction* m_updateOtbVersionAction;
     QAction* m_updateAction;
     QAction* m_updateSettingsAction;
     QAction* m_diagnosticsAction;
@@ -328,8 +349,13 @@ private:
     
     // Constants - exact mirror of C# constants
     static const int ITEM_LIST_WIDTH = 232;
+    static const int ITEM_LIST_HEIGHT = 440;
     static const int APPEARANCE_WIDTH = 89;
-    static const int PROPERTIES_MIN_WIDTH = 200;
+    static const int APPEARANCE_HEIGHT = 309;
+    static const int PROPERTIES_MIN_WIDTH = 425;
+    static const int PROPERTIES_MIN_HEIGHT = 309;
+    static const int OUTPUT_MIN_WIDTH = 525;
+    static const int OUTPUT_MIN_HEIGHT = 160;
     static const int WINDOW_MIN_WIDTH = 800;
     static const int WINDOW_MIN_HEIGHT = 600;
     static const int UPDATE_INTERVAL_MS = 100;

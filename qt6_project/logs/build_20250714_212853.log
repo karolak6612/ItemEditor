@@ -1,0 +1,15 @@
+2025-07-14 21:28:53,530 - INFO - Build session started - Log file: /app/qt6_project/logs/build_20250714_212853.log
+2025-07-14 21:28:53,535 - INFO - Project directory: /app/qt6_project
+2025-07-14 21:28:53,542 - ERROR - Qt6 not found in PATH
+2025-07-14 21:28:53,544 - INFO - CMakeLists.txt found: /app/qt6_project/CMakeLists.txt
+2025-07-14 21:28:53,545 - INFO - Running command: cmake --version
+2025-07-14 21:28:53,546 - INFO - Working directory: /app/qt6_project
+2025-07-14 21:28:53,563 - DEBUG - STDOUT:
+cmake version 3.28.3
+
+CMake suite maintained and supported by Kitware (kitware.com/cmake).
+2025-07-14 21:28:53,566 - INFO - Command succeeded: cmake --version
+2025-07-14 21:28:53,570 - ERROR - Prerequisites check failed
+2025-07-14 21:28:53,576 - INFO - Build completed in 0.0 seconds
+2025-07-14 21:28:53,577 - INFO - Final status: FAILED
+2025-07-14 21:28:53,578 - INFO - Log file saved to: /app/qt6_project/logs/build_20250714_212853.log
