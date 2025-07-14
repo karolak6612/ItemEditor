@@ -1,4 +1,13 @@
-# Main application executable
+# Find Qt6 components
+find_package(Qt6 REQUIRED COMPONENTS
+    Core
+    Widgets
+    Gui
+    Network
+    Xml
+)
+
+# Main application executable - Linux only
 qt_add_executable(ItemEditor
     main.cpp
     MainForm.cpp
@@ -35,46 +44,12 @@ target_include_directories(ItemEditor PRIVATE
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-# Set target properties
+# Set target properties - Linux only
 set_target_properties(ItemEditor PROPERTIES
-    WIN32_EXECUTABLE ON
-    MACOSX_BUNDLE ON
     OUTPUT_NAME "ItemEditor"
 )
 
-# Windows-specific properties
-if(WIN32)
-    set_target_properties(ItemEditor PROPERTIES
-        WIN32_EXECUTABLE TRUE
-    )
-endif()
-
-# macOS-specific properties
-if(APPLE)
-    set_target_properties(ItemEditor PROPERTIES
-        MACOSX_BUNDLE TRUE
-        MACOSX_BUNDLE_BUNDLE_NAME "Item Editor"
-        MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
-        MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION}
-        MACOSX_BUNDLE_IDENTIFIER "org.ottools.ItemEditor"
-    )
-endif()
-
 # Installation
 install(TARGETS ItemEditor
-    BUNDLE DESTINATION .
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
-
-# Install Qt6 dependencies (Windows/Linux)
-if(NOT APPLE)
-    find_program(QT_DEPLOY_EXECUTABLE NAMES windeployqt macdeployqt linuxdeployqt)
-    if(QT_DEPLOY_EXECUTABLE)
-        install(CODE "
-            execute_process(
-                COMMAND ${QT_DEPLOY_EXECUTABLE} \${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/ItemEditor
-                WORKING_DIRECTORY \${CMAKE_INSTALL_PREFIX}
-            )
-        ")
-    endif()
-endif()
