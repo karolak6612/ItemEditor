@@ -1,0 +1,307 @@
+2025-07-14 21:46:26,965 - INFO - Running command: sudo apt update
+2025-07-14 21:46:29,342 - INFO - Command succeeded: sudo apt update
+2025-07-14 21:46:29,348 - INFO - Running command: dpkg -l build-essential
+2025-07-14 21:46:29,369 - INFO - Command succeeded: dpkg -l build-essential
+2025-07-14 21:46:29,372 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name            Version      Architecture Description
++++-===============-============-============-==============================================
+ii  build-essential 12.10ubuntu1 amd64        Informational list of build-essential packages
+2025-07-14 21:46:29,375 - INFO - Running command: dpkg -l cmake
+2025-07-14 21:46:29,396 - INFO - Command succeeded: dpkg -l cmake
+2025-07-14 21:46:29,398 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name           Version        Architecture Description
++++-==============-==============-============-=======================================
+ii  cmake          3.28.3-1build7 amd64        cross-platform, open-source make system
+2025-07-14 21:46:29,402 - INFO - Running command: dpkg -l git
+2025-07-14 21:46:29,423 - INFO - Command succeeded: dpkg -l git
+2025-07-14 21:46:29,425 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name           Version                       Architecture Description
++++-==============-=============================-============-===================================================
+ii  git            1:2.49.0-2~ppa1~ubuntu24.04.1 amd64        fast, scalable, distributed revision control system
+2025-07-14 21:46:29,429 - INFO - Running command: dpkg -l pkg-config
+2025-07-14 21:46:29,450 - INFO - Command succeeded: dpkg -l pkg-config
+2025-07-14 21:46:29,452 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name             Version       Architecture Description
++++-================-=============-============-==================================================================
+ii  pkg-config:amd64 1.8.1-2build1 amd64        manage compile and link flags for libraries (transitional package)
+2025-07-14 21:46:29,455 - INFO - Running command: dpkg -l qt6-base-dev
+2025-07-14 21:46:29,476 - INFO - Command succeeded: dpkg -l qt6-base-dev
+2025-07-14 21:46:29,478 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name               Version               Architecture Description
++++-==================-=====================-============-=================================
+ii  qt6-base-dev:amd64 6.4.2+dfsg-21.1build5 amd64        Qt 6 base development files
+2025-07-14 21:46:29,482 - INFO - Running command: dpkg -l qt6-tools-dev
+2025-07-14 21:46:29,503 - INFO - Command succeeded: dpkg -l qt6-tools-dev
+2025-07-14 21:46:29,505 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name                Version       Architecture Description
++++-===================-=============-============-=================================
+ii  qt6-tools-dev:amd64 6.4.2-3build3 amd64        Qt 6 Tools - development files
+2025-07-14 21:46:29,508 - INFO - Running command: dpkg -l qt6-tools-dev-tools
+2025-07-14 21:46:29,528 - INFO - Command succeeded: dpkg -l qt6-tools-dev-tools
+2025-07-14 21:46:29,531 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name                Version       Architecture Description
++++-===================-=============-============-=================================
+ii  qt6-tools-dev-tools 6.4.2-3build3 amd64        Qt 6 development tools
+2025-07-14 21:46:29,534 - INFO - Running command: dpkg -l libqt6core6
+2025-07-14 21:46:29,555 - INFO - Command succeeded: dpkg -l libqt6core6
+2025-07-14 21:46:29,558 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name           Version      Architecture Description
++++-==============-============-============-=================================
+un  libqt6core6    <none>       <none>       (no description available)
+2025-07-14 21:46:29,561 - INFO - Running command: dpkg -l libqt6gui6
+2025-07-14 21:46:29,581 - INFO - Command succeeded: dpkg -l libqt6gui6
+2025-07-14 21:46:29,583 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name           Version      Architecture Description
++++-==============-============-============-=================================
+un  libqt6gui6     <none>       <none>       (no description available)
+2025-07-14 21:46:29,587 - INFO - Running command: dpkg -l libqt6widgets6
+2025-07-14 21:46:29,607 - INFO - Command succeeded: dpkg -l libqt6widgets6
+2025-07-14 21:46:29,610 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name           Version      Architecture Description
++++-==============-============-============-=================================
+un  libqt6widgets6 <none>       <none>       (no description available)
+2025-07-14 21:46:29,613 - INFO - Running command: dpkg -l libqt6network6
+2025-07-14 21:46:29,634 - INFO - Command succeeded: dpkg -l libqt6network6
+2025-07-14 21:46:29,637 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name           Version      Architecture Description
++++-==============-============-============-=================================
+un  libqt6network6 <none>       <none>       (no description available)
+2025-07-14 21:46:29,640 - INFO - Running command: dpkg -l libqt6xml6
+2025-07-14 21:46:29,661 - INFO - Command succeeded: dpkg -l libqt6xml6
+2025-07-14 21:46:29,663 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name           Version      Architecture Description
++++-==============-============-============-=================================
+un  libqt6xml6     <none>       <none>       (no description available)
+2025-07-14 21:46:29,666 - INFO - Running command: dpkg -l qt6-qpa-plugins
+2025-07-14 21:46:29,687 - INFO - Command succeeded: dpkg -l qt6-qpa-plugins
+2025-07-14 21:46:29,690 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name                  Version               Architecture Description
++++-=====================-=====================-============-=================================
+ii  qt6-qpa-plugins:amd64 6.4.2+dfsg-21.1build5 amd64        Qt 6 QPA plugins
+2025-07-14 21:46:29,693 - INFO - Running command: dpkg -l libgl1-mesa-dev
+2025-07-14 21:46:29,714 - INFO - Command succeeded: dpkg -l libgl1-mesa-dev
+2025-07-14 21:46:29,716 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name                  Version                 Architecture Description
++++-=====================-=======================-============-=================================
+ii  libgl1-mesa-dev:amd64 24.2.8-1ubuntu1~24.04.1 amd64        transitional dummy package
+2025-07-14 21:46:29,720 - INFO - Running command: dpkg -l libglu1-mesa-dev
+2025-07-14 21:46:29,741 - INFO - Command succeeded: dpkg -l libglu1-mesa-dev
+2025-07-14 21:46:29,743 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name                   Version         Architecture Description
++++-======================-===============-============-================================================
+ii  libglu1-mesa-dev:amd64 9.0.2-1.1build1 amd64        Mesa OpenGL utility library -- development files
+2025-07-14 21:46:29,746 - INFO - Running command: dpkg -l libxkbcommon-dev
+2025-07-14 21:46:29,767 - INFO - Command succeeded: dpkg -l libxkbcommon-dev
+2025-07-14 21:46:29,769 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name                   Version       Architecture Description
++++-======================-=============-============-=========================================================
+ii  libxkbcommon-dev:amd64 1.6.0-1build1 amd64        library interface to the XKB compiler - development files
+2025-07-14 21:46:29,772 - INFO - Running command: dpkg -l libxcb-xinerama0-dev
+2025-07-14 21:46:29,793 - INFO - Command succeeded: dpkg -l libxcb-xinerama0-dev
+2025-07-14 21:46:29,796 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name                       Version       Architecture Description
++++-==========================-=============-============-==================================================
+ii  libxcb-xinerama0-dev:amd64 1.15-1ubuntu2 amd64        X C Binding, xinerama extension, development files
+2025-07-14 21:46:29,799 - INFO - Running command: dpkg -l libxcb-cursor-dev
+2025-07-14 21:46:29,820 - INFO - Command succeeded: dpkg -l libxcb-cursor-dev
+2025-07-14 21:46:29,822 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name                    Version       Architecture Description
++++-=======================-=============-============-==============================================================
+ii  libxcb-cursor-dev:amd64 0.1.4-1build1 amd64        utility libraries for X C Binding -- cursor, development files
+2025-07-14 21:46:29,826 - INFO - Running command: dpkg -l libfontconfig1-dev
+2025-07-14 21:46:29,847 - INFO - Command succeeded: dpkg -l libfontconfig1-dev
+2025-07-14 21:46:29,850 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name                     Version           Architecture Description
++++-========================-=================-============-==================================================
+ii  libfontconfig1-dev:amd64 2.15.0-1.1ubuntu2 amd64        generic font configuration library - dummy package
+2025-07-14 21:46:29,853 - INFO - Running command: dpkg -l libfreetype6-dev
+2025-07-14 21:46:29,874 - INFO - Command succeeded: dpkg -l libfreetype6-dev
+2025-07-14 21:46:29,876 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name             Version      Architecture Description
++++-================-============-============-=================================
+un  libfreetype6-dev <none>       <none>       (no description available)
+2025-07-14 21:46:29,880 - INFO - Running command: dpkg -l libx11-dev
+2025-07-14 21:46:29,901 - INFO - Command succeeded: dpkg -l libx11-dev
+2025-07-14 21:46:29,903 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name             Version         Architecture Description
++++-================-===============-============-=============================================
+ii  libx11-dev:amd64 2:1.8.7-1build1 amd64        X11 client-side library (development headers)
+2025-07-14 21:46:29,907 - INFO - Running command: dpkg -l libxext-dev
+2025-07-14 21:46:29,928 - INFO - Command succeeded: dpkg -l libxext-dev
+2025-07-14 21:46:29,930 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name              Version         Architecture Description
++++-=================-===============-============-==========================================================
+ii  libxext-dev:amd64 2:1.3.4-1build2 amd64        X11 miscellaneous extensions library (development headers)
+2025-07-14 21:46:29,933 - INFO - Running command: dpkg -l libxfixes-dev
+2025-07-14 21:46:29,955 - INFO - Command succeeded: dpkg -l libxfixes-dev
+2025-07-14 21:46:29,957 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name                Version         Architecture Description
++++-===================-===============-============-=================================================================
+ii  libxfixes-dev:amd64 1:6.0.0-2build1 amd64        X11 miscellaneous 'fixes' extension library (development headers)
+2025-07-14 21:46:29,960 - INFO - Running command: dpkg -l libxi-dev
+2025-07-14 21:46:29,983 - INFO - Command succeeded: dpkg -l libxi-dev
+2025-07-14 21:46:29,986 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name            Version         Architecture Description
++++-===============-===============-============-=================================================
+ii  libxi-dev:amd64 2:1.8.1-1build1 amd64        X11 Input extension library (development headers)
+2025-07-14 21:46:29,989 - INFO - Running command: dpkg -l libxrender-dev
+2025-07-14 21:46:30,010 - INFO - Command succeeded: dpkg -l libxrender-dev
+2025-07-14 21:46:30,013 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name                 Version            Architecture Description
++++-====================-==================-============-========================================================
+ii  libxrender-dev:amd64 1:0.9.10-1.1build1 amd64        X Rendering Extension client library (development files)
+2025-07-14 21:46:30,016 - INFO - Running command: dpkg -l libxcb1-dev
+2025-07-14 21:46:30,037 - INFO - Command succeeded: dpkg -l libxcb1-dev
+2025-07-14 21:46:30,040 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name              Version       Architecture Description
++++-=================-=============-============-=================================
+ii  libxcb1-dev:amd64 1.15-1ubuntu2 amd64        X C Binding, development files
+2025-07-14 21:46:30,043 - INFO - Running command: dpkg -l libx11-xcb-dev
+2025-07-14 21:46:30,064 - INFO - Command succeeded: dpkg -l libx11-xcb-dev
+2025-07-14 21:46:30,066 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name                 Version         Architecture Description
++++-====================-===============-============-================================================
+ii  libx11-xcb-dev:amd64 2:1.8.7-1build1 amd64        Xlib/XCB interface library (development headers)
+2025-07-14 21:46:30,071 - INFO - Running command: dpkg -l libxcb-glx0-dev
+2025-07-14 21:46:30,092 - INFO - Command succeeded: dpkg -l libxcb-glx0-dev
+2025-07-14 21:46:30,095 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name                  Version       Architecture Description
++++-=====================-=============-============-=============================================
+ii  libxcb-glx0-dev:amd64 1.15-1ubuntu2 amd64        X C Binding, glx extension, development files
+2025-07-14 21:46:30,098 - INFO - Running command: dpkg -l libxcb-keysyms1-dev
+2025-07-14 21:46:30,120 - INFO - Command succeeded: dpkg -l libxcb-keysyms1-dev
+2025-07-14 21:46:30,122 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name                      Version       Architecture Description
++++-=========================-=============-============-===============================================================
+ii  libxcb-keysyms1-dev:amd64 0.4.0-1build4 amd64        utility libraries for X C Binding -- keysyms, development files
+2025-07-14 21:46:30,125 - INFO - Running command: dpkg -l libxcb-image0-dev
+2025-07-14 21:46:30,146 - INFO - Command succeeded: dpkg -l libxcb-image0-dev
+2025-07-14 21:46:30,149 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name                    Version       Architecture Description
++++-=======================-=============-============-=============================================================
+ii  libxcb-image0-dev:amd64 0.4.0-2build1 amd64        utility libraries for X C Binding -- image, development files
+2025-07-14 21:46:30,152 - INFO - Running command: dpkg -l libxcb-shm0-dev
+2025-07-14 21:46:30,173 - INFO - Command succeeded: dpkg -l libxcb-shm0-dev
+2025-07-14 21:46:30,175 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name                  Version       Architecture Description
++++-=====================-=============-============-=============================================
+ii  libxcb-shm0-dev:amd64 1.15-1ubuntu2 amd64        X C Binding, shm extension, development files
+2025-07-14 21:46:30,178 - INFO - Running command: dpkg -l libxcb-icccm4-dev
+2025-07-14 21:46:30,199 - INFO - Command succeeded: dpkg -l libxcb-icccm4-dev
+2025-07-14 21:46:30,201 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name                    Version         Architecture Description
++++-=======================-===============-============-=============================================================
+ii  libxcb-icccm4-dev:amd64 0.4.1-1.1build3 amd64        utility libraries for X C Binding -- icccm, development files
+2025-07-14 21:46:30,205 - INFO - Running command: dpkg -l libxcb-sync-dev
+2025-07-14 21:46:30,226 - INFO - Command succeeded: dpkg -l libxcb-sync-dev
+2025-07-14 21:46:30,228 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name                  Version       Architecture Description
++++-=====================-=============-============-==============================================
+ii  libxcb-sync-dev:amd64 1.15-1ubuntu2 amd64        X C Binding, sync extension, development files
+2025-07-14 21:46:30,231 - INFO - Running command: dpkg -l libxcb-xfixes0-dev
+2025-07-14 21:46:30,252 - INFO - Command succeeded: dpkg -l libxcb-xfixes0-dev
+2025-07-14 21:46:30,255 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name                     Version       Architecture Description
++++-========================-=============-============-================================================
+ii  libxcb-xfixes0-dev:amd64 1.15-1ubuntu2 amd64        X C Binding, xfixes extension, development files
+2025-07-14 21:46:30,258 - INFO - Running command: dpkg -l libxcb-shape0-dev
+2025-07-14 21:46:30,279 - INFO - Command succeeded: dpkg -l libxcb-shape0-dev
+2025-07-14 21:46:30,281 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name                    Version       Architecture Description
++++-=======================-=============-============-===============================================
+ii  libxcb-shape0-dev:amd64 1.15-1ubuntu2 amd64        X C Binding, shape extension, development files
+2025-07-14 21:46:30,285 - INFO - Running command: dpkg -l libxcb-randr0-dev
+2025-07-14 21:46:30,306 - INFO - Command succeeded: dpkg -l libxcb-randr0-dev
+2025-07-14 21:46:30,308 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name                    Version       Architecture Description
++++-=======================-=============-============-===============================================
+ii  libxcb-randr0-dev:amd64 1.15-1ubuntu2 amd64        X C Binding, randr extension, development files
+2025-07-14 21:46:30,312 - INFO - Running command: dpkg -l libxcb-render-util0-dev
+2025-07-14 21:46:30,333 - INFO - Command succeeded: dpkg -l libxcb-render-util0-dev
+2025-07-14 21:46:30,335 - DEBUG - STDOUT: Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name                          Version       Architecture Description
++++-=============================-=============-============-================================================
+ii  libxcb-render-util0-dev:amd64 0.3.9-1build4 amd64        utility libraries for X C Binding -- render-util
+2025-07-14 21:46:30,342 - INFO - Running command: sudo apt install -y libqt6core6 libqt6gui6 libqt6widgets6 libqt6network6 libqt6xml6 libfreetype6-dev
+2025-07-14 21:46:32,673 - INFO - Command succeeded: sudo apt install -y libqt6core6 libqt6gui6 libqt6widgets6 libqt6network6 libqt6xml6 libfreetype6-dev
+2025-07-14 21:46:32,677 - INFO - Running command: /usr/lib/qt6/bin/qmake6 -version
+2025-07-14 21:46:32,684 - INFO - Command succeeded: /usr/lib/qt6/bin/qmake6 -version
+2025-07-14 21:46:32,686 - DEBUG - STDOUT: QMake version 3.1
+Using Qt version 6.4.2 in /usr/lib/x86_64-linux-gnu
+2025-07-14 21:46:32,691 - INFO - Running command: cmake -G Unix Makefiles -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON /app/qt6_project -DCMAKE_PREFIX_PATH=/usr/lib/qt6
+2025-07-14 21:46:32,692 - INFO - Working directory: /app/qt6_project/build
+2025-07-14 21:46:33,009 - ERROR - Command failed with code 1: cmake -G Unix Makefiles -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON /app/qt6_project -DCMAKE_PREFIX_PATH=/usr/lib/qt6
