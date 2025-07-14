@@ -37,26 +37,6 @@ The Qt6 application MUST handle these file formats exactly like the C# version:
 - **Dialog Windows** - All modal dialogs and forms
 - **Rendering System** - Sprite display and graphics
 
-## Required Tools & Workflow
-
-### MCP Tools (MANDATORY)
-You MUST use these MCP tools for all work:
-
-1. **context7-mcp** - Documentation and code examples
-   - Use "qt-6-docs" for Qt6 framework documentation
-   - Use "csharp-docs" for C# reference when needed
-   - Get code snippets and implementation patterns
-
-2. **shrimp-task-manager** - Task planning and execution
-   - Execute existing tasks and mark completion
-   - Research what's left to migrate using thinking mode
-   - Plan new tasks based on gap analysis
-   - Track progress systematically
-
-3. **desktop-commander** - Code navigation and file operations
-   - Navigate through both C# and Qt6 codebases
-   - Compare implementations side-by-side
-   - Examine file structures and dependencies
 
 ### Research Protocol (MANDATORY FIRST STEP)
 
@@ -140,12 +120,11 @@ qt6_project/src/
 ## Typical Workflow
 
 1. **Context Restoration**
-   - Use shrimp-task-manager to review completed tasks
    - Examine current Qt6 implementation state
    - Identify immediate priorities
 
 2. **Research Phase**
-   - Use context7-mcp to understand Qt6 patterns
+   - understand Qt6 patterns
    - Study C# implementation for specific functionality
    - Plan migration approach
 
@@ -172,7 +151,6 @@ The migration is successful when:
 ## Remember
 
 - **Always start with research** - Understand current state before coding
-- **Use MCP tools** - They are essential for proper migration
 - **Think like an end user** - Will they encounter bugs or missing features?
 - **Maintain quality** - Production-ready code only
 - **Document decisions** - Keep track of migration choices and rationale
