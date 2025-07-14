@@ -50,11 +50,6 @@ Before marking ANY task complete:
 ✅ **Error handling**: Graceful handling of edge cases?  
 ✅ **Qt6 standards**: Follows Qt6 best practices?
 
-## Tools to Use
-- **context7-mcp**: Use "qt-6-docs" for Qt6 documentation
-- **shrimp-task-manager**: Track task progress
-- **desktop-commander**: Navigate code files
-
 ## Remember
 This is a **migration project**, not new development. The C# version is your specification - make the Qt6 version work exactly the same way.
 
