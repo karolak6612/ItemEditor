@@ -13,3 +13,4 @@ obj/
 # StyleCop
 stylecop.*
 *cache
+qt6_project/acli.exe
