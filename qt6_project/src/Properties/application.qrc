@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RCC>
+    <qresource prefix="/">
+        <!-- Essential Application Icons -->
+        <file alias="icons/application.png">icons/application.png</file>
+        <file alias="icons/new.png">icons/new.png</file>
+        <file alias="icons/open.png">icons/open.png</file>
+        <file alias="icons/save.png">icons/save.png</file>
+        <file alias="icons/saveas.png">icons/saveas.png</file>
+        <file alias="icons/find.png">icons/find.png</file>
+        <file alias="icons/about.png">icons/about.png</file>
+        <file alias="icons/help.png">icons/help.png</file>
+        <file alias="icons/exit.png">icons/exit.png</file>
+        
+        <!-- Status Icons -->
+        <file alias="icons/status_ready.png">icons/status_ready.png</file>
+        <file alias="icons/status_loading.png">icons/status_loading.png</file>
+        <file alias="icons/status_error.png">icons/status_error.png</file>
+        
+        <!-- Stylesheets -->
+        <file alias="styles/dark.qss">styles/dark.qss</file>
+        <file alias="styles/light.qss">styles/light.qss</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,62 @@
+# Performance Test CMakeLists.txt for UI Controls
+cmake_minimum_required(VERSION 3.16)
+
+# Find Qt6 components
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
+
+# Create performance test executable
+add_executable(ui_performance_test
+    performance_test.cpp
+    ClientItemView.cpp
+    ClientItemView.h
+    ServerItemListBox.cpp
+    ServerItemListBox.h
+    FlagCheckBox.cpp
+    FlagCheckBox.h
+    ListBase.cpp
+    ListBase.h
+)
+
+# Link Qt6 libraries
+target_link_libraries(ui_performance_test
+    Qt6::Core
+    Qt6::Widgets
+)
+
+# Set target properties
+set_target_properties(ui_performance_test PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED ON
+)
+
+# Include directories
+target_include_directories(ui_performance_test PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/..
+)
+
+# Enable Qt MOC
+set_target_properties(ui_performance_test PROPERTIES
+    AUTOMOC ON
+    AUTOUIC ON
+    AUTORCC ON
+)
+
+# Add compile definitions
+target_compile_definitions(ui_performance_test PRIVATE
+    QT_NO_KEYWORDS
+    QT_DISABLE_DEPRECATED_BEFORE=0x060000
+)
+
+# Performance test specific settings
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    target_compile_definitions(ui_performance_test PRIVATE
+        QT_NO_DEBUG_OUTPUT
+        QT_NO_WARNING_OUTPUT
+    )
+endif()
+
+# Install target
+install(TARGETS ui_performance_test
+    RUNTIME DESTINATION bin
+)

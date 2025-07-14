@@ -1,0 +1,12 @@
+{
+    "IID": "org.ottools.ItemEditor.IPlugin/1.0",
+    "MetaData": {
+        "name": "PluginOne",
+        "version": "1.0.0",
+        "description": "Tibia 7.x client support plugin",
+        "author": "OTTools",
+        "supportedVersions": ["7.60", "7.70", "7.80", "7.90"],
+        "clientType": "legacy",
+        "features": ["dat", "spr", "otb"]
+    }
+}

@@ -51,7 +51,7 @@
         "C:\\Users\\karol\\Documents\\Github_OLD\\mcp-shrimp-task-manager\\dist\\index.js"
       ],
       "env": {
-        "DATA_DIR": "C:\\Users\\karol\\Documents\\Github_OLD\\mcp-shrimp-task-manager\\tasks",
+        "DATA_DIR": "C:\\Users\\karol\\Documents\\Github_OLD\\Item Editor Final\\tasks",
         "ENABLE_THOUGHT_CHAIN": "true",
         "TEMPLATES_USE": "en",
         "ENABLE_GUI": "true",
