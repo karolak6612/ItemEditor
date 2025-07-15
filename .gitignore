@@ -16,3 +16,4 @@ stylecop.*
 qt6_project/acli.exe
 acli.exe
 /qt6_project/build/
+/qt6_project/logs/
