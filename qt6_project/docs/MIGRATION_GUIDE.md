@@ -23,38 +23,74 @@ This document provides detailed guidance for migrating the Item Editor applicati
 
 ## Component Migration Details
 
-### 1. Controls Migration
+### 1. Custom Controls Migration (CRITICAL COMPONENTS)
 
-#### ClientItemView (Custom Paint Control)
-**C# Original**: `Legacy_App/csharp/Source/Controls/ClientItemView.cs`
+#### ClientItemView (Custom Paint Control) - COMPLETE IMPLEMENTATION REQUIRED
+**C# Reference**: `Legacy_App/csharp/Source/Controls/ClientItemView.cs`
 **Qt6 Target**: `src/Controls/ClientItemView.cpp/.h`
 
-**Key Changes**:
-- Inherit from `QWidget` instead of `UserControl`
-- Override `paintEvent()` instead of `OnPaint()`
-- Use `QPainter` instead of `Graphics`
-- Use `QPixmap` instead of `Bitmap`
+**Critical Implementation Requirements**:
+- **Exact Visual Behavior**: Sprite centering and scaling must match C# version precisely
+- **Transparency Support**: Handle alpha channels correctly for sprite rendering
+- **Performance**: Efficient rendering without flickering or lag
+- **Data Binding**: Seamless integration with ClientItem objects
 
-**Implementation Pattern**:
+**Complete Implementation Pattern**:
 ```cpp
 class ClientItemView : public QWidget
 {
     Q_OBJECT
     
 public:
-    explicit ClientItemView(QWidget *parent = nullptr);
+    explicit ClientItemView(QWidget* parent = nullptr);
+    ~ClientItemView() override;
     
-    ClientItem* clientItem() const { return m_item; }
+    // Properties (exact C# equivalents)
+    ClientItem* clientItem() const { return m_clientItem; }
     void setClientItem(ClientItem* item);
     
+    // Size management
+    QSize sizeHint() const override;
+    QSize minimumSizeHint() const override;
+
+signals:
+    void clientItemChanged(ClientItem* item);
+
 protected:
-    void paintEvent(QPaintEvent *event) override;
+    void paintEvent(QPaintEvent* event) override;
+    void resizeEvent(QResizeEvent* event) override;
     
 private:
-    ClientItem* m_item;
+    void updateRects();
+    void paintSprite(QPainter& painter);
+    
+    ClientItem* m_clientItem;
     QRect m_destRect;
     QRect m_sourceRect;
+    bool m_rectsNeedUpdate;
 };
+
+// Implementation details for paintEvent()
+void ClientItemView::paintEvent(QPaintEvent* event)
+{
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing, false);
+    
+    // Clear background
+    painter.fillRect(rect(), palette().base());
+    
+    if (m_clientItem && m_clientItem->sprite()) {
+        if (m_rectsNeedUpdate) {
+            updateRects();
+        }
+        
+        // Draw sprite centered in widget
+        QPixmap sprite = m_clientItem->sprite()->pixmap();
+        if (!sprite.isNull()) {
+            painter.drawPixmap(m_destRect, sprite, m_sourceRect);
+        }
+    }
+}
 ```
 
 #### ServerItemListBox (Custom List Control)
