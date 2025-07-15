@@ -511,6 +511,7 @@ void ServerItemListBox::updateVisibleRange()
             m_updateTimer->start();
         }
     }
+}
 
 void ServerItemListBox::addItems(const QList<ItemEditor::ServerItem*>& itemList)
 {
@@ -531,7 +532,6 @@ void ServerItemListBox::setIdDisplayFormat(IdDisplayFormat format)
         m_idDisplayFormat = format;
         update();
     }
-}
 }
 
 void ServerItemListBox::performDeferredUpdate()

@@ -63,12 +63,12 @@ bool ItemsXmlReader::read(const QString& directory, OTLib::Collections::ServerIt
             QXmlStreamReader::TokenType token = reader.readNext();
             
             if (token == QXmlStreamReader::StartElement) {
-                if (reader.name() == "items") {
+                if (reader.name() == QString("items")) {
                     // Process items
                     while (!reader.atEnd() && !reader.hasError()) {
                         token = reader.readNext();
                         
-                        if (token == QXmlStreamReader::StartElement && reader.name() == "item") {
+                        if (token == QXmlStreamReader::StartElement && reader.name() == QString("item")) {
                             QXmlStreamAttributes attributes = reader.attributes();
                             
                             if (attributes.hasAttribute("id")) {

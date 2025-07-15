@@ -1,0 +1,573 @@
+2025-07-15 08:58:12,055 - INFO - Linux build session started - Log file: /app/qt6_project/logs/build_linux_20250715_085812.log
+2025-07-15 08:58:12,060 - INFO - Project directory: /app/qt6_project
+2025-07-15 08:58:12,066 - INFO - CMakeLists.txt found: /app/qt6_project/CMakeLists.txt
+2025-07-15 08:58:12,067 - INFO - Running command: cmake --version
+2025-07-15 08:58:12,068 - INFO - Working directory: /app/qt6_project
+2025-07-15 08:58:12,083 - DEBUG - STDOUT:
+cmake version 3.28.3
+
+CMake suite maintained and supported by Kitware (kitware.com/cmake).
+2025-07-15 08:58:12,086 - INFO - Command succeeded: cmake --version
+2025-07-15 08:58:12,087 - INFO - Running command: g++ --version
+2025-07-15 08:58:12,088 - INFO - Working directory: /app/qt6_project
+2025-07-15 08:58:12,092 - DEBUG - STDOUT:
+g++ (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0
+Copyright (C) 2023 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+2025-07-15 08:58:12,095 - INFO - Command succeeded: g++ --version
+2025-07-15 08:58:12,098 - INFO - All prerequisites verified successfully
+2025-07-15 08:58:12,100 - INFO - Running command: sudo apt update
+2025-07-15 08:58:12,101 - INFO - Working directory: /app/qt6_project
+2025-07-15 08:58:14,191 - DEBUG - STDOUT:
+Hit:1 http://us-central1.gce.archive.ubuntu.com/ubuntu noble InRelease
+Hit:2 http://us-central1.gce.archive.ubuntu.com/ubuntu noble-updates InRelease
+Hit:3 http://us-central1.gce.archive.ubuntu.com/ubuntu noble-backports InRelease
+Hit:4 http://us-central1.gce.archive.ubuntu.com/ubuntu noble-security InRelease
+Hit:5 https://download.docker.com/linux/ubuntu noble InRelease
+Hit:6 https://ppa.launchpadcontent.net/git-core/ppa/ubuntu noble InRelease
+Reading package lists...
+Building dependency tree...
+Reading state information...
+12 packages can be upgraded. Run 'apt list --upgradable' to see them.
+2025-07-15 08:58:14,193 - WARNING - STDERR:
+WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+2025-07-15 08:58:14,195 - INFO - Command succeeded: sudo apt update
+2025-07-15 08:58:14,199 - INFO - Running command: sudo apt install -y build-essential cmake git pkg-config ninja-build qt6-base-dev qt6-tools-dev qt6-tools-dev-tools libqt6core6 libqt6gui6
+2025-07-15 08:58:14,201 - INFO - Working directory: /app/qt6_project
+2025-07-15 08:58:15,838 - DEBUG - STDOUT:
+Reading package lists...
+Building dependency tree...
+Reading state information...
+build-essential is already the newest version (12.10ubuntu1).
+cmake is already the newest version (3.28.3-1build7).
+git is already the newest version (1:2.50.1-0ppa1~ubuntu24.04.1).
+pkg-config is already the newest version (1.8.1-2build1).
+ninja-build is already the newest version (1.11.1-2).
+qt6-base-dev is already the newest version (6.4.2+dfsg-21.1build5).
+qt6-tools-dev is already the newest version (6.4.2-3build3).
+qt6-tools-dev-tools is already the newest version (6.4.2-3build3).
+libqt6core6t64 is already the newest version (6.4.2+dfsg-21.1build5).
+libqt6gui6t64 is already the newest version (6.4.2+dfsg-21.1build5).
+The following packages were automatically installed and are no longer required:
+  bridge-utils dns-root-data dnsmasq-base netcat-openbsd ubuntu-fan
+Use 'sudo apt autoremove' to remove them.
+0 upgraded, 0 newly installed, 0 to remove and 12 not upgraded.
+2025-07-15 08:58:15,844 - WARNING - STDERR:
+WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+2025-07-15 08:58:15,846 - INFO - Command succeeded: sudo apt install -y build-essential cmake git pkg-config ninja-build qt6-base-dev qt6-tools-dev qt6-tools-dev-tools libqt6core6 libqt6gui6
+2025-07-15 08:58:15,848 - INFO - Running command: sudo apt install -y libqt6widgets6 libqt6network6 libqt6xml6 qt6-qpa-plugins libgl1-mesa-dev libglu1-mesa-dev libxkbcommon-dev libxcb-xinerama0-dev libxcb-cursor-dev libfontconfig1-dev
+2025-07-15 08:58:15,851 - INFO - Working directory: /app/qt6_project
+2025-07-15 08:58:17,536 - DEBUG - STDOUT:
+Reading package lists...
+Building dependency tree...
+Reading state information...
+libqt6widgets6t64 is already the newest version (6.4.2+dfsg-21.1build5).
+libqt6network6t64 is already the newest version (6.4.2+dfsg-21.1build5).
+libqt6xml6t64 is already the newest version (6.4.2+dfsg-21.1build5).
+qt6-qpa-plugins is already the newest version (6.4.2+dfsg-21.1build5).
+libgl1-mesa-dev is already the newest version (24.2.8-1ubuntu1~24.04.1).
+libglu1-mesa-dev is already the newest version (9.0.2-1.1build1).
+libxkbcommon-dev is already the newest version (1.6.0-1build1).
+libxcb-xinerama0-dev is already the newest version (1.15-1ubuntu2).
+libxcb-cursor-dev is already the newest version (0.1.4-1build1).
+libfontconfig1-dev is already the newest version (2.15.0-1.1ubuntu2).
+The following packages were automatically installed and are no longer required:
+  bridge-utils dns-root-data dnsmasq-base netcat-openbsd ubuntu-fan
+Use 'sudo apt autoremove' to remove them.
+0 upgraded, 0 newly installed, 0 to remove and 12 not upgraded.
+2025-07-15 08:58:17,542 - WARNING - STDERR:
+WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+2025-07-15 08:58:17,545 - INFO - Command succeeded: sudo apt install -y libqt6widgets6 libqt6network6 libqt6xml6 qt6-qpa-plugins libgl1-mesa-dev libglu1-mesa-dev libxkbcommon-dev libxcb-xinerama0-dev libxcb-cursor-dev libfontconfig1-dev
+2025-07-15 08:58:17,547 - INFO - Running command: sudo apt install -y libfreetype6-dev libx11-dev libxext-dev libxfixes-dev libxi-dev libxrender-dev libxcb1-dev libx11-xcb-dev libxcb-glx0-dev libxcb-keysyms1-dev
+2025-07-15 08:58:17,549 - INFO - Working directory: /app/qt6_project
+2025-07-15 08:58:19,281 - DEBUG - STDOUT:
+Reading package lists...
+Building dependency tree...
+Reading state information...
+libfreetype-dev is already the newest version (2.13.2+dfsg-1build3).
+libx11-dev is already the newest version (2:1.8.7-1build1).
+libxext-dev is already the newest version (2:1.3.4-1build2).
+libxfixes-dev is already the newest version (1:6.0.0-2build1).
+libxi-dev is already the newest version (2:1.8.1-1build1).
+libxrender-dev is already the newest version (1:0.9.10-1.1build1).
+libxcb1-dev is already the newest version (1.15-1ubuntu2).
+libx11-xcb-dev is already the newest version (2:1.8.7-1build1).
+libxcb-glx0-dev is already the newest version (1.15-1ubuntu2).
+libxcb-keysyms1-dev is already the newest version (0.4.0-1build4).
+The following packages were automatically installed and are no longer required:
+  bridge-utils dns-root-data dnsmasq-base netcat-openbsd ubuntu-fan
+Use 'sudo apt autoremove' to remove them.
+0 upgraded, 0 newly installed, 0 to remove and 12 not upgraded.
+2025-07-15 08:58:19,286 - WARNING - STDERR:
+WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+2025-07-15 08:58:19,289 - INFO - Command succeeded: sudo apt install -y libfreetype6-dev libx11-dev libxext-dev libxfixes-dev libxi-dev libxrender-dev libxcb1-dev libx11-xcb-dev libxcb-glx0-dev libxcb-keysyms1-dev
+2025-07-15 08:58:19,292 - INFO - Running command: sudo apt install -y libxcb-image0-dev libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev
+2025-07-15 08:58:19,294 - INFO - Working directory: /app/qt6_project
+2025-07-15 08:58:20,972 - DEBUG - STDOUT:
+Reading package lists...
+Building dependency tree...
+Reading state information...
+libxcb-image0-dev is already the newest version (0.4.0-2build1).
+libxcb-shm0-dev is already the newest version (1.15-1ubuntu2).
+libxcb-icccm4-dev is already the newest version (0.4.1-1.1build3).
+libxcb-sync-dev is already the newest version (1.15-1ubuntu2).
+libxcb-xfixes0-dev is already the newest version (1.15-1ubuntu2).
+libxcb-shape0-dev is already the newest version (1.15-1ubuntu2).
+libxcb-randr0-dev is already the newest version (1.15-1ubuntu2).
+libxcb-render-util0-dev is already the newest version (0.3.9-1build4).
+The following packages were automatically installed and are no longer required:
+  bridge-utils dns-root-data dnsmasq-base netcat-openbsd ubuntu-fan
+Use 'sudo apt autoremove' to remove them.
+0 upgraded, 0 newly installed, 0 to remove and 12 not upgraded.
+2025-07-15 08:58:20,977 - WARNING - STDERR:
+WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+2025-07-15 08:58:20,980 - INFO - Command succeeded: sudo apt install -y libxcb-image0-dev libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev
+2025-07-15 08:58:20,984 - INFO - Successfully installed 38 packages
+2025-07-15 08:58:20,985 - INFO - Running command: /usr/lib/qt6/bin/qmake6 -version
+2025-07-15 08:58:20,986 - INFO - Working directory: /app/qt6_project
+2025-07-15 08:58:20,994 - DEBUG - STDOUT:
+QMake version 3.1
+Using Qt version 6.4.2 in /usr/lib/x86_64-linux-gnu
+2025-07-15 08:58:20,996 - INFO - Command succeeded: /usr/lib/qt6/bin/qmake6 -version
+2025-07-15 08:58:21,000 - INFO - Qt6 /usr/lib/x86_64-linux-gnu installation verified
+2025-07-15 08:58:21,007 - INFO - Cleaned directory: /app/qt6_project/build
+2025-07-15 08:58:21,009 - INFO - Created build directory: /app/qt6_project/build
+2025-07-15 08:58:21,011 - INFO - Running command: cmake -G Unix Makefiles -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_PREFIX_PATH=/usr/lib/qt6 -DCMAKE_VERBOSE_MAKEFILE=ON /app/qt6_project
+2025-07-15 08:58:21,013 - INFO - Working directory: /app/qt6_project/build
+2025-07-15 08:58:22,139 - DEBUG - STDOUT:
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Performing Test HAVE_STDATOMIC
+-- Performing Test HAVE_STDATOMIC - Success
+-- Found WrapAtomic: TRUE
+-- Found OpenGL: /usr/lib/x86_64-linux-gnu/libOpenGL.so
+-- Found WrapOpenGL: TRUE
+-- Found XKB: /usr/lib/x86_64-linux-gnu/libxkbcommon.so (found suitable version "1.6.0", minimum required is "0.5.0")
+-- Found WrapVulkanHeaders: /usr/include
+-- Plugins will be installed to: /usr/local/plugins
+-- Plugins will be built to: /app/qt6_project/build/plugins
+-- ItemEditor Configuration Summary:
+--   Version: 1.0.0
+--   Build type: Release
+--   C++ standard: 17
+--   Qt6 version: 6.4.2
+--   Install prefix: /usr/local
+--   Plugin directory: lib/ItemEditor/plugins
+-- Configuring done (0.9s)
+-- Generating done (0.1s)
+-- Build files have been written to: /app/qt6_project/build
+2025-07-15 08:58:22,144 - INFO - Command succeeded: cmake -G Unix Makefiles -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_PREFIX_PATH=/usr/lib/qt6 -DCMAKE_VERBOSE_MAKEFILE=ON /app/qt6_project
+2025-07-15 08:58:22,148 - INFO - Running command: cmake --build . --target PluginOne --config Release --parallel 4
+2025-07-15 08:58:22,150 - INFO - Working directory: /app/qt6_project/build
+2025-07-15 08:58:30,352 - DEBUG - STDOUT:
+Change Dir: '/app/qt6_project/build'
+
+Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile -j4 PluginOne
+/usr/bin/cmake -S/app/qt6_project -B/app/qt6_project/build --check-build-system CMakeFiles/Makefile.cmake 0
+/usr/bin/gmake  -f CMakeFiles/Makefile2 PluginOne
+gmake[1]: Entering directory '/app/qt6_project/build'
+/usr/bin/cmake -S/app/qt6_project -B/app/qt6_project/build --check-build-system CMakeFiles/Makefile.cmake 0
+/usr/bin/cmake -E cmake_progress_start /app/qt6_project/build/CMakeFiles 46
+/usr/bin/gmake  -f CMakeFiles/Makefile2 plugins/PluginOne/CMakeFiles/PluginOne.dir/all
+gmake[2]: Entering directory '/app/qt6_project/build'
+/usr/bin/gmake  -f src/PluginInterface/OTLib/Utils/CMakeFiles/ItemEditorOTLibUtils_autogen_timestamp_deps.dir/build.make src/PluginInterface/OTLib/Utils/CMakeFiles/ItemEditorOTLibUtils_autogen_timestamp_deps.dir/depend
+/usr/bin/gmake  -f src/PluginInterface/OTLib/Collections/CMakeFiles/ItemEditorOTLibCollections_autogen_timestamp_deps.dir/build.make src/PluginInterface/OTLib/Collections/CMakeFiles/ItemEditorOTLibCollections_autogen_timestamp_deps.dir/depend
+/usr/bin/gmake  -f src/PluginInterface/OTLib/OTB/CMakeFiles/ItemEditorOTLibOTB_autogen_timestamp_deps.dir/build.make src/PluginInterface/OTLib/OTB/CMakeFiles/ItemEditorOTLibOTB_autogen_timestamp_deps.dir/depend
+gmake[3]: Entering directory '/app/qt6_project/build'
+cd /app/qt6_project/build && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /app/qt6_project /app/qt6_project/src/PluginInterface/OTLib/Utils /app/qt6_project/build /app/qt6_project/build/src/PluginInterface/OTLib/Utils /app/qt6_project/build/src/PluginInterface/OTLib/Utils/CMakeFiles/ItemEditorOTLibUtils_autogen_timestamp_deps.dir/DependInfo.cmake "--color="
+/usr/bin/gmake  -f src/PluginInterface/OTLib/Server/Items/CMakeFiles/ItemEditorOTLibServerItems_autogen_timestamp_deps.dir/build.make src/PluginInterface/OTLib/Server/Items/CMakeFiles/ItemEditorOTLibServerItems_autogen_timestamp_deps.dir/depend
+gmake[3]: Entering directory '/app/qt6_project/build'
+cd /app/qt6_project/build && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /app/qt6_project /app/qt6_project/src/PluginInterface/OTLib/Collections /app/qt6_project/build /app/qt6_project/build/src/PluginInterface/OTLib/Collections /app/qt6_project/build/src/PluginInterface/OTLib/Collections/CMakeFiles/ItemEditorOTLibCollections_autogen_timestamp_deps.dir/DependInfo.cmake "--color="
+gmake[3]: Entering directory '/app/qt6_project/build'
+cd /app/qt6_project/build && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /app/qt6_project /app/qt6_project/src/PluginInterface/OTLib/OTB /app/qt6_project/build /app/qt6_project/build/src/PluginInterface/OTLib/OTB /app/qt6_project/build/src/PluginInterface/OTLib/OTB/CMakeFiles/ItemEditorOTLibOTB_autogen_timestamp_deps.dir/DependInfo.cmake "--color="
+gmake[3]: Entering directory '/app/qt6_project/build'
+cd /app/qt6_project/build && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /app/qt6_project /app/qt6_project/src/PluginInterface/OTLib/Server/Items /app/qt6_project/build /app/qt6_project/build/src/PluginInterface/OTLib/Server/Items /app/qt6_project/build/src/PluginInterface/OTLib/Server/Items/CMakeFiles/ItemEditorOTLibServerItems_autogen_timestamp_deps.dir/DependInfo.cmake "--color="
+gmake[3]: Leaving directory '/app/qt6_project/build'
+/usr/bin/gmake  -f src/PluginInterface/OTLib/Utils/CMakeFiles/ItemEditorOTLibUtils_autogen_timestamp_deps.dir/build.make src/PluginInterface/OTLib/Utils/CMakeFiles/ItemEditorOTLibUtils_autogen_timestamp_deps.dir/build
+gmake[3]: Leaving directory '/app/qt6_project/build'
+gmake[3]: Leaving directory '/app/qt6_project/build'
+/usr/bin/gmake  -f src/PluginInterface/OTLib/OTB/CMakeFiles/ItemEditorOTLibOTB_autogen_timestamp_deps.dir/build.make src/PluginInterface/OTLib/OTB/CMakeFiles/ItemEditorOTLibOTB_autogen_timestamp_deps.dir/build
+gmake[3]: Entering directory '/app/qt6_project/build'
+gmake[3]: Nothing to be done for 'src/PluginInterface/OTLib/Utils/CMakeFiles/ItemEditorOTLibUtils_autogen_timestamp_deps.dir/build'.
+gmake[3]: Leaving directory '/app/qt6_project/build'
+/usr/bin/gmake  -f src/PluginInterface/OTLib/Collections/CMakeFiles/ItemEditorOTLibCollections_autogen_timestamp_deps.dir/build.make src/PluginInterface/OTLib/Collections/CMakeFiles/ItemEditorOTLibCollections_autogen_timestamp_deps.dir/build
+gmake[3]: Leaving directory '/app/qt6_project/build'
+gmake[3]: Entering directory '/app/qt6_project/build'
+gmake[3]: Nothing to be done for 'src/PluginInterface/OTLib/OTB/CMakeFiles/ItemEditorOTLibOTB_autogen_timestamp_deps.dir/build'.
+gmake[3]: Leaving directory '/app/qt6_project/build'
+/usr/bin/gmake  -f src/PluginInterface/OTLib/Server/Items/CMakeFiles/ItemEditorOTLibServerItems_autogen_timestamp_deps.dir/build.make src/PluginInterface/OTLib/Server/Items/CMakeFiles/ItemEditorOTLibServerItems_autogen_timestamp_deps.dir/build
+gmake[3]: Entering directory '/app/qt6_project/build'
+gmake[3]: Nothing to be done for 'src/PluginInterface/OTLib/Collections/CMakeFiles/ItemEditorOTLibCollections_autogen_timestamp_deps.dir/build'.
+gmake[3]: Leaving directory '/app/qt6_project/build'
+gmake[3]: Entering directory '/app/qt6_project/build'
+gmake[3]: Nothing to be done for 'src/PluginInterface/OTLib/Server/Items/CMakeFiles/ItemEditorOTLibServerItems_autogen_timestamp_deps.dir/build'.
+gmake[3]: Leaving directory '/app/qt6_project/build'
+[  0%] Built target ItemEditorOTLibOTB_autogen_timestamp_deps
+[  0%] Built target ItemEditorOTLibUtils_autogen_timestamp_deps
+/usr/bin/gmake  -f src/PluginInterface/OTLib/SPR/CMakeFiles/ItemEditorOTLibSPR_autogen_timestamp_deps.dir/build.make src/PluginInterface/OTLib/SPR/CMakeFiles/ItemEditorOTLibSPR_autogen_timestamp_deps.dir/depend
+[  0%] Built target ItemEditorOTLibCollections_autogen_timestamp_deps
+/usr/bin/gmake  -f src/PluginInterface/OTLib/Utils/CMakeFiles/ItemEditorOTLibUtils_autogen.dir/build.make src/PluginInterface/OTLib/Utils/CMakeFiles/ItemEditorOTLibUtils_autogen.dir/depend
+/usr/bin/gmake  -f src/PluginInterface/OTLib/Collections/CMakeFiles/ItemEditorOTLibCollections_autogen.dir/build.make src/PluginInterface/OTLib/Collections/CMakeFiles/ItemEditorOTLibCollections_autogen.dir/depend
+[  0%] Built target ItemEditorOTLibServerItems_autogen_timestamp_deps
+gmake[3]: Entering directory '/app/qt6_project/build'
+cd /app/qt6_project/build && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /app/qt6_project /app/qt6_project/src/PluginInterface/OTLib/SPR /app/qt6_project/build /app/qt6_project/build/src/PluginInterface/OTLib/SPR /app/qt6_project/build/src/PluginInterface/OTLib/SPR/CMakeFiles/ItemEditorOTLibSPR_autogen_timestamp_deps.dir/DependInfo.cmake "--color="
+/usr/bin/gmake  -f src/PluginInterface/OTLib/OTB/CMakeFiles/ItemEditorOTLibOTB_autogen.dir/build.make src/PluginInterface/OTLib/OTB/CMakeFiles/ItemEditorOTLibOTB_autogen.dir/depend
+gmake[3]: Entering directory '/app/qt6_project/build'
+cd /app/qt6_project/build && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /app/qt6_project /app/qt6_project/src/PluginInterface/OTLib/Utils /app/qt6_project/build /app/qt6_project/build/src/PluginInterface/OTLib/Utils /app/qt6_project/build/src/PluginInterface/OTLib/Utils/CMakeFiles/ItemEditorOTLibUtils_autogen.dir/DependInfo.cmake "--color="
+gmake[3]: Entering directory '/app/qt6_project/build'
+cd /app/qt6_project/build && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /app/qt6_project /app/qt6_project/src/PluginInterface/OTLib/Collections /app/qt6_project/build /app/qt6_project/build/src/PluginInterface/OTLib/Collections /app/qt6_project/build/src/PluginInterface/OTLib/Collections/CMakeFiles/ItemEditorOTLibCollections_autogen.dir/DependInfo.cmake "--color="
+gmake[3]: Entering directory '/app/qt6_project/build'
+cd /app/qt6_project/build && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /app/qt6_project /app/qt6_project/src/PluginInterface/OTLib/OTB /app/qt6_project/build /app/qt6_project/build/src/PluginInterface/OTLib/OTB /app/qt6_project/build/src/PluginInterface/OTLib/OTB/CMakeFiles/ItemEditorOTLibOTB_autogen.dir/DependInfo.cmake "--color="
+gmake[3]: Leaving directory '/app/qt6_project/build'
+/usr/bin/gmake  -f src/PluginInterface/OTLib/SPR/CMakeFiles/ItemEditorOTLibSPR_autogen_timestamp_deps.dir/build.make src/PluginInterface/OTLib/SPR/CMakeFiles/ItemEditorOTLibSPR_autogen_timestamp_deps.dir/build
+gmake[3]: Leaving directory '/app/qt6_project/build'
+/usr/bin/gmake  -f src/PluginInterface/OTLib/Utils/CMakeFiles/ItemEditorOTLibUtils_autogen.dir/build.make src/PluginInterface/OTLib/Utils/CMakeFiles/ItemEditorOTLibUtils_autogen.dir/build
+gmake[3]: Leaving directory '/app/qt6_project/build'
+gmake[3]: Entering directory '/app/qt6_project/build'
+gmake[3]: Nothing to be done for 'src/PluginInterface/OTLib/SPR/CMakeFiles/ItemEditorOTLibSPR_autogen_timestamp_deps.dir/build'.
+gmake[3]: Leaving directory '/app/qt6_project/build'
+/usr/bin/gmake  -f src/PluginInterface/OTLib/Collections/CMakeFiles/ItemEditorOTLibCollections_autogen.dir/build.make src/PluginInterface/OTLib/Collections/CMakeFiles/ItemEditorOTLibCollections_autogen.dir/build
+gmake[3]: Leaving directory '/app/qt6_project/build'
+/usr/bin/gmake  -f src/PluginInterface/OTLib/OTB/CMakeFiles/ItemEditorOTLibOTB_autogen.dir/build.make src/PluginInterface/OTLib/OTB/CMakeFiles/ItemEditorOTLibOTB_autogen.dir/build
+gmake[3]: Entering directory '/app/qt6_project/build'
+gmake[3]: Entering directory '/app/qt6_project/build'
+gmake[3]: Entering directory '/app/qt6_project/build'
+[  0%] Built target ItemEditorOTLibSPR_autogen_timestamp_deps
+[  2%] Automatic MOC and UIC for target ItemEditorOTLibUtils
+/usr/bin/gmake  -f src/PluginInterface/OTLib/Server/Items/CMakeFiles/ItemEditorOTLibServerItems_autogen.dir/build.make src/PluginInterface/OTLib/Server/Items/CMakeFiles/ItemEditorOTLibServerItems_autogen.dir/depend
+cd /app/qt6_project/build/src/PluginInterface/OTLib/Utils && /usr/bin/cmake -E cmake_autogen /app/qt6_project/build/src/PluginInterface/OTLib/Utils/CMakeFiles/ItemEditorOTLibUtils_autogen.dir/AutogenInfo.json Release
+[  6%] Automatic MOC and UIC for target ItemEditorOTLibCollections
+[  6%] Automatic MOC and UIC for target ItemEditorOTLibOTB
+cd /app/qt6_project/build/src/PluginInterface/OTLib/OTB && /usr/bin/cmake -E cmake_autogen /app/qt6_project/build/src/PluginInterface/OTLib/OTB/CMakeFiles/ItemEditorOTLibOTB_autogen.dir/AutogenInfo.json Release
+cd /app/qt6_project/build/src/PluginInterface/OTLib/Collections && /usr/bin/cmake -E cmake_autogen /app/qt6_project/build/src/PluginInterface/OTLib/Collections/CMakeFiles/ItemEditorOTLibCollections_autogen.dir/AutogenInfo.json Release
+gmake[3]: Entering directory '/app/qt6_project/build'
+cd /app/qt6_project/build && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /app/qt6_project /app/qt6_project/src/PluginInterface/OTLib/Server/Items /app/qt6_project/build /app/qt6_project/build/src/PluginInterface/OTLib/Server/Items /app/qt6_project/build/src/PluginInterface/OTLib/Server/Items/CMakeFiles/ItemEditorOTLibServerItems_autogen.dir/DependInfo.cmake "--color="
+AutoGen: Refreshing parse cache because it doesn't exist.
+AutoMoc: Generating "SRC:/build/src/PluginInterface/OTLib/Utils/ItemEditorOTLibUtils_autogen/moc_predefs.h", because it doesn't exist.
+/usr/bin/c++ -std=gnu++17 -dM -E -c /usr/share/cmake-3.28/Modules/CMakeCXXCompilerABI.cpp -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -I/app/qt6_project/src/PluginInterface/OTLib/Utils -I/app/qt6_project/build/src/PluginInterface/OTLib/Utils -I/usr/include/x86_64-linux-gnu/qt6/QtCore -I/usr/include/x86_64-linux-gnu/qt6 -I/usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -I/usr/include/x86_64-linux-gnu/qt6/QtGui -I/usr/include -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu
+AutoGen: Refreshing parse cache because it doesn't exist.
+AutoMoc: Generating "SRC:/build/src/PluginInterface/OTLib/OTB/ItemEditorOTLibOTB_autogen/moc_predefs.h", because it doesn't exist.
+/usr/bin/c++ -std=gnu++17 -dM -E -c /usr/share/cmake-3.28/Modules/CMakeCXXCompilerABI.cpp -DQT_CORE_LIB -DQT_NO_DEBUG -I/app/qt6_project/src/PluginInterface/OTLib/OTB -I/app/qt6_project/build/src/PluginInterface/OTLib/OTB -I/usr/include/x86_64-linux-gnu/qt6/QtCore -I/usr/include/x86_64-linux-gnu/qt6 -I/usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include
+AutoGen: Refreshing parse cache because it doesn't exist.
+AutoMoc: Generating "SRC:/build/src/PluginInterface/OTLib/Collections/ItemEditorOTLibCollections_autogen/moc_predefs.h", because it doesn't exist.
+/usr/bin/c++ -std=gnu++17 -dM -E -c /usr/share/cmake-3.28/Modules/CMakeCXXCompilerABI.cpp -DQT_CORE_LIB -DQT_NO_DEBUG -I/app/qt6_project/src/PluginInterface/OTLib/Collections -I/app/qt6_project/build/src/PluginInterface/OTLib/Collections -I/usr/include/x86_64-linux-gnu/qt6/QtCore -I/usr/include/x86_64-linux-gnu/qt6 -I/usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include
+gmake[3]: Leaving directory '/app/qt6_project/build'
+/usr/bin/gmake  -f src/PluginInterface/OTLib/Server/Items/CMakeFiles/ItemEditorOTLibServerItems_autogen.dir/build.make src/PluginInterface/OTLib/Server/Items/CMakeFiles/ItemEditorOTLibServerItems_autogen.dir/build
+gmake[3]: Entering directory '/app/qt6_project/build'
+AutoGen: Parsing "SRC:/src/PluginInterface/OTLib/OTB/OtbVersionInfo.h"
+AutoGen: Parsing "SRC:/src/PluginInterface/OTLib/OTB/OtbWriter.h"
+AutoGen: Parsing "SRC:/src/PluginInterface/OTLib/OTB/OtbReader.cpp"
+AutoGen: Parsing "SRC:/src/PluginInterface/OTLib/OTB/OtbVersionInfo.cpp"
+AutoGen: Parsing "SRC:/src/PluginInterface/OTLib/OTB/OtbWriter.cpp"
+AutoGen: Parsing "SRC:/src/PluginInterface/OTLib/OTB/OtbReader.h"
+AutoGen: Parsing "SRC:/src/PluginInterface/OTLib/Utils/BinaryTreeReader.h"
+AutoMoc: Generating "SRC:/build/src/PluginInterface/OTLib/OTB/ItemEditorOTLibOTB_autogen/EWIEGA46WW/moc_OtbReader.cpp", because it doesn't exist, from "SRC:/src/PluginInterface/OTLib/OTB/OtbReader.h"
+/usr/lib/qt6/libexec/moc -DQT_CORE_LIB -DQT_NO_DEBUG -I/app/qt6_project/src/PluginInterface/OTLib/OTB -I/app/qt6_project/build/src/PluginInterface/OTLib/OTB -I/usr/include/x86_64-linux-gnu/qt6/QtCore -I/usr/include/x86_64-linux-gnu/qt6 -I/usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include --include /app/qt6_project/build/src/PluginInterface/OTLib/OTB/ItemEditorOTLibOTB_autogen/moc_predefs.h --output-dep-file -o /app/qt6_project/build/src/PluginInterface/OTLib/OTB/ItemEditorOTLibOTB_autogen/EWIEGA46WW/moc_OtbReader.cpp /app/qt6_project/src/PluginInterface/OTLib/OTB/OtbReader.h
+AutoGen: Parsing "SRC:/src/PluginInterface/OTLib/Utils/BinaryTreeWriter.h"
+AutoMoc: Generating "SRC:/build/src/PluginInterface/OTLib/OTB/ItemEditorOTLibOTB_autogen/EWIEGA46WW/moc_OtbWriter.cpp", because it doesn't exist, from "SRC:/src/PluginInterface/OTLib/OTB/OtbWriter.h"
+/usr/lib/qt6/libexec/moc -DQT_CORE_LIB -DQT_NO_DEBUG -I/app/qt6_project/src/PluginInterface/OTLib/OTB -I/app/qt6_project/build/src/PluginInterface/OTLib/OTB -I/usr/include/x86_64-linux-gnu/qt6/QtCore -I/usr/include/x86_64-linux-gnu/qt6 -I/usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include --include /app/qt6_project/build/src/PluginInterface/OTLib/OTB/ItemEditorOTLibOTB_autogen/moc_predefs.h --output-dep-file -o /app/qt6_project/build/src/PluginInterface/OTLib/OTB/ItemEditorOTLibOTB_autogen/EWIEGA46WW/moc_OtbWriter.cpp /app/qt6_project/src/PluginInterface/OTLib/OTB/OtbWriter.h
+AutoGen: Parsing "SRC:/src/PluginInterface/OTLib/Utils/BitmapLocker.h"
+AutoGen: Parsing "SRC:/src/PluginInterface/OTLib/Utils/SpecialChar.h"
+AutoGen: Parsing "SRC:/src/PluginInterface/OTLib/Utils/BinaryTreeReader.cpp"
+AutoGen: Parsing "SRC:/src/PluginInterface/OTLib/Utils/BinaryTreeWriter.cpp"
+AutoGen: Parsing "SRC:/src/PluginInterface/OTLib/Utils/BitmapLocker.cpp"
+AutoGen: Parsing "SRC:/src/PluginInterface/OTLib/Utils/SpecialChar.cpp"
+AutoMoc: Generating "SRC:/build/src/PluginInterface/OTLib/Utils/ItemEditorOTLibUtils_autogen/EWIEGA46WW/moc_BinaryTreeReader.cpp", because it doesn't exist, from "SRC:/src/PluginInterface/OTLib/Utils/BinaryTreeReader.h"
+/usr/lib/qt6/libexec/moc -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -I/app/qt6_project/src/PluginInterface/OTLib/Utils -I/app/qt6_project/build/src/PluginInterface/OTLib/Utils -I/usr/include/x86_64-linux-gnu/qt6/QtCore -I/usr/include/x86_64-linux-gnu/qt6 -I/usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -I/usr/include/x86_64-linux-gnu/qt6/QtGui -I/usr/include -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu --include /app/qt6_project/build/src/PluginInterface/OTLib/Utils/ItemEditorOTLibUtils_autogen/moc_predefs.h --output-dep-file -o /app/qt6_project/build/src/PluginInterface/OTLib/Utils/ItemEditorOTLibUtils_autogen/EWIEGA46WW/moc_BinaryTreeReader.cpp /app/qt6_project/src/PluginInterface/OTLib/Utils/BinaryTreeReader.h
+AutoMoc: Generating "SRC:/build/src/PluginInterface/OTLib/Utils/ItemEditorOTLibUtils_autogen/EWIEGA46WW/moc_BinaryTreeWriter.cpp", because it doesn't exist, from "SRC:/src/PluginInterface/OTLib/Utils/BinaryTreeWriter.h"
+/usr/lib/qt6/libexec/moc -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -I/app/qt6_project/src/PluginInterface/OTLib/Utils -I/app/qt6_project/build/src/PluginInterface/OTLib/Utils -I/usr/include/x86_64-linux-gnu/qt6/QtCore -I/usr/include/x86_64-linux-gnu/qt6 -I/usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -I/usr/include/x86_64-linux-gnu/qt6/QtGui -I/usr/include -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu --include /app/qt6_project/build/src/PluginInterface/OTLib/Utils/ItemEditorOTLibUtils_autogen/moc_predefs.h --output-dep-file -o /app/qt6_project/build/src/PluginInterface/OTLib/Utils/ItemEditorOTLibUtils_autogen/EWIEGA46WW/moc_BinaryTreeWriter.cpp /app/qt6_project/src/PluginInterface/OTLib/Utils/BinaryTreeWriter.h
+AutoMoc: Generating "SRC:/build/src/PluginInterface/OTLib/Utils/ItemEditorOTLibUtils_autogen/EWIEGA46WW/moc_BitmapLocker.cpp", because it doesn't exist, from "SRC:/src/PluginInterface/OTLib/Utils/BitmapLocker.h"
+/usr/lib/qt6/libexec/moc -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -I/app/qt6_project/src/PluginInterface/OTLib/Utils -I/app/qt6_project/build/src/PluginInterface/OTLib/Utils -I/usr/include/x86_64-linux-gnu/qt6/QtCore -I/usr/include/x86_64-linux-gnu/qt6 -I/usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -I/usr/include/x86_64-linux-gnu/qt6/QtGui -I/usr/include -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu --include /app/qt6_project/build/src/PluginInterface/OTLib/Utils/ItemEditorOTLibUtils_autogen/moc_predefs.h --output-dep-file -o /app/qt6_project/build/src/PluginInterface/OTLib/Utils/ItemEditorOTLibUtils_autogen/EWIEGA46WW/moc_BitmapLocker.cpp /app/qt6_project/src/PluginInterface/OTLib/Utils/BitmapLocker.h
+[  8%] Automatic MOC and UIC for target ItemEditorOTLibServerItems
+cd /app/qt6_project/build/src/PluginInterface/OTLib/Server/Items && /usr/bin/cmake -E cmake_autogen /app/qt6_project/build/src/PluginInterface/OTLib/Server/Items/CMakeFiles/ItemEditorOTLibServerItems_autogen.dir/AutogenInfo.json Release
+AutoGen: Parsing "SRC:/src/PluginInterface/OTLib/Collections/ServerItemList.h"
+AutoGen: Parsing "SRC:/src/PluginInterface/OTLib/Collections/ServerItemList.cpp"
+AutoMoc: Generating "SRC:/build/src/PluginInterface/OTLib/Collections/ItemEditorOTLibCollections_autogen/EWIEGA46WW/moc_ServerItemList.cpp", because it doesn't exist, from "SRC:/src/PluginInterface/OTLib/Collections/ServerItemList.h"
+/usr/lib/qt6/libexec/moc -DQT_CORE_LIB -DQT_NO_DEBUG -I/app/qt6_project/src/PluginInterface/OTLib/Collections -I/app/qt6_project/build/src/PluginInterface/OTLib/Collections -I/usr/include/x86_64-linux-gnu/qt6/QtCore -I/usr/include/x86_64-linux-gnu/qt6 -I/usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include --include /app/qt6_project/build/src/PluginInterface/OTLib/Collections/ItemEditorOTLibCollections_autogen/moc_predefs.h --output-dep-file -o /app/qt6_project/build/src/PluginInterface/OTLib/Collections/ItemEditorOTLibCollections_autogen/EWIEGA46WW/moc_ServerItemList.cpp /app/qt6_project/src/PluginInterface/OTLib/Collections/ServerItemList.h
+AutoGen: Refreshing parse cache because it doesn't exist.
+AutoMoc: Generating "SRC:/build/src/PluginInterface/OTLib/Server/Items/ItemEditorOTLibServerItems_autogen/moc_predefs.h", because it doesn't exist.
+/usr/bin/c++ -std=gnu++17 -dM -E -c /usr/share/cmake-3.28/Modules/CMakeCXXCompilerABI.cpp -DQT_CORE_LIB -DQT_NO_DEBUG -DQT_XML_LIB -I/app/qt6_project/src/PluginInterface/OTLib/Server/Items -I/app/qt6_project/build/src/PluginInterface/OTLib/Server/Items -I/usr/include/x86_64-linux-gnu/qt6/QtCore -I/usr/include/x86_64-linux-gnu/qt6 -I/usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -I/usr/include/x86_64-linux-gnu/qt6/QtXml -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include
+AutoGen: Parsing "SRC:/src/PluginInterface/OTLib/Server/Items/ItemsXmlReader.h"
+AutoGen: Parsing "SRC:/src/PluginInterface/OTLib/Server/Items/ServerItem.h"
+AutoGen: Parsing "SRC:/src/PluginInterface/OTLib/Server/Items/ServerItemAttribute.h"
+AutoGen: Parsing "SRC:/src/PluginInterface/OTLib/Server/Items/ServerItemFlag.h"
+AutoGen: Parsing "SRC:/src/PluginInterface/OTLib/Server/Items/ItemsXmlReader.cpp"
+AutoGen: Parsing "SRC:/src/PluginInterface/OTLib/Server/Items/ServerItem.cpp"
+AutoGen: Parsing "SRC:/src/PluginInterface/OTLib/Server/Items/ServerItemAttribute.cpp"
+AutoGen: Parsing "SRC:/src/PluginInterface/OTLib/Server/Items/ServerItemFlag.cpp"
+AutoMoc: Generating "SRC:/build/src/PluginInterface/OTLib/Server/Items/ItemEditorOTLibServerItems_autogen/EWIEGA46WW/moc_ItemsXmlReader.cpp", because it doesn't exist, from "SRC:/src/PluginInterface/OTLib/Server/Items/ItemsXmlReader.h"
+/usr/lib/qt6/libexec/moc -DQT_CORE_LIB -DQT_NO_DEBUG -DQT_XML_LIB -I/app/qt6_project/src/PluginInterface/OTLib/Server/Items -I/app/qt6_project/build/src/PluginInterface/OTLib/Server/Items -I/usr/include/x86_64-linux-gnu/qt6/QtCore -I/usr/include/x86_64-linux-gnu/qt6 -I/usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -I/usr/include/x86_64-linux-gnu/qt6/QtXml -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include --include /app/qt6_project/build/src/PluginInterface/OTLib/Server/Items/ItemEditorOTLibServerItems_autogen/moc_predefs.h --output-dep-file -o /app/qt6_project/build/src/PluginInterface/OTLib/Server/Items/ItemEditorOTLibServerItems_autogen/EWIEGA46WW/moc_ItemsXmlReader.cpp /app/qt6_project/src/PluginInterface/OTLib/Server/Items/ItemsXmlReader.h
+AutoMoc: Generating "SRC:/build/src/PluginInterface/OTLib/Server/Items/ItemEditorOTLibServerItems_autogen/EWIEGA46WW/moc_ServerItem.cpp", because it doesn't exist, from "SRC:/src/PluginInterface/OTLib/Server/Items/ServerItem.h"
+/usr/lib/qt6/libexec/moc -DQT_CORE_LIB -DQT_NO_DEBUG -DQT_XML_LIB -I/app/qt6_project/src/PluginInterface/OTLib/Server/Items -I/app/qt6_project/build/src/PluginInterface/OTLib/Server/Items -I/usr/include/x86_64-linux-gnu/qt6/QtCore -I/usr/include/x86_64-linux-gnu/qt6 -I/usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -I/usr/include/x86_64-linux-gnu/qt6/QtXml -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include --include /app/qt6_project/build/src/PluginInterface/OTLib/Server/Items/ItemEditorOTLibServerItems_autogen/moc_predefs.h --output-dep-file -o /app/qt6_project/build/src/PluginInterface/OTLib/Server/Items/ItemEditorOTLibServerItems_autogen/EWIEGA46WW/moc_ServerItem.cpp /app/qt6_project/src/PluginInterface/OTLib/Server/Items/ServerItem.h
+AutoMoc: Reading dependencies from "SRC:/build/src/PluginInterface/OTLib/OTB/ItemEditorOTLibOTB_autogen/EWIEGA46WW/moc_OtbWriter.cpp.d"
+AutoMoc: Reading dependencies from "SRC:/build/src/PluginInterface/OTLib/OTB/ItemEditorOTLibOTB_autogen/EWIEGA46WW/moc_OtbReader.cpp.d"
+AutoMoc: Generating MOC compilation "SRC:/build/src/PluginInterface/OTLib/OTB/ItemEditorOTLibOTB_autogen/mocs_compilation.cpp"
+AutoMoc: Merging MOC dependencies into "SRC:/build/src/PluginInterface/OTLib/OTB/ItemEditorOTLibOTB_autogen/deps"
+AutoGen: Writing the parse cache file "SRC:/build/src/PluginInterface/OTLib/OTB/CMakeFiles/ItemEditorOTLibOTB_autogen.dir/ParseCache.txt"
+AutoGen: Writing the settings file "SRC:/build/src/PluginInterface/OTLib/OTB/CMakeFiles/ItemEditorOTLibOTB_autogen.dir/AutogenUsed.txt"
+cd /app/qt6_project/build/src/PluginInterface/OTLib/OTB && /usr/bin/cmake -E touch /app/qt6_project/build/src/PluginInterface/OTLib/OTB/ItemEditorOTLibOTB_autogen/timestamp
+gmake[3]: Leaving directory '/app/qt6_project/build'
+[  8%] Built target ItemEditorOTLibOTB_autogen
+/usr/bin/gmake  -f src/PluginInterface/OTLib/SPR/CMakeFiles/ItemEditorOTLibSPR_autogen.dir/build.make src/PluginInterface/OTLib/SPR/CMakeFiles/ItemEditorOTLibSPR_autogen.dir/depend
+gmake[3]: Entering directory '/app/qt6_project/build'
+cd /app/qt6_project/build && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /app/qt6_project /app/qt6_project/src/PluginInterface/OTLib/SPR /app/qt6_project/build /app/qt6_project/build/src/PluginInterface/OTLib/SPR /app/qt6_project/build/src/PluginInterface/OTLib/SPR/CMakeFiles/ItemEditorOTLibSPR_autogen.dir/DependInfo.cmake "--color="
+AutoMoc: Reading dependencies from "SRC:/build/src/PluginInterface/OTLib/Server/Items/ItemEditorOTLibServerItems_autogen/EWIEGA46WW/moc_ServerItem.cpp.d"
+gmake[3]: Leaving directory '/app/qt6_project/build'
+/usr/bin/gmake  -f src/PluginInterface/OTLib/SPR/CMakeFiles/ItemEditorOTLibSPR_autogen.dir/build.make src/PluginInterface/OTLib/SPR/CMakeFiles/ItemEditorOTLibSPR_autogen.dir/build
+gmake[3]: Entering directory '/app/qt6_project/build'
+AutoMoc: Reading dependencies from "SRC:/build/src/PluginInterface/OTLib/Collections/ItemEditorOTLibCollections_autogen/EWIEGA46WW/moc_ServerItemList.cpp.d"
+AutoMoc: Generating MOC compilation "SRC:/build/src/PluginInterface/OTLib/Collections/ItemEditorOTLibCollections_autogen/mocs_compilation.cpp"
+AutoMoc: Merging MOC dependencies into "SRC:/build/src/PluginInterface/OTLib/Collections/ItemEditorOTLibCollections_autogen/deps"
+[ 10%] Automatic MOC and UIC for target ItemEditorOTLibSPR
+AutoGen: Writing the parse cache file "SRC:/build/src/PluginInterface/OTLib/Collections/CMakeFiles/ItemEditorOTLibCollections_autogen.dir/ParseCache.txt"
+AutoGen: Writing the settings file "SRC:/build/src/PluginInterface/OTLib/Collections/CMakeFiles/ItemEditorOTLibCollections_autogen.dir/AutogenUsed.txt"
+cd /app/qt6_project/build/src/PluginInterface/OTLib/Collections && /usr/bin/cmake -E touch /app/qt6_project/build/src/PluginInterface/OTLib/Collections/ItemEditorOTLibCollections_autogen/timestamp
+cd /app/qt6_project/build/src/PluginInterface/OTLib/SPR && /usr/bin/cmake -E cmake_autogen /app/qt6_project/build/src/PluginInterface/OTLib/SPR/CMakeFiles/ItemEditorOTLibSPR_autogen.dir/AutogenInfo.json Release
+AutoGen: Refreshing parse cache because it doesn't exist.
+AutoMoc: Generating "SRC:/build/src/PluginInterface/OTLib/SPR/ItemEditorOTLibSPR_autogen/moc_predefs.h", because it doesn't exist.
+/usr/bin/c++ -std=gnu++17 -dM -E -c /usr/share/cmake-3.28/Modules/CMakeCXXCompilerABI.cpp -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -I/app/qt6_project/src/PluginInterface/OTLib/SPR -I/app/qt6_project/build/src/PluginInterface/OTLib/SPR -I/usr/include/x86_64-linux-gnu/qt6/QtCore -I/usr/include/x86_64-linux-gnu/qt6 -I/usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -I/usr/include/x86_64-linux-gnu/qt6/QtGui -I/usr/include -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu
+gmake[3]: Leaving directory '/app/qt6_project/build'
+AutoMoc: Reading dependencies from "SRC:/build/src/PluginInterface/OTLib/Utils/ItemEditorOTLibUtils_autogen/EWIEGA46WW/moc_BinaryTreeWriter.cpp.d"
+AutoGen: Parsing "SRC:/src/PluginInterface/OTLib/SPR/SpriteReader.h"
+AutoGen: Parsing "SRC:/src/PluginInterface/OTLib/SPR/SpriteReader.cpp"
+[ 10%] Built target ItemEditorOTLibCollections_autogen
+AutoMoc: Reading dependencies from "SRC:/build/src/PluginInterface/OTLib/Utils/ItemEditorOTLibUtils_autogen/EWIEGA46WW/moc_BinaryTreeReader.cpp.d"
+AutoMoc: Generating "SRC:/build/src/PluginInterface/OTLib/SPR/ItemEditorOTLibSPR_autogen/EWIEGA46WW/moc_SpriteReader.cpp", because it doesn't exist, from "SRC:/src/PluginInterface/OTLib/SPR/SpriteReader.h"
+/usr/lib/qt6/libexec/moc -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -I/app/qt6_project/src/PluginInterface/OTLib/SPR -I/app/qt6_project/build/src/PluginInterface/OTLib/SPR -I/usr/include/x86_64-linux-gnu/qt6/QtCore -I/usr/include/x86_64-linux-gnu/qt6 -I/usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -I/usr/include/x86_64-linux-gnu/qt6/QtGui -I/usr/include -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu --include /app/qt6_project/build/src/PluginInterface/OTLib/SPR/ItemEditorOTLibSPR_autogen/moc_predefs.h --output-dep-file -o /app/qt6_project/build/src/PluginInterface/OTLib/SPR/ItemEditorOTLibSPR_autogen/EWIEGA46WW/moc_SpriteReader.cpp /app/qt6_project/src/PluginInterface/OTLib/SPR/SpriteReader.h
+/usr/bin/gmake  -f src/PluginInterface/OTLib/Collections/CMakeFiles/ItemEditorOTLibCollections.dir/build.make src/PluginInterface/OTLib/Collections/CMakeFiles/ItemEditorOTLibCollections.dir/depend
+gmake[3]: Entering directory '/app/qt6_project/build'
+cd /app/qt6_project/build && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /app/qt6_project /app/qt6_project/src/PluginInterface/OTLib/Collections /app/qt6_project/build /app/qt6_project/build/src/PluginInterface/OTLib/Collections /app/qt6_project/build/src/PluginInterface/OTLib/Collections/CMakeFiles/ItemEditorOTLibCollections.dir/DependInfo.cmake "--color="
+AutoMoc: Reading dependencies from "SRC:/build/src/PluginInterface/OTLib/Utils/ItemEditorOTLibUtils_autogen/EWIEGA46WW/moc_BitmapLocker.cpp.d"
+AutoMoc: Generating MOC compilation "SRC:/build/src/PluginInterface/OTLib/Utils/ItemEditorOTLibUtils_autogen/mocs_compilation.cpp"
+AutoMoc: Merging MOC dependencies into "SRC:/build/src/PluginInterface/OTLib/Utils/ItemEditorOTLibUtils_autogen/deps"
+AutoGen: Writing the parse cache file "SRC:/build/src/PluginInterface/OTLib/Utils/CMakeFiles/ItemEditorOTLibUtils_autogen.dir/ParseCache.txt"
+AutoGen: Writing the settings file "SRC:/build/src/PluginInterface/OTLib/Utils/CMakeFiles/ItemEditorOTLibUtils_autogen.dir/AutogenUsed.txt"
+cd /app/qt6_project/build/src/PluginInterface/OTLib/Utils && /usr/bin/cmake -E touch /app/qt6_project/build/src/PluginInterface/OTLib/Utils/ItemEditorOTLibUtils_autogen/timestamp
+Dependencies file "src/PluginInterface/OTLib/Collections/ItemEditorOTLibCollections_autogen/deps" is newer than depends file "/app/qt6_project/build/src/PluginInterface/OTLib/Collections/CMakeFiles/ItemEditorOTLibCollections.dir/compiler_depend.internal".
+Consolidate compiler generated dependencies of target ItemEditorOTLibCollections
+gmake[3]: Leaving directory '/app/qt6_project/build'
+/usr/bin/gmake  -f src/PluginInterface/OTLib/Collections/CMakeFiles/ItemEditorOTLibCollections.dir/build.make src/PluginInterface/OTLib/Collections/CMakeFiles/ItemEditorOTLibCollections.dir/build
+gmake[3]: Entering directory '/app/qt6_project/build'
+gmake[3]: Leaving directory '/app/qt6_project/build'
+[ 13%] Building CXX object src/PluginInterface/OTLib/Collections/CMakeFiles/ItemEditorOTLibCollections.dir/ItemEditorOTLibCollections_autogen/mocs_compilation.cpp.o
+AutoMoc: Reading dependencies from "SRC:/build/src/PluginInterface/OTLib/Server/Items/ItemEditorOTLibServerItems_autogen/EWIEGA46WW/moc_ItemsXmlReader.cpp.d"
+cd /app/qt6_project/build/src/PluginInterface/OTLib/Collections && /usr/bin/c++ -DQT_CORE_LIB -DQT_NO_DEBUG -I/app/qt6_project/build/src/PluginInterface/OTLib/Collections/ItemEditorOTLibCollections_autogen/include -I/app/qt6_project/src/PluginInterface/OTLib/Collections -I/app/qt6_project/build/src/PluginInterface/OTLib/Collections -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -O3 -DNDEBUG -O3 -DNDEBUG -std=gnu++17 -fPIC -fPIC -MD -MT src/PluginInterface/OTLib/Collections/CMakeFiles/ItemEditorOTLibCollections.dir/ItemEditorOTLibCollections_autogen/mocs_compilation.cpp.o -MF CMakeFiles/ItemEditorOTLibCollections.dir/ItemEditorOTLibCollections_autogen/mocs_compilation.cpp.o.d -o CMakeFiles/ItemEditorOTLibCollections.dir/ItemEditorOTLibCollections_autogen/mocs_compilation.cpp.o -c /app/qt6_project/build/src/PluginInterface/OTLib/Collections/ItemEditorOTLibCollections_autogen/mocs_compilation.cpp
+AutoMoc: Generating MOC compilation "SRC:/build/src/PluginInterface/OTLib/Server/Items/ItemEditorOTLibServerItems_autogen/mocs_compilation.cpp"
+AutoMoc: Merging MOC dependencies into "SRC:/build/src/PluginInterface/OTLib/Server/Items/ItemEditorOTLibServerItems_autogen/deps"
+AutoGen: Writing the parse cache file "SRC:/build/src/PluginInterface/OTLib/Server/Items/CMakeFiles/ItemEditorOTLibServerItems_autogen.dir/ParseCache.txt"
+AutoGen: Writing the settings file "SRC:/build/src/PluginInterface/OTLib/Server/Items/CMakeFiles/ItemEditorOTLibServerItems_autogen.dir/AutogenUsed.txt"
+cd /app/qt6_project/build/src/PluginInterface/OTLib/Server/Items && /usr/bin/cmake -E touch /app/qt6_project/build/src/PluginInterface/OTLib/Server/Items/ItemEditorOTLibServerItems_autogen/timestamp
+[ 13%] Built target ItemEditorOTLibUtils_autogen
+gmake[3]: Leaving directory '/app/qt6_project/build'
+[ 15%] Building CXX object src/PluginInterface/OTLib/Collections/CMakeFiles/ItemEditorOTLibCollections.dir/ServerItemList.cpp.o
+cd /app/qt6_project/build/src/PluginInterface/OTLib/Collections && /usr/bin/c++ -DQT_CORE_LIB -DQT_NO_DEBUG -I/app/qt6_project/build/src/PluginInterface/OTLib/Collections/ItemEditorOTLibCollections_autogen/include -I/app/qt6_project/src/PluginInterface/OTLib/Collections -I/app/qt6_project/build/src/PluginInterface/OTLib/Collections -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -O3 -DNDEBUG -O3 -DNDEBUG -std=gnu++17 -fPIC -fPIC -MD -MT src/PluginInterface/OTLib/Collections/CMakeFiles/ItemEditorOTLibCollections.dir/ServerItemList.cpp.o -MF CMakeFiles/ItemEditorOTLibCollections.dir/ServerItemList.cpp.o.d -o CMakeFiles/ItemEditorOTLibCollections.dir/ServerItemList.cpp.o -c /app/qt6_project/src/PluginInterface/OTLib/Collections/ServerItemList.cpp
+[ 15%] Built target ItemEditorOTLibServerItems_autogen
+/usr/bin/gmake  -f src/PluginInterface/OTLib/OTB/CMakeFiles/ItemEditorOTLibOTB.dir/build.make src/PluginInterface/OTLib/OTB/CMakeFiles/ItemEditorOTLibOTB.dir/depend
+gmake[3]: Entering directory '/app/qt6_project/build'
+cd /app/qt6_project/build && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /app/qt6_project /app/qt6_project/src/PluginInterface/OTLib/OTB /app/qt6_project/build /app/qt6_project/build/src/PluginInterface/OTLib/OTB /app/qt6_project/build/src/PluginInterface/OTLib/OTB/CMakeFiles/ItemEditorOTLibOTB.dir/DependInfo.cmake "--color="
+Dependencies file "src/PluginInterface/OTLib/OTB/ItemEditorOTLibOTB_autogen/deps" is newer than depends file "/app/qt6_project/build/src/PluginInterface/OTLib/OTB/CMakeFiles/ItemEditorOTLibOTB.dir/compiler_depend.internal".
+Consolidate compiler generated dependencies of target ItemEditorOTLibOTB
+gmake[3]: Leaving directory '/app/qt6_project/build'
+/usr/bin/gmake  -f src/PluginInterface/OTLib/OTB/CMakeFiles/ItemEditorOTLibOTB.dir/build.make src/PluginInterface/OTLib/OTB/CMakeFiles/ItemEditorOTLibOTB.dir/build
+gmake[3]: Entering directory '/app/qt6_project/build'
+[ 17%] Building CXX object src/PluginInterface/OTLib/OTB/CMakeFiles/ItemEditorOTLibOTB.dir/ItemEditorOTLibOTB_autogen/mocs_compilation.cpp.o
+cd /app/qt6_project/build/src/PluginInterface/OTLib/OTB && /usr/bin/c++ -DQT_CORE_LIB -DQT_NO_DEBUG -I/app/qt6_project/build/src/PluginInterface/OTLib/OTB/ItemEditorOTLibOTB_autogen/include -I/app/qt6_project/src/PluginInterface/OTLib/OTB -I/app/qt6_project/build/src/PluginInterface/OTLib/OTB -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -O3 -DNDEBUG -O3 -DNDEBUG -std=gnu++17 -fPIC -fPIC -MD -MT src/PluginInterface/OTLib/OTB/CMakeFiles/ItemEditorOTLibOTB.dir/ItemEditorOTLibOTB_autogen/mocs_compilation.cpp.o -MF CMakeFiles/ItemEditorOTLibOTB.dir/ItemEditorOTLibOTB_autogen/mocs_compilation.cpp.o.d -o CMakeFiles/ItemEditorOTLibOTB.dir/ItemEditorOTLibOTB_autogen/mocs_compilation.cpp.o -c /app/qt6_project/build/src/PluginInterface/OTLib/OTB/ItemEditorOTLibOTB_autogen/mocs_compilation.cpp
+AutoMoc: Reading dependencies from "SRC:/build/src/PluginInterface/OTLib/SPR/ItemEditorOTLibSPR_autogen/EWIEGA46WW/moc_SpriteReader.cpp.d"
+AutoMoc: Generating MOC compilation "SRC:/build/src/PluginInterface/OTLib/SPR/ItemEditorOTLibSPR_autogen/mocs_compilation.cpp"
+AutoMoc: Merging MOC dependencies into "SRC:/build/src/PluginInterface/OTLib/SPR/ItemEditorOTLibSPR_autogen/deps"
+AutoGen: Writing the parse cache file "SRC:/build/src/PluginInterface/OTLib/SPR/CMakeFiles/ItemEditorOTLibSPR_autogen.dir/ParseCache.txt"
+AutoGen: Writing the settings file "SRC:/build/src/PluginInterface/OTLib/SPR/CMakeFiles/ItemEditorOTLibSPR_autogen.dir/AutogenUsed.txt"
+cd /app/qt6_project/build/src/PluginInterface/OTLib/SPR && /usr/bin/cmake -E touch /app/qt6_project/build/src/PluginInterface/OTLib/SPR/ItemEditorOTLibSPR_autogen/timestamp
+gmake[3]: Leaving directory '/app/qt6_project/build'
+[ 17%] Built target ItemEditorOTLibSPR_autogen
+[ 19%] Building CXX object src/PluginInterface/OTLib/OTB/CMakeFiles/ItemEditorOTLibOTB.dir/OtbReader.cpp.o
+cd /app/qt6_project/build/src/PluginInterface/OTLib/OTB && /usr/bin/c++ -DQT_CORE_LIB -DQT_NO_DEBUG -I/app/qt6_project/build/src/PluginInterface/OTLib/OTB/ItemEditorOTLibOTB_autogen/include -I/app/qt6_project/src/PluginInterface/OTLib/OTB -I/app/qt6_project/build/src/PluginInterface/OTLib/OTB -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -O3 -DNDEBUG -O3 -DNDEBUG -std=gnu++17 -fPIC -fPIC -MD -MT src/PluginInterface/OTLib/OTB/CMakeFiles/ItemEditorOTLibOTB.dir/OtbReader.cpp.o -MF CMakeFiles/ItemEditorOTLibOTB.dir/OtbReader.cpp.o.d -o CMakeFiles/ItemEditorOTLibOTB.dir/OtbReader.cpp.o -c /app/qt6_project/src/PluginInterface/OTLib/OTB/OtbReader.cpp
+/usr/bin/gmake  -f src/PluginInterface/OTLib/Server/Items/CMakeFiles/ItemEditorOTLibServerItems.dir/build.make src/PluginInterface/OTLib/Server/Items/CMakeFiles/ItemEditorOTLibServerItems.dir/depend
+gmake[3]: Entering directory '/app/qt6_project/build'
+cd /app/qt6_project/build && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /app/qt6_project /app/qt6_project/src/PluginInterface/OTLib/Server/Items /app/qt6_project/build /app/qt6_project/build/src/PluginInterface/OTLib/Server/Items /app/qt6_project/build/src/PluginInterface/OTLib/Server/Items/CMakeFiles/ItemEditorOTLibServerItems.dir/DependInfo.cmake "--color="
+Dependencies file "src/PluginInterface/OTLib/Server/Items/ItemEditorOTLibServerItems_autogen/deps" is newer than depends file "/app/qt6_project/build/src/PluginInterface/OTLib/Server/Items/CMakeFiles/ItemEditorOTLibServerItems.dir/compiler_depend.internal".
+Consolidate compiler generated dependencies of target ItemEditorOTLibServerItems
+gmake[3]: Leaving directory '/app/qt6_project/build'
+/usr/bin/gmake  -f src/PluginInterface/OTLib/Server/Items/CMakeFiles/ItemEditorOTLibServerItems.dir/build.make src/PluginInterface/OTLib/Server/Items/CMakeFiles/ItemEditorOTLibServerItems.dir/build
+gmake[3]: Entering directory '/app/qt6_project/build'
+[ 21%] Building CXX object src/PluginInterface/OTLib/Server/Items/CMakeFiles/ItemEditorOTLibServerItems.dir/ItemEditorOTLibServerItems_autogen/mocs_compilation.cpp.o
+cd /app/qt6_project/build/src/PluginInterface/OTLib/Server/Items && /usr/bin/c++ -DQT_CORE_LIB -DQT_NO_DEBUG -DQT_XML_LIB -I/app/qt6_project/build/src/PluginInterface/OTLib/Server/Items/ItemEditorOTLibServerItems_autogen/include -I/app/qt6_project/src/PluginInterface/OTLib/Server/Items -I/app/qt6_project/build/src/PluginInterface/OTLib/Server/Items -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt6/QtXml -O3 -DNDEBUG -O3 -DNDEBUG -std=gnu++17 -fPIC -fPIC -MD -MT src/PluginInterface/OTLib/Server/Items/CMakeFiles/ItemEditorOTLibServerItems.dir/ItemEditorOTLibServerItems_autogen/mocs_compilation.cpp.o -MF CMakeFiles/ItemEditorOTLibServerItems.dir/ItemEditorOTLibServerItems_autogen/mocs_compilation.cpp.o.d -o CMakeFiles/ItemEditorOTLibServerItems.dir/ItemEditorOTLibServerItems_autogen/mocs_compilation.cpp.o -c /app/qt6_project/build/src/PluginInterface/OTLib/Server/Items/ItemEditorOTLibServerItems_autogen/mocs_compilation.cpp
+/usr/bin/gmake  -f src/PluginInterface/OTLib/SPR/CMakeFiles/ItemEditorOTLibSPR.dir/build.make src/PluginInterface/OTLib/SPR/CMakeFiles/ItemEditorOTLibSPR.dir/depend
+gmake[3]: Entering directory '/app/qt6_project/build'
+cd /app/qt6_project/build && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /app/qt6_project /app/qt6_project/src/PluginInterface/OTLib/SPR /app/qt6_project/build /app/qt6_project/build/src/PluginInterface/OTLib/SPR /app/qt6_project/build/src/PluginInterface/OTLib/SPR/CMakeFiles/ItemEditorOTLibSPR.dir/DependInfo.cmake "--color="
+Dependencies file "src/PluginInterface/OTLib/SPR/ItemEditorOTLibSPR_autogen/deps" is newer than depends file "/app/qt6_project/build/src/PluginInterface/OTLib/SPR/CMakeFiles/ItemEditorOTLibSPR.dir/compiler_depend.internal".
+Consolidate compiler generated dependencies of target ItemEditorOTLibSPR
+gmake[3]: Leaving directory '/app/qt6_project/build'
+/usr/bin/gmake  -f src/PluginInterface/OTLib/SPR/CMakeFiles/ItemEditorOTLibSPR.dir/build.make src/PluginInterface/OTLib/SPR/CMakeFiles/ItemEditorOTLibSPR.dir/build
+gmake[3]: Entering directory '/app/qt6_project/build'
+[ 23%] Building CXX object src/PluginInterface/OTLib/SPR/CMakeFiles/ItemEditorOTLibSPR.dir/ItemEditorOTLibSPR_autogen/mocs_compilation.cpp.o
+cd /app/qt6_project/build/src/PluginInterface/OTLib/SPR && /usr/bin/c++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -I/app/qt6_project/build/src/PluginInterface/OTLib/SPR/ItemEditorOTLibSPR_autogen/include -I/app/qt6_project/src/PluginInterface/OTLib/SPR -I/app/qt6_project/build/src/PluginInterface/OTLib/SPR -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt6/QtGui -O3 -DNDEBUG -O3 -DNDEBUG -std=gnu++17 -fPIC -fPIC -MD -MT src/PluginInterface/OTLib/SPR/CMakeFiles/ItemEditorOTLibSPR.dir/ItemEditorOTLibSPR_autogen/mocs_compilation.cpp.o -MF CMakeFiles/ItemEditorOTLibSPR.dir/ItemEditorOTLibSPR_autogen/mocs_compilation.cpp.o.d -o CMakeFiles/ItemEditorOTLibSPR.dir/ItemEditorOTLibSPR_autogen/mocs_compilation.cpp.o -c /app/qt6_project/build/src/PluginInterface/OTLib/SPR/ItemEditorOTLibSPR_autogen/mocs_compilation.cpp
+[ 26%] Linking CXX static library ../../../../lib/libItemEditorOTLibCollections.a
+cd /app/qt6_project/build/src/PluginInterface/OTLib/Collections && /usr/bin/cmake -P CMakeFiles/ItemEditorOTLibCollections.dir/cmake_clean_target.cmake
+cd /app/qt6_project/build/src/PluginInterface/OTLib/Collections && /usr/bin/cmake -E cmake_link_script CMakeFiles/ItemEditorOTLibCollections.dir/link.txt --verbose=1
+/usr/bin/ar qc ../../../../lib/libItemEditorOTLibCollections.a CMakeFiles/ItemEditorOTLibCollections.dir/ItemEditorOTLibCollections_autogen/mocs_compilation.cpp.o CMakeFiles/ItemEditorOTLibCollections.dir/ServerItemList.cpp.o
+/usr/bin/ranlib ../../../../lib/libItemEditorOTLibCollections.a
+gmake[3]: Leaving directory '/app/qt6_project/build'
+[ 28%] Built target ItemEditorOTLibCollections
+[ 30%] Building CXX object src/PluginInterface/OTLib/Server/Items/CMakeFiles/ItemEditorOTLibServerItems.dir/ItemsXmlReader.cpp.o
+cd /app/qt6_project/build/src/PluginInterface/OTLib/Server/Items && /usr/bin/c++ -DQT_CORE_LIB -DQT_NO_DEBUG -DQT_XML_LIB -I/app/qt6_project/build/src/PluginInterface/OTLib/Server/Items/ItemEditorOTLibServerItems_autogen/include -I/app/qt6_project/src/PluginInterface/OTLib/Server/Items -I/app/qt6_project/build/src/PluginInterface/OTLib/Server/Items -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt6/QtXml -O3 -DNDEBUG -O3 -DNDEBUG -std=gnu++17 -fPIC -fPIC -MD -MT src/PluginInterface/OTLib/Server/Items/CMakeFiles/ItemEditorOTLibServerItems.dir/ItemsXmlReader.cpp.o -MF CMakeFiles/ItemEditorOTLibServerItems.dir/ItemsXmlReader.cpp.o.d -o CMakeFiles/ItemEditorOTLibServerItems.dir/ItemsXmlReader.cpp.o -c /app/qt6_project/src/PluginInterface/OTLib/Server/Items/ItemsXmlReader.cpp
+[ 32%] Building CXX object src/PluginInterface/OTLib/OTB/CMakeFiles/ItemEditorOTLibOTB.dir/OtbVersionInfo.cpp.o
+cd /app/qt6_project/build/src/PluginInterface/OTLib/OTB && /usr/bin/c++ -DQT_CORE_LIB -DQT_NO_DEBUG -I/app/qt6_project/build/src/PluginInterface/OTLib/OTB/ItemEditorOTLibOTB_autogen/include -I/app/qt6_project/src/PluginInterface/OTLib/OTB -I/app/qt6_project/build/src/PluginInterface/OTLib/OTB -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -O3 -DNDEBUG -O3 -DNDEBUG -std=gnu++17 -fPIC -fPIC -MD -MT src/PluginInterface/OTLib/OTB/CMakeFiles/ItemEditorOTLibOTB.dir/OtbVersionInfo.cpp.o -MF CMakeFiles/ItemEditorOTLibOTB.dir/OtbVersionInfo.cpp.o.d -o CMakeFiles/ItemEditorOTLibOTB.dir/OtbVersionInfo.cpp.o -c /app/qt6_project/src/PluginInterface/OTLib/OTB/OtbVersionInfo.cpp
+[ 34%] Building CXX object src/PluginInterface/OTLib/SPR/CMakeFiles/ItemEditorOTLibSPR.dir/SpriteReader.cpp.o
+cd /app/qt6_project/build/src/PluginInterface/OTLib/SPR && /usr/bin/c++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -I/app/qt6_project/build/src/PluginInterface/OTLib/SPR/ItemEditorOTLibSPR_autogen/include -I/app/qt6_project/src/PluginInterface/OTLib/SPR -I/app/qt6_project/build/src/PluginInterface/OTLib/SPR -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt6/QtGui -O3 -DNDEBUG -O3 -DNDEBUG -std=gnu++17 -fPIC -fPIC -MD -MT src/PluginInterface/OTLib/SPR/CMakeFiles/ItemEditorOTLibSPR.dir/SpriteReader.cpp.o -MF CMakeFiles/ItemEditorOTLibSPR.dir/SpriteReader.cpp.o.d -o CMakeFiles/ItemEditorOTLibSPR.dir/SpriteReader.cpp.o -c /app/qt6_project/src/PluginInterface/OTLib/SPR/SpriteReader.cpp
+[ 36%] Building CXX object src/PluginInterface/OTLib/OTB/CMakeFiles/ItemEditorOTLibOTB.dir/OtbWriter.cpp.o
+cd /app/qt6_project/build/src/PluginInterface/OTLib/OTB && /usr/bin/c++ -DQT_CORE_LIB -DQT_NO_DEBUG -I/app/qt6_project/build/src/PluginInterface/OTLib/OTB/ItemEditorOTLibOTB_autogen/include -I/app/qt6_project/src/PluginInterface/OTLib/OTB -I/app/qt6_project/build/src/PluginInterface/OTLib/OTB -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -O3 -DNDEBUG -O3 -DNDEBUG -std=gnu++17 -fPIC -fPIC -MD -MT src/PluginInterface/OTLib/OTB/CMakeFiles/ItemEditorOTLibOTB.dir/OtbWriter.cpp.o -MF CMakeFiles/ItemEditorOTLibOTB.dir/OtbWriter.cpp.o.d -o CMakeFiles/ItemEditorOTLibOTB.dir/OtbWriter.cpp.o -c /app/qt6_project/src/PluginInterface/OTLib/OTB/OtbWriter.cpp
+[ 39%] Building CXX object src/PluginInterface/OTLib/Server/Items/CMakeFiles/ItemEditorOTLibServerItems.dir/ServerItem.cpp.o
+cd /app/qt6_project/build/src/PluginInterface/OTLib/Server/Items && /usr/bin/c++ -DQT_CORE_LIB -DQT_NO_DEBUG -DQT_XML_LIB -I/app/qt6_project/build/src/PluginInterface/OTLib/Server/Items/ItemEditorOTLibServerItems_autogen/include -I/app/qt6_project/src/PluginInterface/OTLib/Server/Items -I/app/qt6_project/build/src/PluginInterface/OTLib/Server/Items -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt6/QtXml -O3 -DNDEBUG -O3 -DNDEBUG -std=gnu++17 -fPIC -fPIC -MD -MT src/PluginInterface/OTLib/Server/Items/CMakeFiles/ItemEditorOTLibServerItems.dir/ServerItem.cpp.o -MF CMakeFiles/ItemEditorOTLibServerItems.dir/ServerItem.cpp.o.d -o CMakeFiles/ItemEditorOTLibServerItems.dir/ServerItem.cpp.o -c /app/qt6_project/src/PluginInterface/OTLib/Server/Items/ServerItem.cpp
+/usr/bin/gmake  -f src/PluginInterface/OTLib/Utils/CMakeFiles/ItemEditorOTLibUtils.dir/build.make src/PluginInterface/OTLib/Utils/CMakeFiles/ItemEditorOTLibUtils.dir/depend
+gmake[3]: Entering directory '/app/qt6_project/build'
+cd /app/qt6_project/build && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /app/qt6_project /app/qt6_project/src/PluginInterface/OTLib/Utils /app/qt6_project/build /app/qt6_project/build/src/PluginInterface/OTLib/Utils /app/qt6_project/build/src/PluginInterface/OTLib/Utils/CMakeFiles/ItemEditorOTLibUtils.dir/DependInfo.cmake "--color="
+Dependencies file "src/PluginInterface/OTLib/Utils/ItemEditorOTLibUtils_autogen/deps" is newer than depends file "/app/qt6_project/build/src/PluginInterface/OTLib/Utils/CMakeFiles/ItemEditorOTLibUtils.dir/compiler_depend.internal".
+Consolidate compiler generated dependencies of target ItemEditorOTLibUtils
+gmake[3]: Leaving directory '/app/qt6_project/build'
+/usr/bin/gmake  -f src/PluginInterface/OTLib/Utils/CMakeFiles/ItemEditorOTLibUtils.dir/build.make src/PluginInterface/OTLib/Utils/CMakeFiles/ItemEditorOTLibUtils.dir/build
+gmake[3]: Entering directory '/app/qt6_project/build'
+[ 41%] Building CXX object src/PluginInterface/OTLib/Utils/CMakeFiles/ItemEditorOTLibUtils.dir/ItemEditorOTLibUtils_autogen/mocs_compilation.cpp.o
+cd /app/qt6_project/build/src/PluginInterface/OTLib/Utils && /usr/bin/c++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -I/app/qt6_project/build/src/PluginInterface/OTLib/Utils/ItemEditorOTLibUtils_autogen/include -I/app/qt6_project/src/PluginInterface/OTLib/Utils -I/app/qt6_project/build/src/PluginInterface/OTLib/Utils -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt6/QtGui -O3 -DNDEBUG -O3 -DNDEBUG -std=gnu++17 -fPIC -fPIC -MD -MT src/PluginInterface/OTLib/Utils/CMakeFiles/ItemEditorOTLibUtils.dir/ItemEditorOTLibUtils_autogen/mocs_compilation.cpp.o -MF CMakeFiles/ItemEditorOTLibUtils.dir/ItemEditorOTLibUtils_autogen/mocs_compilation.cpp.o.d -o CMakeFiles/ItemEditorOTLibUtils.dir/ItemEditorOTLibUtils_autogen/mocs_compilation.cpp.o -c /app/qt6_project/build/src/PluginInterface/OTLib/Utils/ItemEditorOTLibUtils_autogen/mocs_compilation.cpp
+gmake[3]: Leaving directory '/app/qt6_project/build'
+[ 43%] Building CXX object src/PluginInterface/OTLib/Utils/CMakeFiles/ItemEditorOTLibUtils.dir/BinaryTreeReader.cpp.o
+cd /app/qt6_project/build/src/PluginInterface/OTLib/Utils && /usr/bin/c++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -I/app/qt6_project/build/src/PluginInterface/OTLib/Utils/ItemEditorOTLibUtils_autogen/include -I/app/qt6_project/src/PluginInterface/OTLib/Utils -I/app/qt6_project/build/src/PluginInterface/OTLib/Utils -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt6/QtGui -O3 -DNDEBUG -O3 -DNDEBUG -std=gnu++17 -fPIC -fPIC -MD -MT src/PluginInterface/OTLib/Utils/CMakeFiles/ItemEditorOTLibUtils.dir/BinaryTreeReader.cpp.o -MF CMakeFiles/ItemEditorOTLibUtils.dir/BinaryTreeReader.cpp.o.d -o CMakeFiles/ItemEditorOTLibUtils.dir/BinaryTreeReader.cpp.o -c /app/qt6_project/src/PluginInterface/OTLib/Utils/BinaryTreeReader.cpp
+[ 43%] Building CXX object src/PluginInterface/OTLib/Utils/CMakeFiles/ItemEditorOTLibUtils.dir/BinaryTreeWriter.cpp.o
+cd /app/qt6_project/build/src/PluginInterface/OTLib/Utils && /usr/bin/c++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -I/app/qt6_project/build/src/PluginInterface/OTLib/Utils/ItemEditorOTLibUtils_autogen/include -I/app/qt6_project/src/PluginInterface/OTLib/Utils -I/app/qt6_project/build/src/PluginInterface/OTLib/Utils -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt6/QtGui -O3 -DNDEBUG -O3 -DNDEBUG -std=gnu++17 -fPIC -fPIC -MD -MT src/PluginInterface/OTLib/Utils/CMakeFiles/ItemEditorOTLibUtils.dir/BinaryTreeWriter.cpp.o -MF CMakeFiles/ItemEditorOTLibUtils.dir/BinaryTreeWriter.cpp.o.d -o CMakeFiles/ItemEditorOTLibUtils.dir/BinaryTreeWriter.cpp.o -c /app/qt6_project/src/PluginInterface/OTLib/Utils/BinaryTreeWriter.cpp
+[ 45%] Linking CXX static library ../../../../lib/libItemEditorOTLibOTB.a
+cd /app/qt6_project/build/src/PluginInterface/OTLib/OTB && /usr/bin/cmake -P CMakeFiles/ItemEditorOTLibOTB.dir/cmake_clean_target.cmake
+cd /app/qt6_project/build/src/PluginInterface/OTLib/OTB && /usr/bin/cmake -E cmake_link_script CMakeFiles/ItemEditorOTLibOTB.dir/link.txt --verbose=1
+/usr/bin/ar qc ../../../../lib/libItemEditorOTLibOTB.a CMakeFiles/ItemEditorOTLibOTB.dir/ItemEditorOTLibOTB_autogen/mocs_compilation.cpp.o CMakeFiles/ItemEditorOTLibOTB.dir/OtbReader.cpp.o CMakeFiles/ItemEditorOTLibOTB.dir/OtbVersionInfo.cpp.o CMakeFiles/ItemEditorOTLibOTB.dir/OtbWriter.cpp.o
+/usr/bin/ranlib ../../../../lib/libItemEditorOTLibOTB.a
+gmake[3]: Leaving directory '/app/qt6_project/build'
+[ 45%] Built target ItemEditorOTLibOTB
+[ 47%] Building CXX object src/PluginInterface/OTLib/Utils/CMakeFiles/ItemEditorOTLibUtils.dir/BitmapLocker.cpp.o
+cd /app/qt6_project/build/src/PluginInterface/OTLib/Utils && /usr/bin/c++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -I/app/qt6_project/build/src/PluginInterface/OTLib/Utils/ItemEditorOTLibUtils_autogen/include -I/app/qt6_project/src/PluginInterface/OTLib/Utils -I/app/qt6_project/build/src/PluginInterface/OTLib/Utils -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt6/QtGui -O3 -DNDEBUG -O3 -DNDEBUG -std=gnu++17 -fPIC -fPIC -MD -MT src/PluginInterface/OTLib/Utils/CMakeFiles/ItemEditorOTLibUtils.dir/BitmapLocker.cpp.o -MF CMakeFiles/ItemEditorOTLibUtils.dir/BitmapLocker.cpp.o.d -o CMakeFiles/ItemEditorOTLibUtils.dir/BitmapLocker.cpp.o -c /app/qt6_project/src/PluginInterface/OTLib/Utils/BitmapLocker.cpp
+[ 50%] Linking CXX static library ../../../../lib/libItemEditorOTLibSPR.a
+cd /app/qt6_project/build/src/PluginInterface/OTLib/SPR && /usr/bin/cmake -P CMakeFiles/ItemEditorOTLibSPR.dir/cmake_clean_target.cmake
+cd /app/qt6_project/build/src/PluginInterface/OTLib/SPR && /usr/bin/cmake -E cmake_link_script CMakeFiles/ItemEditorOTLibSPR.dir/link.txt --verbose=1
+/usr/bin/ar qc ../../../../lib/libItemEditorOTLibSPR.a CMakeFiles/ItemEditorOTLibSPR.dir/ItemEditorOTLibSPR_autogen/mocs_compilation.cpp.o CMakeFiles/ItemEditorOTLibSPR.dir/SpriteReader.cpp.o
+/usr/bin/ranlib ../../../../lib/libItemEditorOTLibSPR.a
+gmake[3]: Leaving directory '/app/qt6_project/build'
+[ 50%] Built target ItemEditorOTLibSPR
+[ 52%] Building CXX object src/PluginInterface/OTLib/Utils/CMakeFiles/ItemEditorOTLibUtils.dir/SpecialChar.cpp.o
+cd /app/qt6_project/build/src/PluginInterface/OTLib/Utils && /usr/bin/c++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -I/app/qt6_project/build/src/PluginInterface/OTLib/Utils/ItemEditorOTLibUtils_autogen/include -I/app/qt6_project/src/PluginInterface/OTLib/Utils -I/app/qt6_project/build/src/PluginInterface/OTLib/Utils -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt6/QtGui -O3 -DNDEBUG -O3 -DNDEBUG -std=gnu++17 -fPIC -fPIC -MD -MT src/PluginInterface/OTLib/Utils/CMakeFiles/ItemEditorOTLibUtils.dir/SpecialChar.cpp.o -MF CMakeFiles/ItemEditorOTLibUtils.dir/SpecialChar.cpp.o.d -o CMakeFiles/ItemEditorOTLibUtils.dir/SpecialChar.cpp.o -c /app/qt6_project/src/PluginInterface/OTLib/Utils/SpecialChar.cpp
+[ 54%] Linking CXX static library ../../../../lib/libItemEditorOTLibUtils.a
+cd /app/qt6_project/build/src/PluginInterface/OTLib/Utils && /usr/bin/cmake -P CMakeFiles/ItemEditorOTLibUtils.dir/cmake_clean_target.cmake
+cd /app/qt6_project/build/src/PluginInterface/OTLib/Utils && /usr/bin/cmake -E cmake_link_script CMakeFiles/ItemEditorOTLibUtils.dir/link.txt --verbose=1
+/usr/bin/ar qc ../../../../lib/libItemEditorOTLibUtils.a CMakeFiles/ItemEditorOTLibUtils.dir/ItemEditorOTLibUtils_autogen/mocs_compilation.cpp.o CMakeFiles/ItemEditorOTLibUtils.dir/BinaryTreeReader.cpp.o CMakeFiles/ItemEditorOTLibUtils.dir/BinaryTreeWriter.cpp.o CMakeFiles/ItemEditorOTLibUtils.dir/BitmapLocker.cpp.o CMakeFiles/ItemEditorOTLibUtils.dir/SpecialChar.cpp.o
+/usr/bin/ranlib ../../../../lib/libItemEditorOTLibUtils.a
+gmake[3]: Leaving directory '/app/qt6_project/build'
+[ 56%] Built target ItemEditorOTLibUtils
+gmake[2]: Leaving directory '/app/qt6_project/build'
+gmake[1]: Leaving directory '/app/qt6_project/build'
+2025-07-15 08:58:30,491 - WARNING - STDERR:
+/app/qt6_project/src/PluginInterface/OTLib/Server/Items/ItemsXmlReader.cpp: In member function ‘bool OTLib::Server::Items::ItemsXmlReader::read(const QString&, OTLib::Collections::ServerItemList*)’:
+/app/qt6_project/src/PluginInterface/OTLib/Server/Items/ItemsXmlReader.cpp:66:38: error: conversion from ‘const char [6]’ to ‘QChar’ is ambiguous
+   66 |                 if (reader.name() == "items") {
+      |                                      ^~~~~~~
+In file included from /usr/include/x86_64-linux-gnu/qt6/QtCore/qstring.h:14,
+                 from /usr/include/x86_64-linux-gnu/qt6/QtCore/qobject.h:11,
+                 from /usr/include/x86_64-linux-gnu/qt6/QtCore/QObject:1,
+                 from /app/qt6_project/src/PluginInterface/OTLib/Server/Items/ItemsXmlReader.h:12,
+                 from /app/qt6_project/src/PluginInterface/OTLib/Server/Items/ItemsXmlReader.cpp:9:
+/usr/include/x86_64-linux-gnu/qt6/QtCore/qchar.h:90:45: note: candidate: ‘constexpr QChar::QChar(char)’ (near match)
+   90 |     QT_ASCII_CAST_WARN constexpr Q_IMPLICIT QChar(char c) noexcept : ucs(uchar(c)) { }
+      |                                             ^~~~~
+/usr/include/x86_64-linux-gnu/qt6/QtCore/qchar.h:90:45: note:   conversion of argument 1 would be ill-formed:
+/app/qt6_project/src/PluginInterface/OTLib/Server/Items/ItemsXmlReader.cpp:66:38: error: invalid conversion from ‘const char*’ to ‘char’ [-fpermissive]
+   66 |                 if (reader.name() == "items") {
+      |                                      ^~~~~~~
+      |                                      |
+      |                                      const char*
+/usr/include/x86_64-linux-gnu/qt6/QtCore/qchar.h:83:26: note: candidate: ‘constexpr QChar::QChar(char16_t)’ (near match)
+   83 |     constexpr Q_IMPLICIT QChar(char16_t ch) noexcept : ucs(ch) {}
+      |                          ^~~~~
+/usr/include/x86_64-linux-gnu/qt6/QtCore/qchar.h:83:26: note:   conversion of argument 1 would be ill-formed:
+/app/qt6_project/src/PluginInterface/OTLib/Server/Items/ItemsXmlReader.cpp:66:38: error: invalid conversion from ‘const char*’ to ‘char16_t’ [-fpermissive]
+   66 |                 if (reader.name() == "items") {
+      |                                      ^~~~~~~
+      |                                      |
+      |                                      const char*
+/usr/include/x86_64-linux-gnu/qt6/QtCore/qchar.h:78:26: note: candidate: ‘constexpr QChar::QChar(short int)’ (near match)
+   78 |     constexpr Q_IMPLICIT QChar(short rc) noexcept : ucs(char16_t(rc)) {}
+      |                          ^~~~~
+/usr/include/x86_64-linux-gnu/qt6/QtCore/qchar.h:78:26: note:   conversion of argument 1 would be ill-formed:
+/app/qt6_project/src/PluginInterface/OTLib/Server/Items/ItemsXmlReader.cpp:66:38: error: invalid conversion from ‘const char*’ to ‘short int’ [-fpermissive]
+   66 |                 if (reader.name() == "items") {
+      |                                      ^~~~~~~
+      |                                      |
+      |                                      const char*
+/usr/include/x86_64-linux-gnu/qt6/QtCore/qchar.h:76:26: note: candidate: ‘constexpr QChar::QChar(ushort)’ (near match)
+   76 |     constexpr Q_IMPLICIT QChar(ushort rc) noexcept : ucs(rc) {}
+      |                          ^~~~~
+/usr/include/x86_64-linux-gnu/qt6/QtCore/qchar.h:76:26: note:   conversion of argument 1 would be ill-formed:
+/app/qt6_project/src/PluginInterface/OTLib/Server/Items/ItemsXmlReader.cpp:66:38: error: invalid conversion from ‘const char*’ to ‘ushort’ {aka ‘short unsigned int’} [-fpermissive]
+   66 |                 if (reader.name() == "items") {
+      |                                      ^~~~~~~
+      |                                      |
+      |                                      const char*
+In file included from /usr/include/x86_64-linux-gnu/qt6/QtCore/qchar.h:651:
+/usr/include/x86_64-linux-gnu/qt6/QtCore/qstringview.h:380:51: note:   initializing argument 2 of ‘bool operator==(QStringView, QChar)’
+  380 |     friend bool operator==(QStringView lhs, QChar rhs) noexcept { return lhs == QStringView(&rhs, 1); }
+      |                                             ~~~~~~^~~
+/app/qt6_project/src/PluginInterface/OTLib/Server/Items/ItemsXmlReader.cpp:71:89: error: conversion from ‘const char [5]’ to ‘QChar’ is ambiguous
+   71 |                         if (token == QXmlStreamReader::StartElement && reader.name() == "item") {
+      |                                                                                         ^~~~~~
+/usr/include/x86_64-linux-gnu/qt6/QtCore/qchar.h:90:45: note: candidate: ‘constexpr QChar::QChar(char)’ (near match)
+   90 |     QT_ASCII_CAST_WARN constexpr Q_IMPLICIT QChar(char c) noexcept : ucs(uchar(c)) { }
+      |                                             ^~~~~
+/usr/include/x86_64-linux-gnu/qt6/QtCore/qchar.h:90:45: note:   conversion of argument 1 would be ill-formed:
+/app/qt6_project/src/PluginInterface/OTLib/Server/Items/ItemsXmlReader.cpp:71:89: error: invalid conversion from ‘const char*’ to ‘char’ [-fpermissive]
+   71 |                         if (token == QXmlStreamReader::StartElement && reader.name() == "item") {
+      |                                                                                         ^~~~~~
+      |                                                                                         |
+      |                                                                                         const char*
+/usr/include/x86_64-linux-gnu/qt6/QtCore/qchar.h:83:26: note: candidate: ‘constexpr QChar::QChar(char16_t)’ (near match)
+   83 |     constexpr Q_IMPLICIT QChar(char16_t ch) noexcept : ucs(ch) {}
+      |                          ^~~~~
+/usr/include/x86_64-linux-gnu/qt6/QtCore/qchar.h:83:26: note:   conversion of argument 1 would be ill-formed:
+/app/qt6_project/src/PluginInterface/OTLib/Server/Items/ItemsXmlReader.cpp:71:89: error: invalid conversion from ‘const char*’ to ‘char16_t’ [-fpermissive]
+   71 |                         if (token == QXmlStreamReader::StartElement && reader.name() == "item") {
+      |                                                                                         ^~~~~~
+      |                                                                                         |
+      |                                                                                         const char*
+/usr/include/x86_64-linux-gnu/qt6/QtCore/qchar.h:78:26: note: candidate: ‘constexpr QChar::QChar(short int)’ (near match)
+   78 |     constexpr Q_IMPLICIT QChar(short rc) noexcept : ucs(char16_t(rc)) {}
+      |                          ^~~~~
+/usr/include/x86_64-linux-gnu/qt6/QtCore/qchar.h:78:26: note:   conversion of argument 1 would be ill-formed:
+/app/qt6_project/src/PluginInterface/OTLib/Server/Items/ItemsXmlReader.cpp:71:89: error: invalid conversion from ‘const char*’ to ‘short int’ [-fpermissive]
+   71 |                         if (token == QXmlStreamReader::StartElement && reader.name() == "item") {
+      |                                                                                         ^~~~~~
+      |                                                                                         |
+      |                                                                                         const char*
+/usr/include/x86_64-linux-gnu/qt6/QtCore/qchar.h:76:26: note: candidate: ‘constexpr QChar::QChar(ushort)’ (near match)
+   76 |     constexpr Q_IMPLICIT QChar(ushort rc) noexcept : ucs(rc) {}
+      |                          ^~~~~
+/usr/include/x86_64-linux-gnu/qt6/QtCore/qchar.h:76:26: note:   conversion of argument 1 would be ill-formed:
+/app/qt6_project/src/PluginInterface/OTLib/Server/Items/ItemsXmlReader.cpp:71:89: error: invalid conversion from ‘const char*’ to ‘ushort’ {aka ‘short unsigned int’} [-fpermissive]
+   71 |                         if (token == QXmlStreamReader::StartElement && reader.name() == "item") {
+      |                                                                                         ^~~~~~
+      |                                                                                         |
+      |                                                                                         const char*
+/usr/include/x86_64-linux-gnu/qt6/QtCore/qstringview.h:380:51: note:   initializing argument 2 of ‘bool operator==(QStringView, QChar)’
+  380 |     friend bool operator==(QStringView lhs, QChar rhs) noexcept { return lhs == QStringView(&rhs, 1); }
+      |                                             ~~~~~~^~~
+gmake[3]: *** [src/PluginInterface/OTLib/Server/Items/CMakeFiles/ItemEditorOTLibServerItems.dir/build.make:100: src/PluginInterface/OTLib/Server/Items/CMakeFiles/ItemEditorOTLibServerItems.dir/ItemsXmlReader.cpp.o] Error 1
+gmake[3]: *** Waiting for unfinished jobs....
+gmake[2]: *** [CMakeFiles/Makefile2:1481: src/PluginInterface/OTLib/Server/Items/CMakeFiles/ItemEditorOTLibServerItems.dir/all] Error 2
+gmake[2]: *** Waiting for unfinished jobs....
+gmake[1]: *** [CMakeFiles/Makefile2:1733: plugins/PluginOne/CMakeFiles/PluginOne.dir/rule] Error 2
+gmake: *** [Makefile:770: PluginOne] Error 2
+2025-07-15 08:58:30,527 - ERROR - Command failed: cmake --build . --target PluginOne --config Release --parallel 4 (exit code: 2)
+2025-07-15 08:58:30,548 - INFO - Build completed in 18.5 seconds
+2025-07-15 08:58:30,549 - INFO - Final status: FAILED
+2025-07-15 08:58:30,550 - INFO - Log file saved to: /app/qt6_project/logs/build_linux_20250715_085812.log

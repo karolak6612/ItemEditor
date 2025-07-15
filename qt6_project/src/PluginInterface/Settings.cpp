@@ -33,7 +33,7 @@ bool Settings::load(const QString& filename)
         QFile file(m_settingsFilename);
         if (!file.open(QIODevice::ReadOnly)) {
             // Create default XML like C# version
-            m_xmlDocument.setContent("<settings></settings>");
+            m_xmlDocument.setContent(QString("<settings></settings>"));
             return false;
         }
         
@@ -41,7 +41,7 @@ bool Settings::load(const QString& filename)
         int errorLine, errorColumn;
         if (!m_xmlDocument.setContent(&file, &errorMsg, &errorLine, &errorColumn)) {
             qWarning() << "Failed to parse XML:" << errorMsg << "at line" << errorLine;
-            m_xmlDocument.setContent("<settings></settings>");
+            m_xmlDocument.setContent(QString("<settings></settings>"));
             file.close();
             return false;
         }
@@ -50,7 +50,7 @@ bool Settings::load(const QString& filename)
         return true;
     }
     catch (...) {
-        m_xmlDocument.setContent("<settings></settings>");
+        m_xmlDocument.setContent(QString("<settings></settings>"));
         return false;
     }
 }

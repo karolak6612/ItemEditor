@@ -108,7 +108,7 @@ bool FileNameHelper::hasExtension(const QString& fileName, const QString& extens
     invalidChars.append({"/", "\\"});
 #else
     // On Unix-like systems, only forward slash is invalid in filenames
-    invalidChars.append({"/"});
+    invalidChars.append(QString("/"));
 #endif
 
     // Control characters (0-31)

@@ -167,6 +167,10 @@ private:
     void paintItemSprite(QPainter& painter, ItemEditor::ServerItem* item, const QRect& destRect);
     void paintItemText(QPainter& painter, ItemEditor::ServerItem* item, const QRect& layoutRect);
     void paintItemBorder(QPainter& painter, const QRect& rect);
+    bool isItemMismatched(ItemEditor::ServerItem* serverItem);
+
+    bool m_showOnlyMismatchedItems;
+    IdDisplayFormat m_idDisplayFormat;
     
     // Performance helper methods
     int getItemsPerRow() const;

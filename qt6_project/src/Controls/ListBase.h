@@ -343,4 +343,6 @@ void ListBase<T>::ensureVisible(int index)
 
 } // namespace ItemEditor
 
+#include "ListBase.cpp"
+
 #endif // ITEMEDITOR_LISTBASE_H

@@ -7,6 +7,7 @@
  */
 
 #include "ListBase.h"
+#include "ServerItem.h"
 #include <QPainter>
 #include <QScrollBar>
 #include <QApplication>
@@ -385,7 +386,5 @@ void ListBase<ItemEditor::ServerItem>::resizeEvent(QResizeEvent *event)
     update();
 }
 
-// Explicit template instantiation
-template class ListBase<ItemEditor::ServerItem>;
 
 } // namespace ItemEditor
