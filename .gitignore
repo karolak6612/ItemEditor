@@ -1,15 +1,3 @@
-# Scripts
-release/
-debug/
-packages/
-
-# Visual studio intermediate directories
-bin/
-obj/
-*.suo
-*.csproj.user
-*.vs/
-
-# StyleCop
-stylecop.*
-*cache
+.mcp.json
+acli.exe
+forge.yaml

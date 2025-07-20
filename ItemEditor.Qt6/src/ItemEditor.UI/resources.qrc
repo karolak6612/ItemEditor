@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RCC>
+    <qresource prefix="/">
+        <file>icons/application.ico</file>
+        <file>themes/dark.qss</file>
+    </qresource>
+</RCC>

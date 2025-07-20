@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=ItemEditor
+Comment=OTB (Open Tibia Binary) data file editor for game development
+Exec=@CMAKE_INSTALL_PREFIX@/bin/itemeditor
+Icon=itemeditor
+Terminal=false
+Categories=Development;Game;
+Keywords=tibia;otb;game;editor;development;
+StartupNotify=true
+MimeType=application/x-otb;
