@@ -1,0 +1,93 @@
+<ui:FluentWindow x:Class="ItemEditor.Dialogs.ImportSettingsDialog"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                Title="Import Settings"
+                Width="400"
+                Height="350"
+                WindowStartupLocation="CenterOwner"
+                ResizeMode="NoResize"
+                ShowInTaskbar="False">
+    
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <ui:TextBlock Text="Import Settings" 
+                         FontTypography="TitleLarge"
+                         Margin="0,0,0,8"/>
+            <ui:TextBlock Text="Choose how to import the settings from the file."
+                         FontTypography="Body"
+                         Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+        </StackPanel>
+        
+        <!-- Options -->
+        <ui:Card Grid.Row="1" Padding="16">
+            <StackPanel>
+                <ui:TextBlock Text="Import Options" 
+                             FontTypography="BodyStrong"
+                             Margin="0,0,0,12"/>
+                
+                <!-- Import Mode -->
+                <ui:TextBlock Text="Import Mode" 
+                             FontTypography="Body"
+                             Margin="0,0,0,8"/>
+                
+                <RadioButton x:Name="MergeRadioButton"
+                            Content="Merge with existing settings"
+                            IsChecked="True"
+                            Margin="0,0,0,8"
+                            ToolTip="Import settings will be merged with current settings, keeping existing values where not specified"/>
+                
+                <RadioButton x:Name="ReplaceRadioButton"
+                            Content="Replace all settings"
+                            Margin="0,0,0,16"
+                            ToolTip="All current settings will be replaced with imported settings"/>
+                
+                <!-- Backup Option -->
+                <CheckBox x:Name="CreateBackupCheckBox"
+                         Content="Create backup before import"
+                         IsChecked="True"
+                         Margin="0,0,0,8"
+                         ToolTip="Create a backup of current settings before importing"/>
+                
+                <CheckBox x:Name="ValidateSettingsCheckBox"
+                         Content="Validate imported settings"
+                         IsChecked="True"
+                         Margin="0,0,0,8"
+                         ToolTip="Validate imported settings before applying them"/>
+                
+                <!-- Warning -->
+                <ui:InfoBar IsOpen="True"
+                           Severity="Warning"
+                           Title="Warning"
+                           Message="Importing settings will modify your current configuration. Make sure to create a backup if needed."
+                           IsClosable="False"
+                           Margin="0,12,0,0"/>
+            </StackPanel>
+        </ui:Card>
+        
+        <!-- Action Buttons -->
+        <StackPanel Grid.Row="2" 
+                   Orientation="Horizontal" 
+                   HorizontalAlignment="Right"
+                   Margin="0,20,0,0">
+            
+            <ui:Button x:Name="ImportButton"
+                      Content="Import"
+                      Appearance="Primary"
+                      Margin="0,0,8,0"
+                      Click="ImportButton_Click"/>
+            
+            <ui:Button x:Name="CancelButton"
+                      Content="Cancel"
+                      Appearance="Secondary"
+                      Click="CancelButton_Click"/>
+        </StackPanel>
+    </Grid>
+</ui:FluentWindow>

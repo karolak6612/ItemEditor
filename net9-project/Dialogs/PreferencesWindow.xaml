@@ -1,0 +1,496 @@
+<ui:FluentWindow x:Class="ItemEditor.Dialogs.PreferencesWindow"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                xmlns:vm="clr-namespace:ItemEditor.ViewModels"
+                mc:Ignorable="d"
+                Title="Preferences"
+                Style="{StaticResource DialogWindowStyle}"
+                Width="800" Height="600"
+                WindowStartupLocation="CenterOwner"
+                ResizeMode="CanResize"
+                ShowInTaskbar="False"
+                Icon="pack://application:,,,/Resources/ItemEditor.ico">
+    
+    <Window.DataContext>
+        <vm:PreferencesViewModel/>
+    </Window.DataContext>
+    
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Main Content with Tabs -->
+        <ui:TabView Grid.Row="0" Margin="0,0,0,16">
+            
+            <!-- General Settings Tab -->
+            <ui:TabViewItem Header="General">
+                <ScrollViewer Style="{StaticResource ModernScrollViewerStyle}">
+                    <StackPanel >
+                        
+                        <!-- Client Configuration -->
+                        <ui:Card Style="{StaticResource CompactCardStyle}">
+                            <StackPanel>
+                                <ui:TextBlock Text="Client Configuration"
+                                              Style="{StaticResource SectionHeaderStyle}"/>
+                                
+                                <!-- Client Directory -->
+                                <ui:TextBlock Text="Client Directory"
+                                              Style="{StaticResource PropertyLabelStyle}"/>
+                                <Grid Margin="0,0,0,12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <ui:TextBox Grid.Column="0"
+                                                Text="{Binding ClientDirectory, UpdateSourceTrigger=PropertyChanged}"
+                                                PlaceholderText="Select client directory..."
+                                                Margin="0,0,8,0"/>
+                                    
+                                    <ui:Button Grid.Column="1"
+                                               Content="Browse"
+                                               Command="{Binding BrowseClientDirectoryCommand}"
+                                               Style="{StaticResource SecondaryButtonStyle}"/>
+                                </Grid>
+                                
+                                <!-- Client Options -->
+                                <ui:TextBlock Text="Client Options"
+                                              Style="{StaticResource PropertyLabelStyle}"/>
+                                
+                                <CheckBox Content="Extended Features"
+                                          IsChecked="{Binding ExtendedFeatures}"
+                                          Margin="0,0,0,8"
+                                          ToolTip="Enable extended client features for newer versions"/>
+                                
+                                <CheckBox Content="Frame Durations"
+                                          IsChecked="{Binding FrameDurations}"
+                                          Margin="0,0,0,8"
+                                          ToolTip="Support for sprite frame duration information"/>
+                                
+                                <CheckBox Content="Transparency Support"
+                                          IsChecked="{Binding TransparencySupport}"
+                                          Margin="0,0,0,8"
+                                          ToolTip="Enable transparency rendering for sprites"/>
+                                
+                                <!-- Client Information -->
+                                <ui:InfoBar IsOpen="{Binding HasClientInfo}"
+                                            Severity="Informational"
+                                            Title="Client Information"
+                                            Message="{Binding ClientInfoMessage}"
+                                            IsClosable="False"
+                                            Margin="0,8,0,0"/>
+                                
+                                <!-- Error Display -->
+                                <ui:InfoBar IsOpen="{Binding HasError}"
+                                            Severity="Error"
+                                            Title="Configuration Error"
+                                            Message="{Binding ErrorMessage}"
+                                            IsClosable="True"
+                                            Margin="0,8,0,0"/>
+                            </StackPanel>
+                        </ui:Card>
+                        
+                        <!-- Application Settings -->
+                        <ui:Card Style="{StaticResource CompactCardStyle}">
+                            <StackPanel>
+                                <ui:TextBlock Text="Application Settings"
+                                              Style="{StaticResource SectionHeaderStyle}"/>
+                                
+                                <!-- Auto-save -->
+                                <CheckBox Content="Auto-save changes"
+                                          IsChecked="{Binding AutoSave}"
+                                          Margin="0,0,0,8"
+                                          ToolTip="Automatically save changes when editing items"/>
+                                
+                                <!-- Backup -->
+                                <CheckBox Content="Create backups"
+                                          IsChecked="{Binding CreateBackups}"
+                                          Margin="0,0,0,8"
+                                          ToolTip="Create backup files before saving"/>
+                                
+                                <!-- Recent Files Count -->
+                                <ui:TextBlock Text="Recent Files Count"
+                                              Style="{StaticResource PropertyLabelStyle}"/>
+                                <ui:NumberBox Value="{Binding RecentFilesCount}"
+                                              Minimum="1"
+                                              Maximum="20"
+                                              Margin="0,0,0,12"
+                                              ToolTip="Number of recent files to remember"/>
+                            </StackPanel>
+                        </ui:Card>
+                        
+                    </StackPanel>
+                </ScrollViewer>
+            </ui:TabViewItem>
+            
+            <!-- Appearance Tab -->
+            <ui:TabViewItem Header="Appearance">
+                <ScrollViewer Style="{StaticResource ModernScrollViewerStyle}">
+                    <StackPanel >
+                        
+                        <!-- Theme Settings -->
+                        <ui:Card Style="{StaticResource CompactCardStyle}">
+                            <StackPanel>
+                                <ui:TextBlock Text="Theme Settings"
+                                              Style="{StaticResource SectionHeaderStyle}"/>
+                                
+                                <!-- Theme Selection -->
+                                <ui:TextBlock Text="Application Theme"
+                                              Style="{StaticResource PropertyLabelStyle}"/>
+                                <ComboBox ItemsSource="{Binding AvailableThemes}"
+                                          SelectedItem="{Binding SelectedTheme}"
+                                          SelectionChanged="ThemeComboBox_SelectionChanged"
+                                          Margin="0,0,0,12">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <ui:SymbolIcon Symbol="{Binding Icon}" 
+                                                               Width="16" Height="16"
+                                                               Margin="0,0,8,0"/>
+                                                <TextBlock Text="{Binding Name}"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                                
+                                <!-- Accent Color -->
+                                <ui:TextBlock Text="Accent Color"
+                                              Style="{StaticResource PropertyLabelStyle}"/>
+                                <ComboBox ItemsSource="{Binding AvailableAccentColors}"
+                                          SelectedItem="{Binding SelectedAccentColor}"
+                                          SelectionChanged="AccentColorComboBox_SelectionChanged"
+                                          Margin="0,0,0,12">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Rectangle Width="16" Height="16"
+                                                           Fill="{Binding Brush}"
+                                                           Margin="0,0,8,0"/>
+                                                <TextBlock Text="{Binding Name}"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                                
+                                <!-- Theme Preview -->
+                                <ui:TextBlock Text="Preview"
+                                              Style="{StaticResource PropertyLabelStyle}"/>
+                                <ui:Card Padding="12" Margin="0,0,0,12">
+                                    <StackPanel>
+                                        <ui:TextBlock Text="Sample Text" 
+                                                     FontTypography="BodyStrong"
+                                                     Margin="0,0,0,8"/>
+                                        <ui:Button Content="Sample Button" 
+                                                  Appearance="Primary"
+                                                  Margin="0,0,8,8"
+                                                  HorizontalAlignment="Left"/>
+                                        <ui:Button Content="Secondary Button" 
+                                                  Appearance="Secondary"
+                                                  Margin="0,0,0,8"
+                                                  HorizontalAlignment="Left"/>
+                                        <CheckBox Content="Sample Checkbox" 
+                                                 IsChecked="True"
+                                                 Margin="0,0,0,4"/>
+                                        <ui:TextBox PlaceholderText="Sample text input"
+                                                   Width="200"
+                                                   HorizontalAlignment="Left"/>
+                                    </StackPanel>
+                                </ui:Card>
+                            </StackPanel>
+                        </ui:Card>
+                        
+                        <!-- Display Settings -->
+                        <ui:Card Style="{StaticResource CompactCardStyle}">
+                            <StackPanel>
+                                <ui:TextBlock Text="Display Settings"
+                                              Style="{StaticResource SectionHeaderStyle}"/>
+                                
+                                <!-- Font Size -->
+                                <ui:TextBlock Text="Font Size"
+                                              Style="{StaticResource PropertyLabelStyle}"/>
+                                <ui:NumberBox Value="{Binding FontSize}"
+                                              Minimum="8"
+                                              Maximum="24"
+                                              Margin="0,0,0,12"
+                                              ToolTip="Application font size"/>
+                                
+                                <!-- Show Thumbnails -->
+                                <CheckBox Content="Show item thumbnails"
+                                          IsChecked="{Binding ShowThumbnails}"
+                                          Margin="0,0,0,8"
+                                          ToolTip="Display thumbnails in item lists"/>
+                                
+                                <!-- Thumbnail Size -->
+                                <ui:TextBlock Text="Thumbnail Size"
+                                              Style="{StaticResource PropertyLabelStyle}"/>
+                                <Slider Value="{Binding ThumbnailSize}"
+                                        Minimum="16"
+                                        Maximum="64"
+                                        TickFrequency="8"
+                                        TickPlacement="BottomRight"
+                                        IsEnabled="{Binding ShowThumbnails}"
+                                        Margin="0,0,0,12"/>
+                            </StackPanel>
+                        </ui:Card>
+                        
+                    </StackPanel>
+                </ScrollViewer>
+            </ui:TabViewItem>
+            
+            <!-- Plugins Tab -->
+            <ui:TabViewItem Header="Plugins">
+                <ScrollViewer Style="{StaticResource ModernScrollViewerStyle}">
+                    <StackPanel >
+                        
+                        <!-- Plugin Management -->
+                        <ui:Card Style="{StaticResource CompactCardStyle}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                
+                                <!-- Header -->
+                                <Grid Grid.Row="0" Margin="0,0,0,12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <ui:TextBlock Grid.Column="0"
+                                                  Text="Installed Plugins"
+                                                  Style="{StaticResource SectionHeaderStyle}"/>
+                                    
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                        <ui:Button Content="Refresh"
+                                                   Command="{Binding RefreshPluginsCommand}"
+                                                   Style="{StaticResource SecondaryButtonStyle}"
+                                                   Margin="0,0,8,0"/>
+                                        
+                                        <ui:Button Content="Install..."
+                                                   Command="{Binding InstallPluginCommand}"
+                                                   Style="{StaticResource SecondaryButtonStyle}"/>
+                                    </StackPanel>
+                                </Grid>
+                                
+                                <!-- Plugin List -->
+                                <ListView Grid.Row="1"
+                                          ItemsSource="{Binding InstalledPlugins}"
+                                          SelectedItem="{Binding SelectedPlugin}"
+                                          Style="{StaticResource ItemListStyle}"
+                                          MinHeight="200">
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate>
+                                            <ui:Card Style="{StaticResource CompactCardStyle}" Margin="2">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    
+                                                    <!-- Status Icon -->
+                                                    <ui:SymbolIcon Grid.Column="0"
+                                                                   Symbol="{Binding StatusIcon}"
+                                                                   Foreground="{Binding StatusBrush}"
+                                                                   Width="16" Height="16"
+                                                                   Margin="0,0,12,0"/>
+                                                    
+                                                    <!-- Plugin Info -->
+                                                    <StackPanel Grid.Column="1">
+                                                        <ui:TextBlock Text="{Binding Name}"
+                                                                      Style="{StaticResource AdaptiveBodyStyle}"/>
+                                                        <ui:TextBlock Text="{Binding Description}"
+                                                                      Style="{StaticResource AdaptiveCaptionStyle}"/>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <ui:TextBlock Text="{Binding Version, StringFormat=v{0}}"
+                                                                          Style="{StaticResource AdaptiveCaptionStyle}"
+                                                                          Margin="0,0,8,0"/>
+                                                            <ui:TextBlock Text="{Binding Author, StringFormat=by {0}}"
+                                                                          Style="{StaticResource AdaptiveCaptionStyle}"/>
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                    
+                                                    <!-- Actions -->
+                                                    <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                                        <ToggleButton IsChecked="{Binding IsEnabled}"
+                                                                      Content="{Binding IsEnabled, Converter={StaticResource BooleanToStringConverter}, ConverterParameter='Enabled|Disabled'}"
+                                                                      Command="{Binding DataContext.TogglePluginCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                      CommandParameter="{Binding}"
+                                                                      Margin="0,0,8,0"/>
+                                                        
+                                                        <ui:Button Content="Remove"
+                                                                   Command="{Binding DataContext.RemovePluginCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                   CommandParameter="{Binding}"
+                                                                   Style="{StaticResource SecondaryButtonStyle}"/>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </ui:Card>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                </ListView>
+                                
+                                <!-- Plugin Details -->
+                                <ui:Card Grid.Row="2" 
+                                         Style="{StaticResource CompactCardStyle}"
+                                         Margin="0,12,0,0"
+                                         Visibility="{Binding SelectedPlugin, Converter={StaticResource NullToVisibilityConverter}}">
+                                    <StackPanel>
+                                        <ui:TextBlock Text="Plugin Details"
+                                                      Style="{StaticResource SubsectionHeaderStyle}"/>
+                                        
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+                                            
+                                            <ui:TextBlock Grid.Row="0" Grid.Column="0" Text="File Path:" Style="{StaticResource PropertyLabelStyle}" Margin="0,0,8,4"/>
+                                            <ui:TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SelectedPlugin.FilePath}" Style="{StaticResource AdaptiveBodyStyle}" Margin="0,0,0,4"/>
+                                            
+                                            <ui:TextBlock Grid.Row="1" Grid.Column="0" Text="Version:" Style="{StaticResource PropertyLabelStyle}" Margin="0,0,8,4"/>
+                                            <ui:TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedPlugin.Version}" Style="{StaticResource AdaptiveBodyStyle}" Margin="0,0,0,4"/>
+                                            
+                                            <ui:TextBlock Grid.Row="2" Grid.Column="0" Text="Loaded:" Style="{StaticResource PropertyLabelStyle}" Margin="0,0,8,4"/>
+                                            <ui:TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SelectedPlugin.LoadedAt, StringFormat=MM/dd/yyyy HH:mm:ss}" Style="{StaticResource AdaptiveBodyStyle}" Margin="0,0,0,4"/>
+                                            
+                                            <ui:TextBlock Grid.Row="3" Grid.Column="0" Text="Supported Clients:" Style="{StaticResource PropertyLabelStyle}" Margin="0,0,8,4"/>
+                                            <ItemsControl Grid.Row="3" Grid.Column="1" ItemsSource="{Binding SelectedPlugin.SupportedClients}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <ui:TextBlock Text="{Binding}" Style="{StaticResource AdaptiveCaptionStyle}"/>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </Grid>
+                                    </StackPanel>
+                                </ui:Card>
+                            </Grid>
+                        </ui:Card>
+                        
+                    </StackPanel>
+                </ScrollViewer>
+            </ui:TabViewItem>
+            
+            <!-- Advanced Tab -->
+            <ui:TabViewItem Header="Advanced">
+                <ScrollViewer Style="{StaticResource ModernScrollViewerStyle}">
+                    <StackPanel >
+                        
+                        <!-- File Associations -->
+                        <ui:Card Style="{StaticResource CompactCardStyle}">
+                            <StackPanel>
+                                <ui:TextBlock Text="File Associations"
+                                              Style="{StaticResource SectionHeaderStyle}"/>
+                                
+                                <CheckBox Content="Associate .otb files"
+                                          IsChecked="{Binding AssociateOtbFiles}"
+                                          Margin="0,0,0,8"
+                                          ToolTip="Register ItemEditor as the default application for .otb files"/>
+                                
+                                <CheckBox Content="Associate .dat files"
+                                          IsChecked="{Binding AssociateDatFiles}"
+                                          Margin="0,0,0,8"
+                                          ToolTip="Register ItemEditor as the default application for .dat files"/>
+                                
+                                <CheckBox Content="Associate .spr files"
+                                          IsChecked="{Binding AssociateSprFiles}"
+                                          Margin="0,0,0,8"
+                                          ToolTip="Register ItemEditor as the default application for .spr files"/>
+                            </StackPanel>
+                        </ui:Card>
+                        
+                        <!-- Performance Settings -->
+                        <ui:Card Style="{StaticResource CompactCardStyle}">
+                            <StackPanel>
+                                <ui:TextBlock Text="Performance Settings"
+                                              Style="{StaticResource SectionHeaderStyle}"/>
+                                
+                                <!-- Memory Settings -->
+                                <ui:TextBlock Text="Memory Cache Size (MB)"
+                                              Style="{StaticResource PropertyLabelStyle}"/>
+                                <ui:NumberBox Value="{Binding MemoryCacheSize}"
+                                              Minimum="64"
+                                              Maximum="2048"
+                                              Margin="0,0,0,12"
+                                              ToolTip="Amount of memory to use for caching sprites and thumbnails"/>
+                                
+                                <!-- Threading -->
+                                <CheckBox Content="Enable multi-threading"
+                                          IsChecked="{Binding EnableMultiThreading}"
+                                          Margin="0,0,0,8"
+                                          ToolTip="Use multiple threads for file operations"/>
+                                
+                                <!-- Hardware Acceleration -->
+                                <CheckBox Content="Hardware acceleration"
+                                          IsChecked="{Binding HardwareAcceleration}"
+                                          Margin="0,0,0,8"
+                                          ToolTip="Use GPU acceleration for rendering when available"/>
+                            </StackPanel>
+                        </ui:Card>
+                        
+                        <!-- Import/Export Settings -->
+                        <ui:Card Style="{StaticResource CompactCardStyle}">
+                            <StackPanel>
+                                <ui:TextBlock Text="Settings Management"
+                                              Style="{StaticResource SectionHeaderStyle}"/>
+                                
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                    <ui:Button Content="Export Settings..."
+                                               Command="{Binding ExportSettingsCommand}"
+                                               Style="{StaticResource SecondaryButtonStyle}"
+                                               Margin="0,0,8,0"
+                                               ToolTip="Export current settings to a file"/>
+                                    
+                                    <ui:Button Content="Import Settings..."
+                                               Command="{Binding ImportSettingsCommand}"
+                                               Style="{StaticResource SecondaryButtonStyle}"
+                                               ToolTip="Import settings from a file"/>
+                                </StackPanel>
+                                
+                                <ui:Button Content="Reset to Defaults"
+                                           Command="{Binding ResetSettingsCommand}"
+                                           Style="{StaticResource SecondaryButtonStyle}"
+                                           HorizontalAlignment="Left"
+                                           ToolTip="Reset all settings to their default values"/>
+                            </StackPanel>
+                        </ui:Card>
+                        
+                    </StackPanel>
+                </ScrollViewer>
+            </ui:TabViewItem>
+            
+        </ui:TabView>
+        
+        <!-- Action Buttons -->
+        <StackPanel Grid.Row="1" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Right">
+            <ui:Button Content="Apply"
+                       Command="{Binding ApplyCommand}"
+                       Style="{StaticResource SecondaryButtonStyle}"
+                       Margin="0,0,8,0"/>
+            
+            <ui:Button Content="OK"
+                       Command="{Binding OkCommand}"
+                       Style="{StaticResource PrimaryButtonStyle}"
+                       Margin="0,0,8,0"/>
+            
+            <ui:Button Content="Cancel"
+                       Command="{Binding CancelCommand}"
+                       Style="{StaticResource SecondaryButtonStyle}"/>
+        </StackPanel>
+    </Grid>
+</ui:FluentWindow>

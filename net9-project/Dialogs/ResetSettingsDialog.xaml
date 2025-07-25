@@ -1,0 +1,118 @@
+<ui:FluentWindow x:Class="ItemEditor.Dialogs.ResetSettingsDialog"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                Title="Reset Settings"
+                Width="450"
+                Height="400"
+                WindowStartupLocation="CenterOwner"
+                ResizeMode="NoResize"
+                ShowInTaskbar="False">
+    
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <ui:TextBlock Text="Reset Settings" 
+                         FontTypography="TitleLarge"
+                         Margin="0,0,0,8"/>
+            <ui:TextBlock Text="Choose which settings to reset to their default values."
+                         FontTypography="Body"
+                         Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+        </StackPanel>
+        
+        <!-- Options -->
+        <ui:Card Grid.Row="1" Padding="16">
+            <StackPanel>
+                <ui:TextBlock Text="Reset Options" 
+                             FontTypography="BodyStrong"
+                             Margin="0,0,0,12"/>
+                
+                <!-- Reset Scope -->
+                <ui:TextBlock Text="What to Reset" 
+                             FontTypography="Body"
+                             Margin="0,0,0,8"/>
+                
+                <RadioButton x:Name="ResetAllRadioButton"
+                            Content="Reset all settings"
+                            IsChecked="True"
+                            Margin="0,0,0,8"
+                            ToolTip="Reset all application settings to their default values"/>
+                
+                <RadioButton x:Name="ResetSelectiveRadioButton"
+                            Content="Reset selected sections only"
+                            Margin="0,0,0,16"
+                            ToolTip="Choose specific sections to reset"/>
+                
+                <!-- Selective Reset Options -->
+                <StackPanel x:Name="SelectiveOptionsPanel"
+                           IsEnabled="{Binding IsChecked, ElementName=ResetSelectiveRadioButton}"
+                           Margin="20,0,0,16">
+                    
+                    <CheckBox x:Name="ResetGeneralCheckBox"
+                             Content="General settings"
+                             Margin="0,0,0,4"
+                             ToolTip="Client directory, extended features, auto-save, etc."/>
+                    
+                    <CheckBox x:Name="ResetAppearanceCheckBox"
+                             Content="Appearance settings"
+                             Margin="0,0,0,4"
+                             ToolTip="Theme, colors, font size, thumbnails, etc."/>
+                    
+                    <CheckBox x:Name="ResetPluginCheckBox"
+                             Content="Plugin settings"
+                             Margin="0,0,0,4"
+                             ToolTip="Plugin configurations and enabled states"/>
+                    
+                    <CheckBox x:Name="ResetAdvancedCheckBox"
+                             Content="Advanced settings"
+                             Margin="0,0,0,4"
+                             ToolTip="File associations, performance settings, etc."/>
+                    
+                    <CheckBox x:Name="ResetUserCheckBox"
+                             Content="User preferences"
+                             Margin="0,0,0,4"
+                             ToolTip="Window positions, recent files, keyboard shortcuts"/>
+                </StackPanel>
+                
+                <!-- Backup Option -->
+                <CheckBox x:Name="CreateBackupCheckBox"
+                         Content="Create backup before reset"
+                         IsChecked="True"
+                         Margin="0,0,0,8"
+                         ToolTip="Create a backup of current settings before resetting"/>
+                
+                <!-- Warning -->
+                <ui:InfoBar IsOpen="True"
+                           Severity="Warning"
+                           Title="Warning"
+                           Message="This action cannot be undone unless you have a backup. All selected settings will be permanently reset to their default values."
+                           IsClosable="False"
+                           Margin="0,12,0,0"/>
+            </StackPanel>
+        </ui:Card>
+        
+        <!-- Action Buttons -->
+        <StackPanel Grid.Row="2" 
+                   Orientation="Horizontal" 
+                   HorizontalAlignment="Right"
+                   Margin="0,20,0,0">
+            
+            <ui:Button x:Name="ResetButton"
+                      Content="Reset Settings"
+                      Appearance="Primary"
+                      Margin="0,0,8,0"
+                      Click="ResetButton_Click"/>
+            
+            <ui:Button x:Name="CancelButton"
+                      Content="Cancel"
+                      Appearance="Secondary"
+                      Click="CancelButton_Click"/>
+        </StackPanel>
+    </Grid>
+</ui:FluentWindow>

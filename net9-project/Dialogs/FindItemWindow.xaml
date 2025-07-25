@@ -1,0 +1,313 @@
+<ui:FluentWindow x:Class="ItemEditor.Dialogs.FindItemWindow"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                xmlns:vm="clr-namespace:ItemEditor.ViewModels"
+                mc:Ignorable="d"
+                Title="Find Item"
+                Style="{StaticResource DialogWindowStyle}"
+                Width="900" Height="600"
+                WindowStartupLocation="CenterOwner"
+                ResizeMode="CanResize"
+                ShowInTaskbar="False"
+                Icon="pack://application:,,,/Resources/ItemEditor.ico">
+    
+    <Window.DataContext>
+        <vm:FindItemViewModel/>
+    </Window.DataContext>
+    
+    <Grid Margin="16">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="8"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        
+        <!-- Search Panel -->
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            
+            <!-- Search Controls -->
+            <ui:Card Grid.Row="0" Style="{StaticResource CompactCardStyle}" Margin="0,0,0,8">
+                <StackPanel>
+                    <ui:TextBlock Text="Search Criteria"
+                                  Style="{StaticResource SectionHeaderStyle}"/>
+                    
+                    <!-- Search Mode Toggle -->
+                    <CheckBox Content="Use Advanced Search"
+                              IsChecked="{Binding UseAdvancedSearch}"
+                              Margin="0,0,0,8"/>
+                    
+                    <!-- Simple Search -->
+                    <StackPanel Visibility="{Binding UseAdvancedSearch, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=True}">
+                        <ui:TextBlock Text="Search Text"
+                                      Style="{StaticResource PropertyLabelStyle}"/>
+                        <ui:TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                                    PlaceholderText="Enter search text..."
+                                    Margin="0,0,0,8"/>
+                    </StackPanel>
+                    
+                    <!-- Advanced Search -->
+                    <StackPanel Visibility="{Binding UseAdvancedSearch, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <!-- Item ID -->
+                        <ui:TextBlock Text="Item ID"
+                                      Style="{StaticResource PropertyLabelStyle}"/>
+                        <ui:NumberBox Value="{Binding SearchId}"
+                                      PlaceholderText="Enter item ID..."
+                                      Margin="0,0,0,8"/>
+                        
+                        <!-- Item Name -->
+                        <ui:TextBlock Text="Item Name"
+                                      Style="{StaticResource PropertyLabelStyle}"/>
+                        <ui:TextBox Text="{Binding SearchName, UpdateSourceTrigger=PropertyChanged}"
+                                    PlaceholderText="Enter item name..."
+                                    Margin="0,0,0,8"/>
+                        
+                        <!-- Item Type -->
+                        <ui:TextBlock Text="Item Type"
+                                      Style="{StaticResource PropertyLabelStyle}"/>
+                        <ComboBox ItemsSource="{Binding ItemTypes}"
+                                  SelectedItem="{Binding SearchType}"
+                                  Margin="0,0,0,8">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        
+                        <!-- Properties -->
+                        <CheckBox Content="Stackable Items Only"
+                                  IsChecked="{Binding SearchStackable}"
+                                  Margin="0,0,0,8"/>
+                    </StackPanel>
+                    
+                    <!-- Search Buttons -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <ui:Button Content="Search"
+                                   Command="{Binding SearchCommand}"
+                                   Style="{StaticResource PrimaryButtonStyle}"
+                                   Margin="0,0,8,0"/>
+                        
+                        <ui:Button Content="Clear"
+                                   Command="{Binding ClearSearchCommand}"
+                                   Style="{StaticResource SecondaryButtonStyle}"/>
+                    </StackPanel>
+                </StackPanel>
+            </ui:Card>
+            
+            <!-- Saved Searches -->
+            <ui:Card Grid.Row="1" Style="{StaticResource CompactCardStyle}" Margin="0,0,0,8">
+                <StackPanel>
+                    <ui:TextBlock Text="Saved Searches"
+                                  Style="{StaticResource SectionHeaderStyle}"/>
+                    
+                    <ListView ItemsSource="{Binding SavedSearches}"
+                              SelectedItem="{Binding SelectedSavedSearch}"
+                              MaxHeight="120"
+                              Style="{StaticResource ItemListStyle}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <StackPanel Grid.Column="0">
+                                        <ui:TextBlock Text="{Binding Name}"
+                                                      Style="{StaticResource AdaptiveBodyStyle}"/>
+                                        <ui:TextBlock Text="{Binding CreatedDate, StringFormat=MM/dd/yyyy}"
+                                                      Style="{StaticResource AdaptiveCaptionStyle}"/>
+                                    </StackPanel>
+                                    
+                                    <ui:Button Grid.Column="1"
+                                               Content="×"
+                                               Command="{Binding DataContext.DeleteSavedSearchCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                               CommandParameter="{Binding}"
+                                               Style="{StaticResource IconButtonStyle}"
+                                               Width="20" Height="20"
+                                               FontSize="12"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                    
+                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                        <ui:Button Content="Load"
+                                   Command="{Binding LoadSavedSearchCommand}"
+                                   Style="{StaticResource SecondaryButtonStyle}"
+                                   Margin="0,0,4,0"/>
+                        
+                        <ui:Button Content="Delete"
+                                   Command="{Binding DeleteSavedSearchCommand}"
+                                   Style="{StaticResource SecondaryButtonStyle}"/>
+                    </StackPanel>
+                    
+                    <!-- Save Current Search -->
+                    <Separator Margin="0,8"/>
+                    
+                    <ui:TextBox Text="{Binding NewSavedSearchName, UpdateSourceTrigger=PropertyChanged}"
+                                PlaceholderText="Enter search name..."
+                                Margin="0,0,0,4"/>
+                    
+                    <ui:Button Content="Save Current Search"
+                               Command="{Binding SaveSearchCommand}"
+                               Style="{StaticResource SecondaryButtonStyle}"/>
+                </StackPanel>
+            </ui:Card>
+            
+            <!-- Search History -->
+            <ui:Card Grid.Row="2" Style="{StaticResource CompactCardStyle}" Margin="0,0,0,8">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <ui:TextBlock Grid.Row="0"
+                                  Text="Search History"
+                                  Style="{StaticResource SectionHeaderStyle}"/>
+                    
+                    <ListView Grid.Row="1"
+                              ItemsSource="{Binding SearchHistory}"
+                              Style="{StaticResource ItemListStyle}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="4">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    
+                                    <ui:TextBlock Grid.Row="0"
+                                                  Text="{Binding SearchText}"
+                                                  Style="{StaticResource AdaptiveBodyStyle}"
+                                                  TextTrimming="CharacterEllipsis"/>
+                                    
+                                    <StackPanel Grid.Row="1" Orientation="Horizontal">
+                                        <ui:TextBlock Text="{Binding SearchDate, StringFormat=MM/dd HH:mm}"
+                                                      Style="{StaticResource AdaptiveCaptionStyle}"
+                                                      Margin="0,0,8,0"/>
+                                        <ui:TextBlock Text="{Binding ResultCount, StringFormat=({0} results)}"
+                                                      Style="{StaticResource AdaptiveCaptionStyle}"/>
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
+            </ui:Card>
+            
+            <!-- Status -->
+            <ui:TextBlock Grid.Row="3"
+                          Text="{Binding SearchStatus}"
+                          Style="{StaticResource AdaptiveBodyStyle}"
+                          TextWrapping="Wrap"/>
+        </Grid>
+        
+        <!-- Results Panel -->
+        <Grid Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            
+            <!-- Results Header -->
+            <ui:Card Grid.Row="0" Style="{StaticResource CompactCardStyle}" Margin="0,0,0,8">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <ui:TextBlock Grid.Column="0"
+                                  Text="Search Results"
+                                  Style="{StaticResource SectionHeaderStyle}"/>
+                    
+                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                        <ui:ProgressRing IsIndeterminate="{Binding IsSearching}"
+                                         Width="16" Height="16"
+                                         Margin="0,0,8,0"/>
+                        
+                        <ui:TextBlock Text="{Binding SearchResults.Count, StringFormat={}{0} items}"
+                                      Style="{StaticResource AdaptiveCaptionStyle}"
+                                      VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Grid>
+            </ui:Card>
+            
+            <!-- Results List -->
+            <ListView Grid.Row="1"
+                      ItemsSource="{Binding SearchResults}"
+                      SelectedItem="{Binding SelectedResult}"
+                      Style="{StaticResource ItemListStyle}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ui:Card Style="{StaticResource CompactCardStyle}" Margin="2">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <!-- Thumbnail -->
+                                <Border Grid.Column="0" 
+                                        Width="32" Height="32"
+                                        Background="{DynamicResource ControlFillColorDefaultBrush}"
+                                        CornerRadius="4"
+                                        Margin="0,0,8,0">
+                                    <Image Source="{Binding Thumbnail}"
+                                           Stretch="Uniform"
+                                           RenderOptions.BitmapScalingMode="HighQuality"/>
+                                </Border>
+                                
+                                <!-- Item Info -->
+                                <StackPanel Grid.Column="1">
+                                    <ui:TextBlock Text="{Binding Name}"
+                                                  Style="{StaticResource AdaptiveBodyStyle}"/>
+                                    <StackPanel Orientation="Horizontal">
+                                        <ui:TextBlock Text="{Binding Id, StringFormat=ID: {0}}"
+                                                      Style="{StaticResource AdaptiveCaptionStyle}"
+                                                      Margin="0,0,8,0"/>
+                                        <ui:TextBlock Text="{Binding Type}"
+                                                      Style="{StaticResource AdaptiveCaptionStyle}"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                
+                                <!-- Select Button -->
+                                <ui:Button Grid.Column="2"
+                                           Content="Select"
+                                           Command="{Binding DataContext.SelectResultCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                           CommandParameter="{Binding}"
+                                           Style="{StaticResource SecondaryButtonStyle}"/>
+                            </Grid>
+                        </ui:Card>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            
+            <!-- Action Buttons -->
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
+                <ui:Button Content="Select and Close"
+                           Style="{StaticResource PrimaryButtonStyle}"
+                           IsEnabled="{Binding SelectedResult, Converter={StaticResource StringToVisibilityConverter}}"
+                           Click="OnSelectAndCloseClick"
+                           Margin="0,0,8,0"/>
+                
+                <ui:Button Content="Close"
+                           Style="{StaticResource SecondaryButtonStyle}"
+                           Click="OnCloseClick"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</ui:FluentWindow>

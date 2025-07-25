@@ -1,0 +1,93 @@
+<Application x:Class="ItemEditor.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- WPFUI Core Theme Resources with Auto theme detection -->
+                <ui:ThemesDictionary Theme="Auto" />
+                <ui:ControlsDictionary />
+                
+                <!-- Application-specific resources -->
+                <ResourceDictionary Source="Resources/Styles.xaml" />
+                <ResourceDictionary Source="Resources/ThemeResources.xaml" />
+                
+                <!-- Additional WPFUI Resources for enhanced theming -->
+                <ResourceDictionary>
+                    <!-- Enhanced theme colors for better consistency -->
+                    <SolidColorBrush x:Key="ApplicationAccentBrush" Color="{DynamicResource SystemAccentColor}" />
+                    <SolidColorBrush x:Key="ApplicationBackgroundBrush" Color="{DynamicResource ApplicationBackgroundColor}" />
+                    <SolidColorBrush x:Key="ApplicationForegroundBrush" Color="{DynamicResource TextFillColorPrimary}" />
+                    
+                    <!-- Custom theme-aware brushes -->
+                    <SolidColorBrush x:Key="ItemEditorPrimaryBrush" Color="{DynamicResource SystemAccentColor}" />
+                    <SolidColorBrush x:Key="ItemEditorSecondaryBrush" Color="{DynamicResource ControlFillColorDefault}" />
+                    <SolidColorBrush x:Key="ItemEditorBorderBrush" Color="{DynamicResource ControlStrokeColorDefault}" />
+                    
+                    <!-- Enhanced shadow effects for modern appearance -->
+                    <DropShadowEffect x:Key="CardShadowEffect" 
+                                      Color="{DynamicResource SystemChromeBlackMediumColor}"
+                                      Direction="270" 
+                                      ShadowDepth="2" 
+                                      BlurRadius="8" 
+                                      Opacity="0.15" />
+                    
+                    <!-- Modern corner radius values -->
+                    <CornerRadius x:Key="ControlCornerRadius">4</CornerRadius>
+                    <CornerRadius x:Key="CardCornerRadius">8</CornerRadius>
+                    <CornerRadius x:Key="DialogCornerRadius">12</CornerRadius>
+                    
+                    <!-- Consistent spacing values -->
+                    <Thickness x:Key="SmallMargin">4</Thickness>
+                    <Thickness x:Key="MediumMargin">8</Thickness>
+                    <Thickness x:Key="LargeMargin">16</Thickness>
+                    <Thickness x:Key="ExtraLargeMargin">24</Thickness>
+                    
+                    <!-- Animation durations for consistent transitions -->
+                    <Duration x:Key="FastAnimationDuration">0:0:0.15</Duration>
+                    <Duration x:Key="MediumAnimationDuration">0:0:0.25</Duration>
+                    <Duration x:Key="SlowAnimationDuration">0:0:0.35</Duration>
+                    
+                    <!-- Modern easing functions for smooth animations -->
+                    <CubicEase x:Key="StandardEaseOut" EasingMode="EaseOut"/>
+                    <CubicEase x:Key="StandardEaseIn" EasingMode="EaseIn"/>
+                    <CubicEase x:Key="StandardEaseInOut" EasingMode="EaseInOut"/>
+                    
+                    <!-- Fluent Design reveal effects -->
+                    <SolidColorBrush x:Key="RevealBorderBrush" Color="{DynamicResource SystemAccentColor}" Opacity="0.8"/>
+                    <SolidColorBrush x:Key="RevealBackgroundBrush" Color="{DynamicResource SystemAccentColor}" Opacity="0.1"/>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+            
+            <!-- Global converters -->
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+            
+            <!-- Custom converters -->
+            <local:FileNameConverter x:Key="FileNameConverter" xmlns:local="clr-namespace:ItemEditor.Converters"/>
+            <local:StringToVisibilityConverter x:Key="StringToVisibilityConverter" xmlns:local="clr-namespace:ItemEditor.Converters"/>
+            <local:BooleanToStringConverter x:Key="BooleanToStringConverter" xmlns:local="clr-namespace:ItemEditor.Converters"/>
+            <local:NullToVisibilityConverter x:Key="NullToVisibilityConverter" xmlns:local="clr-namespace:ItemEditor.Converters"/>
+            
+            <!-- Global value converters for enhanced functionality -->
+            <!-- Null to visibility converter -->
+            <Style x:Key="NullToVisibilityStyle" TargetType="FrameworkElement">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding}" Value="{x:Null}">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+            
+            <!-- Loading state style -->
+            <Style x:Key="LoadingStateStyle" TargetType="FrameworkElement">
+                <Setter Property="IsEnabled" Value="True"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsLoading}" Value="True">
+                        <Setter Property="IsEnabled" Value="False"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

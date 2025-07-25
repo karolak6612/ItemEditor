@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ui:FluentWindow x:Class="ItemEditor.Dialogs.PluginManagerWindow"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 mc:Ignorable="d"
+                 Title="Plugin Manager"
+                 Width="900"
+                 Height="600"
+                 MinWidth="800"
+                 MinHeight="500"
+                 WindowStartupLocation="CenterOwner"
+                 ResizeMode="CanResize">
+
+    <ui:FluentWindow.Resources>
+        <Style x:Key="PluginCardStyle" TargetType="ui:Card">
+            <Setter Property="Margin" Value="4"/>
+            <Setter Property="Padding" Value="12"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorSecondaryBrush}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        
+        <DataTemplate x:Key="PluginItemTemplate">
+            <ui:Card Style="{StaticResource PluginCardStyle}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <!-- Plugin Icon/Status -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,12,0">
+                        <ui:SymbolIcon Symbol="Puzzle24" FontSize="24" Margin="0,0,8,0"/>
+                        <Border Width="12" Height="12" CornerRadius="6" VerticalAlignment="Top">
+                            <Border.Background>
+                                <SolidColorBrush Color="{Binding StatusColor}"/>
+                            </Border.Background>
+                        </Border>
+                    </StackPanel>
+                    
+                    <!-- Plugin Information -->
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <ui:TextBlock Text="{Binding Name}" 
+                                     FontTypography="BodyStrong" 
+                                     Margin="0,0,0,4"/>
+                        <ui:TextBlock Text="{Binding Description}" 
+                                     FontTypography="Body" 
+                                     Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                     TextWrapping="Wrap"
+                                     Margin="0,0,0,4"/>
+                        <StackPanel Orientation="Horizontal">
+                            <ui:TextBlock Text="{Binding Version, StringFormat='Version: {0}'}" 
+                                         FontTypography="Caption" 
+                                         Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                         Margin="0,0,12,0"/>
+                            <ui:TextBlock Text="{Binding Author, StringFormat='by {0}'}" 
+                                         FontTypography="Caption" 
+                                         Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                         Margin="0,0,12,0"/>
+                            <ui:TextBlock Text="{Binding StatusText}" 
+                                         FontTypography="Caption" 
+                                         Foreground="{DynamicResource TextFillColorTertiaryBrush}"/>
+                        </StackPanel>
+                    </StackPanel>
+                    
+                    <!-- Plugin Actions -->
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                        <ui:Button Content="{Binding EnableDisableText}"
+                                  Command="{Binding DataContext.TogglePluginCommand, RelativeSource={RelativeSource AncestorType=ui:FluentWindow}}"
+                                  CommandParameter="{Binding}"
+                                  Appearance="Secondary"
+                                  Margin="0,0,8,0"/>
+                        <ui:Button Content="Configure"
+                                  Command="{Binding DataContext.ConfigurePluginCommand, RelativeSource={RelativeSource AncestorType=ui:FluentWindow}}"
+                                  CommandParameter="{Binding}"
+                                  Appearance="Secondary"
+                                  IsEnabled="{Binding CanConfigure}"
+                                  Margin="0,0,8,0"/>
+                        <ui:Button Content="Remove"
+                                  Command="{Binding DataContext.RemovePluginCommand, RelativeSource={RelativeSource AncestorType=ui:FluentWindow}}"
+                                  CommandParameter="{Binding}"
+                                  Appearance="Danger"
+                                  Margin="0,0,8,0"/>
+                        <ui:Button Content="Info"
+                                  Command="{Binding DataContext.ShowPluginInfoCommand, RelativeSource={RelativeSource AncestorType=ui:FluentWindow}}"
+                                  CommandParameter="{Binding}"
+                                  Appearance="Secondary"/>
+                    </StackPanel>
+                </Grid>
+            </ui:Card>
+        </DataTemplate>
+    </ui:FluentWindow.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Header -->
+        <ui:Card Grid.Row="0" Margin="16,16,16,8">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <ui:TextBlock Text="Plugin Manager" 
+                                 FontTypography="TitleLarge" 
+                                 Margin="0,0,0,4"/>
+                    <ui:TextBlock Text="{Binding StatusMessage}" 
+                                 FontTypography="Body" 
+                                 Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                </StackPanel>
+                
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <ui:Button Content="Install Plugin"
+                              Command="{Binding InstallPluginCommand}"
+                              Appearance="Primary"
+                              Icon="{ui:SymbolIcon Add24}"
+                              Margin="0,0,8,0"/>
+                    <ui:Button Content="Refresh"
+                              Command="{Binding RefreshPluginsCommand}"
+                              Appearance="Secondary"
+                              Icon="{ui:SymbolIcon ArrowClockwise24}"
+                              Margin="0,0,8,0"/>
+                    <ui:Button Content="Settings"
+                              Command="{Binding OpenSettingsCommand}"
+                              Appearance="Secondary"
+                              Icon="{ui:SymbolIcon Settings24}"/>
+                </StackPanel>
+            </Grid>
+        </ui:Card>
+        
+        <!-- Plugin List -->
+        <ui:Card Grid.Row="1" Margin="16,8,16,8">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                
+                <!-- Filter and Search -->
+                <Grid Grid.Row="0" Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <ui:TextBox Grid.Column="0"
+                               Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                               PlaceholderText="Search plugins..."
+                               Icon="{ui:SymbolIcon Search24}"
+                               Margin="0,0,12,0"/>
+                    
+                    <ui:ComboBox Grid.Column="1"
+                                ItemsSource="{Binding CategoryFilters}"
+                                SelectedItem="{Binding SelectedCategoryFilter}"
+                                PlaceholderText="All Categories"
+                                MinWidth="150"
+                                Margin="0,0,12,0"/>
+                    
+                    <ui:ComboBox Grid.Column="2"
+                                ItemsSource="{Binding StatusFilters}"
+                                SelectedItem="{Binding SelectedStatusFilter}"
+                                PlaceholderText="All Status"
+                                MinWidth="120"/>
+                </Grid>
+                
+                <!-- Plugin List -->
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding FilteredPlugins}"
+                                 ItemTemplate="{StaticResource PluginItemTemplate}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </ScrollViewer>
+                
+                <!-- Empty State -->
+                <StackPanel Grid.Row="1" 
+                           HorizontalAlignment="Center" 
+                           VerticalAlignment="Center"
+                           Visibility="{Binding IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <ui:SymbolIcon Symbol="Puzzle24" FontSize="48" 
+                                  Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                  Margin="0,0,0,16"/>
+                    <ui:TextBlock Text="No plugins found" 
+                                 FontTypography="BodyStrong" 
+                                 HorizontalAlignment="Center"
+                                 Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                 Margin="0,0,0,8"/>
+                    <ui:TextBlock Text="Install plugins to extend ItemEditor functionality" 
+                                 FontTypography="Body" 
+                                 HorizontalAlignment="Center"
+                                 Foreground="{DynamicResource TextFillColorTertiaryBrush}"/>
+                </StackPanel>
+            </Grid>
+        </ui:Card>
+        
+        <!-- Footer -->
+        <ui:Card Grid.Row="2" Margin="16,8,16,16">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- Statistics -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <ui:TextBlock Text="{Binding Statistics.TotalPlugins, StringFormat='{0} plugins'}" 
+                                 FontTypography="Caption" 
+                                 Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                 Margin="0,0,16,0"/>
+                    <ui:TextBlock Text="{Binding Statistics.ActivePlugins, StringFormat='{0} active'}" 
+                                 FontTypography="Caption" 
+                                 Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                 Margin="0,0,16,0"/>
+                    <ui:TextBlock Text="{Binding Statistics.LegacyPlugins, StringFormat='{0} legacy'}" 
+                                 FontTypography="Caption" 
+                                 Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                </StackPanel>
+                
+                <!-- Action Buttons -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <ui:Button Content="Close"
+                              Command="{Binding CloseCommand}"
+                              Appearance="Secondary"
+                              IsCancel="True"/>
+                </StackPanel>
+            </Grid>
+        </ui:Card>
+        
+        <!-- Loading Overlay -->
+        <Grid Grid.RowSpan="3" 
+              Background="{DynamicResource LayerFillColorDefaultBrush}"
+              Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <ui:ProgressRing IsIndeterminate="True" Width="48" Height="48" Margin="0,0,0,16"/>
+                <ui:TextBlock Text="{Binding LoadingMessage}" 
+                             FontTypography="Body" 
+                             HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</ui:FluentWindow>

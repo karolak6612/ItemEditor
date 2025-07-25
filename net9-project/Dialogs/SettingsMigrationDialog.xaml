@@ -1,0 +1,159 @@
+<ui:FluentWindow x:Class="ItemEditor.Dialogs.SettingsMigrationDialog"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                Title="Settings Migration"
+                Width="500"
+                Height="350"
+                WindowStartupLocation="CenterOwner"
+                ResizeMode="NoResize"
+                ShowInTaskbar="False">
+    
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <ui:TextBlock Text="Settings Migration" 
+                         FontTypography="TitleLarge"
+                         Margin="0,0,0,8"/>
+            <ui:TextBlock Text="Migrating settings from the legacy ItemEditor application to the modern format."
+                         FontTypography="Body"
+                         Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+        </StackPanel>
+        
+        <!-- Progress Area -->
+        <ui:Card Grid.Row="1" Padding="16">
+            <StackPanel>
+                <!-- Progress Bar -->
+                <ProgressBar x:Name="MigrationProgressBar"
+                            Value="{Binding ProgressPercentage}"
+                            Minimum="0"
+                            Maximum="100"
+                            Height="8"
+                            Margin="0,0,0,16"/>
+                
+                <!-- Current Step -->
+                <ui:TextBlock Text="{Binding CurrentStep}"
+                             FontTypography="BodyStrong"
+                             Margin="0,0,0,8"/>
+                
+                <!-- Step Counter -->
+                <ui:TextBlock Margin="0,0,0,16">
+                    <Run Text="Step"/>
+                    <Run Text="{Binding CurrentStepNumber}"/>
+                    <Run Text="of"/>
+                    <Run Text="{Binding TotalSteps}"/>
+                </ui:TextBlock>
+                
+                <!-- Details -->
+                <ui:TextBlock Text="{Binding Details}"
+                             FontTypography="Caption"
+                             Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                             TextWrapping="Wrap"
+                             Visibility="{Binding Details, Converter={StaticResource StringToVisibilityConverter}}"/>
+                
+                <!-- Results (shown after completion) -->
+                <StackPanel Visibility="{Binding IsComplete, Converter={StaticResource BooleanToVisibilityConverter}}"
+                           Margin="0,16,0,0">
+                    
+                    <ui:InfoBar x:Name="SuccessInfoBar"
+                               IsOpen="{Binding MigrationSuccessful}"
+                               Severity="Success"
+                               Title="Migration Completed"
+                               Message="{Binding ResultMessage}"
+                               Margin="0,0,0,8"/>
+                    
+                    <ui:InfoBar x:Name="ErrorInfoBar"
+                               IsOpen="{Binding MigrationFailed}"
+                               Severity="Error"
+                               Title="Migration Failed"
+                               Message="{Binding ResultMessage}"
+                               Margin="0,0,0,8"/>
+                    
+                    <!-- Migration Details -->
+                    <Expander Header="Migration Details" 
+                             IsExpanded="False"
+                             Margin="0,8,0,0">
+                        <StackPanel Margin="0,8,0,0">
+                            <ui:TextBlock Margin="0,0,0,4">
+                                <Run Text="Settings migrated:"/>
+                                <Run Text="{Binding SettingsMigrated}" FontWeight="Bold"/>
+                            </ui:TextBlock>
+                            
+                            <ui:TextBlock Text="{Binding LegacySettingsPath, StringFormat='Legacy settings: {0}'}"
+                                         FontTypography="Caption"
+                                         Margin="0,0,0,2"
+                                         Visibility="{Binding LegacySettingsPath, Converter={StaticResource StringToVisibilityConverter}}"/>
+                            
+                            <ui:TextBlock Text="{Binding NewSettingsPath, StringFormat='New settings: {0}'}"
+                                         FontTypography="Caption"
+                                         Margin="0,0,0,8"
+                                         Visibility="{Binding NewSettingsPath, Converter={StaticResource StringToVisibilityConverter}}"/>
+                            
+                            <!-- Errors -->
+                            <ItemsControl ItemsSource="{Binding Errors}"
+                                         Visibility="{Binding HasErrors, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <ui:TextBlock Text="{Binding}"
+                                                     FontTypography="Caption"
+                                                     Foreground="{DynamicResource SystemFillColorCriticalBrush}"
+                                                     TextWrapping="Wrap"
+                                                     Margin="0,2"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            
+                            <!-- Warnings -->
+                            <ItemsControl ItemsSource="{Binding Warnings}"
+                                         Visibility="{Binding HasWarnings, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <ui:TextBlock Text="{Binding}"
+                                                     FontTypography="Caption"
+                                                     Foreground="{DynamicResource SystemFillColorCautionBrush}"
+                                                     TextWrapping="Wrap"
+                                                     Margin="0,2"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Expander>
+                </StackPanel>
+            </StackPanel>
+        </ui:Card>
+        
+        <!-- Action Buttons -->
+        <StackPanel Grid.Row="3" 
+                   Orientation="Horizontal" 
+                   HorizontalAlignment="Right"
+                   Margin="0,20,0,0">
+            
+            <ui:Button x:Name="CancelButton"
+                      Content="Cancel"
+                      Appearance="Secondary"
+                      Margin="0,0,8,0"
+                      Click="CancelButton_Click"
+                      Visibility="{Binding IsComplete, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}"/>
+            
+            <ui:Button x:Name="CloseButton"
+                      Content="Close"
+                      Appearance="Primary"
+                      Click="CloseButton_Click"
+                      Visibility="{Binding IsComplete, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            
+            <ui:Button x:Name="RetryButton"
+                      Content="Retry"
+                      Appearance="Secondary"
+                      Margin="8,0,0,0"
+                      Click="RetryButton_Click"
+                      Visibility="{Binding ShowRetryButton, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+        </StackPanel>
+    </Grid>
+</ui:FluentWindow>

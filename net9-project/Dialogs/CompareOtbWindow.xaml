@@ -1,0 +1,352 @@
+<ui:FluentWindow x:Class="ItemEditor.Dialogs.CompareOtbWindow"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                xmlns:vm="clr-namespace:ItemEditor.ViewModels"
+                mc:Ignorable="d"
+                Title="Compare OTB Files"
+                Style="{StaticResource DialogWindowStyle}"
+                Width="1000" Height="700"
+                WindowStartupLocation="CenterOwner"
+                ResizeMode="CanResize"
+                ShowInTaskbar="False"
+                Icon="pack://application:,,,/Resources/ItemEditor.ico">
+    
+    <Window.DataContext>
+        <vm:CompareOtbViewModel/>
+    </Window.DataContext>
+    
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- File Selection Section -->
+        <ui:Card Grid.Row="0" Style="{StaticResource CompactCardStyle}" Margin="0,0,0,16">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                
+                <!-- Header -->
+                <ui:TextBlock Grid.Row="0" 
+                              Text="File Selection"
+                              Style="{StaticResource SectionHeaderStyle}"/>
+                
+                <!-- File Selection Controls -->
+                <Grid Grid.Row="1" Margin="0,8,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <!-- Left File -->
+                    <StackPanel Grid.Column="0">
+                        <ui:TextBlock Text="Left File (Original)"
+                                      Style="{StaticResource PropertyLabelStyle}"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <ui:TextBox Grid.Column="0"
+                                        Text="{Binding LeftFileName}"
+                                        IsReadOnly="True"
+                                        PlaceholderText="Select left OTB file..."
+                                        Margin="0,0,8,0"/>
+                            
+                            <ui:Button Grid.Column="1"
+                                       Content="Browse"
+                                       Command="{Binding SelectLeftFileCommand}"
+                                       Style="{StaticResource SecondaryButtonStyle}"/>
+                        </Grid>
+                    </StackPanel>
+                    
+                    <!-- Right File -->
+                    <StackPanel Grid.Column="2">
+                        <ui:TextBlock Text="Right File (Comparison)"
+                                      Style="{StaticResource PropertyLabelStyle}"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <ui:TextBox Grid.Column="0"
+                                        Text="{Binding RightFileName}"
+                                        IsReadOnly="True"
+                                        PlaceholderText="Select right OTB file..."
+                                        Margin="0,0,8,0"/>
+                            
+                            <ui:Button Grid.Column="1"
+                                       Content="Browse"
+                                       Command="{Binding SelectRightFileCommand}"
+                                       Style="{StaticResource SecondaryButtonStyle}"/>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+                
+                <!-- Action Buttons -->
+                <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,16,0,0">
+                    <ui:Button Content="Compare Files"
+                               Command="{Binding CompareFilesCommand}"
+                               Style="{StaticResource PrimaryButtonStyle}"
+                               Margin="0,0,8,0"/>
+                    
+                    <ui:Button Content="Clear"
+                               Command="{Binding ClearComparisonCommand}"
+                               Style="{StaticResource SecondaryButtonStyle}"/>
+                </StackPanel>
+            </Grid>
+        </ui:Card>
+        
+        <!-- Progress Section -->
+        <ui:Card Grid.Row="1" 
+                 Style="{StaticResource CompactCardStyle}" 
+                 Margin="0,0,0,16"
+                 Visibility="{Binding IsComparing, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <StackPanel>
+                <ui:TextBlock Text="{Binding ProgressText}"
+                              Style="{StaticResource AdaptiveBodyStyle}"
+                              Margin="0,0,0,8"/>
+                
+                <ProgressBar Value="{Binding ProgressValue}"
+                             Height="8"
+                             Maximum="100"/>
+            </StackPanel>
+        </ui:Card>
+        
+        <!-- Results Section -->
+        <Grid Grid.Row="2" Visibility="{Binding HasComparison, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300"/>
+                <ColumnDefinition Width="8"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            
+            <!-- Summary and Differences List -->
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                
+                <!-- Summary -->
+                <ui:Card Grid.Row="0" Style="{StaticResource CompactCardStyle}" Margin="0,0,0,8">
+                    <StackPanel>
+                        <ui:TextBlock Text="Comparison Summary"
+                                      Style="{StaticResource SectionHeaderStyle}"/>
+                        
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            
+                            <ui:TextBlock Grid.Row="0" Grid.Column="0" Text="Added:" Style="{StaticResource PropertyLabelStyle}"/>
+                            <ui:TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Summary.AddedItems}" Style="{StaticResource AdaptiveBodyStyle}" Foreground="Green"/>
+                            
+                            <ui:TextBlock Grid.Row="1" Grid.Column="0" Text="Removed:" Style="{StaticResource PropertyLabelStyle}"/>
+                            <ui:TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Summary.RemovedItems}" Style="{StaticResource AdaptiveBodyStyle}" Foreground="Red"/>
+                            
+                            <ui:TextBlock Grid.Row="2" Grid.Column="0" Text="Modified:" Style="{StaticResource PropertyLabelStyle}"/>
+                            <ui:TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Summary.ModifiedItems}" Style="{StaticResource AdaptiveBodyStyle}" Foreground="Orange"/>
+                            
+                            <ui:TextBlock Grid.Row="3" Grid.Column="0" Text="Unchanged:" Style="{StaticResource PropertyLabelStyle}"/>
+                            <ui:TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Summary.UnchangedItems}" Style="{StaticResource AdaptiveBodyStyle}"/>
+                            
+                            <Separator Grid.Row="4" Grid.ColumnSpan="2" Margin="0,8"/>
+                        </Grid>
+                    </StackPanel>
+                </ui:Card>
+                
+                <!-- Differences List -->
+                <ui:Card Grid.Row="1" Style="{StaticResource CompactCardStyle}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        
+                        <ui:TextBlock Grid.Row="0" 
+                                      Text="Differences"
+                                      Style="{StaticResource SectionHeaderStyle}"/>
+                        
+                        <ListView Grid.Row="1"
+                                  ItemsSource="{Binding Differences}"
+                                  SelectedItem="{Binding SelectedDifference}"
+                                  Style="{StaticResource ItemListStyle}">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <ui:Card Style="{StaticResource CompactCardStyle}" Margin="2">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            
+                                            <!-- Status Indicator -->
+                                            <Ellipse Grid.Column="0" 
+                                                     Width="8" Height="8" 
+                                                     VerticalAlignment="Center"
+                                                     Margin="0,0,8,0">
+                                                <Ellipse.Style>
+                                                    <Style TargetType="Ellipse">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Type}" Value="Added">
+                                                                <Setter Property="Fill" Value="Green"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Type}" Value="Removed">
+                                                                <Setter Property="Fill" Value="Red"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Type}" Value="Modified">
+                                                                <Setter Property="Fill" Value="Orange"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Type}" Value="Unchanged">
+                                                                <Setter Property="Fill" Value="Gray"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Ellipse.Style>
+                                            </Ellipse>
+                                            
+                                            <!-- Item Info -->
+                                            <StackPanel Grid.Column="1">
+                                                <ui:TextBlock Text="{Binding ItemId, StringFormat='ID: {0}'}"
+                                                              Style="{StaticResource AdaptiveBodyStyle}"/>
+                                                <ui:TextBlock Text="{Binding Type}"
+                                                              Style="{StaticResource AdaptiveCaptionStyle}"/>
+                                            </StackPanel>
+                                            
+                                            <!-- Property Count -->
+                                            <ui:TextBlock Grid.Column="2"
+                                                          Text="{Binding PropertyDifferences.Count, StringFormat='{0} props'}"
+                                                          Style="{StaticResource AdaptiveCaptionStyle}"
+                                                          VerticalAlignment="Center"/>
+                                        </Grid>
+                                    </ui:Card>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </Grid>
+                </ui:Card>
+            </Grid>
+            
+            <!-- Detailed Comparison View -->
+            <ui:Card Grid.Column="2" Style="{StaticResource CompactCardStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <ui:TextBlock Grid.Row="0" 
+                                  Text="Detailed Comparison"
+                                  Style="{StaticResource SectionHeaderStyle}"/>
+                    
+                    <ScrollViewer Grid.Row="1" Style="{StaticResource ModernScrollViewerStyle}">
+                        <StackPanel DataContext="{Binding SelectedDifference}">
+                            <!-- Item Information -->
+                            <ui:Card Style="{StaticResource CompactCardStyle}" Margin="0,0,0,8">
+                                <StackPanel>
+                                    <ui:TextBlock Text="{Binding ItemId, StringFormat='Item ID: {0}'}"
+                                                  Style="{StaticResource SubsectionHeaderStyle}"/>
+                                    <ui:TextBlock Text="{Binding Type, StringFormat='Change Type: {0}'}"
+                                                  Style="{StaticResource AdaptiveBodyStyle}"/>
+                                </StackPanel>
+                            </ui:Card>
+                            
+                            <!-- Property Differences -->
+                            <ItemsControl ItemsSource="{Binding PropertyDifferences}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <ui:Card Style="{StaticResource CompactCardStyle}" Margin="0,0,0,4">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                
+                                                <ui:TextBlock Grid.Row="0"
+                                                              Text="{Binding PropertyName}"
+                                                              Style="{StaticResource SubsectionHeaderStyle}"/>
+                                                
+                                                <Grid Grid.Row="1">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    
+                                                    <StackPanel Grid.Column="0" Margin="0,0,4,0">
+                                                        <ui:TextBlock Text="Left (Original)"
+                                                                      Style="{StaticResource PropertyLabelStyle}"/>
+                                                        <ui:TextBox Text="{Binding LeftValue}"
+                                                                    IsReadOnly="True"
+                                                                    Background="LightCoral"/>
+                                                    </StackPanel>
+                                                    
+                                                    <StackPanel Grid.Column="1" Margin="4,0,0,0">
+                                                        <ui:TextBlock Text="Right (Comparison)"
+                                                                      Style="{StaticResource PropertyLabelStyle}"/>
+                                                        <ui:TextBox Text="{Binding RightValue}"
+                                                                    IsReadOnly="True"
+                                                                    Background="LightGreen"/>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </Grid>
+                                        </ui:Card>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </ui:Card>
+        </Grid>
+        
+        <!-- Status and Action Bar -->
+        <Grid Grid.Row="3" Margin="0,16,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <!-- Status -->
+            <ui:TextBlock Grid.Column="0"
+                          Text="{Binding ComparisonStatus}"
+                          Style="{StaticResource AdaptiveBodyStyle}"
+                          VerticalAlignment="Center"/>
+            
+            <!-- Action Buttons -->
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <ui:Button Content="Export Results"
+                           Command="{Binding ExportResultsCommand}"
+                           Style="{StaticResource SecondaryButtonStyle}"
+                           Margin="0,0,8,0"/>
+                
+                <ui:Button Content="Close"
+                           Style="{StaticResource PrimaryButtonStyle}"
+                           IsDefault="True"
+                           Click="OnCloseClick"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</ui:FluentWindow>

@@ -1,0 +1,81 @@
+<ui:FluentWindow x:Class="ItemEditor.Dialogs.ExportSettingsDialog"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                Title="Export Settings"
+                Width="400"
+                Height="300"
+                WindowStartupLocation="CenterOwner"
+                ResizeMode="NoResize"
+                ShowInTaskbar="False">
+    
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <ui:TextBlock Text="Export Settings" 
+                         FontTypography="TitleLarge"
+                         Margin="0,0,0,8"/>
+            <ui:TextBlock Text="Choose which settings to export to the file."
+                         FontTypography="Body"
+                         Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+        </StackPanel>
+        
+        <!-- Options -->
+        <ui:Card Grid.Row="1" Padding="16">
+            <StackPanel>
+                <ui:TextBlock Text="Export Options" 
+                             FontTypography="BodyStrong"
+                             Margin="0,0,0,12"/>
+                
+                <CheckBox x:Name="IncludeUserSettingsCheckBox"
+                         Content="Include user-specific settings"
+                         IsChecked="True"
+                         Margin="0,0,0,8"
+                         ToolTip="Include personal preferences like theme, window positions, and recent files"/>
+                
+                <CheckBox x:Name="IncludePluginSettingsCheckBox"
+                         Content="Include plugin settings"
+                         IsChecked="True"
+                         Margin="0,0,0,8"
+                         ToolTip="Include plugin configurations and enabled/disabled states"/>
+                
+                <CheckBox x:Name="IncludeAdvancedSettingsCheckBox"
+                         Content="Include advanced settings"
+                         IsChecked="True"
+                         Margin="0,0,0,8"
+                         ToolTip="Include performance settings and file associations"/>
+                
+                <ui:InfoBar IsOpen="True"
+                           Severity="Informational"
+                           Title="Note"
+                           Message="Exported settings can be imported on other machines or used as a backup."
+                           IsClosable="False"
+                           Margin="0,12,0,0"/>
+            </StackPanel>
+        </ui:Card>
+        
+        <!-- Action Buttons -->
+        <StackPanel Grid.Row="2" 
+                   Orientation="Horizontal" 
+                   HorizontalAlignment="Right"
+                   Margin="0,20,0,0">
+            
+            <ui:Button x:Name="ExportButton"
+                      Content="Export"
+                      Appearance="Primary"
+                      Margin="0,0,8,0"
+                      Click="ExportButton_Click"/>
+            
+            <ui:Button x:Name="CancelButton"
+                      Content="Cancel"
+                      Appearance="Secondary"
+                      Click="CancelButton_Click"/>
+        </StackPanel>
+    </Grid>
+</ui:FluentWindow>

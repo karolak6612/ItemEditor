@@ -1,6 +1,0 @@
-{
-    "Keys": ["PluginThree"],
-    "Name": "Plugin Three", 
-    "Version": "1.0.0",
-    "Description": "Client data loader for versions 10.00-10.77"
-}

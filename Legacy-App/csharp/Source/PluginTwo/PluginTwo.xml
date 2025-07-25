@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<plugin>
+  <metadata>
+    <name>PluginTwo</name>
+    <description>Plugin Two for ItemEditor</description>
+    <version>1.0.0</version>
+  </metadata>
+</plugin>

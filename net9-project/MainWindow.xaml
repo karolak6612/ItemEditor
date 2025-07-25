@@ -1,0 +1,439 @@
+<ui:FluentWindow x:Class="ItemEditor.MainWindow"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                xmlns:vm="clr-namespace:ItemEditor.ViewModels"
+                mc:Ignorable="d"
+                Title="ItemEditor - OpenTibia Item Editor"
+                Style="{StaticResource MainWindowStyle}"
+                d:DataContext="{d:DesignInstance Type=vm:MainViewModel}">
+    
+
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Enhanced Menu Bar with Modern Styling -->
+        <Menu Grid.Row="0" Style="{StaticResource ModernMenuStyle}">
+            <MenuItem Header="_File" Style="{StaticResource ModernMenuItemStyle}">
+                <MenuItem Header="_New" Command="{Binding NewFileCommand}" Style="{StaticResource ModernMenuItemStyle}">
+                    <MenuItem.Icon>
+                        <ui:SymbolIcon Symbol="DocumentAdd24" Style="{StaticResource MenuIconStyle}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="_Open..." Command="{Binding OpenFileCommand}" Style="{StaticResource ModernMenuItemStyle}">
+                    <MenuItem.Icon>
+                        <ui:SymbolIcon Symbol="FolderOpen24" Style="{StaticResource MenuIconStyle}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                
+                <!-- Recent Files Submenu -->
+                <MenuItem Header="Recent Files" Style="{StaticResource ModernMenuItemStyle}"
+                          Visibility="{Binding RecentFiles.Count, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <MenuItem.Icon>
+                        <ui:SymbolIcon Symbol="History24" Style="{StaticResource MenuIconStyle}"/>
+                    </MenuItem.Icon>
+                    <MenuItem.ItemsSource>
+                        <Binding Path="RecentFiles"/>
+                    </MenuItem.ItemsSource>
+                    <MenuItem.ItemContainerStyle>
+                        <Style TargetType="MenuItem" BasedOn="{StaticResource ModernMenuItemStyle}">
+                            <Setter Property="Header" Value="{Binding Converter={StaticResource FileNameConverter}}"/>
+                            <Setter Property="Command" Value="{Binding DataContext.OpenFileCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                            <Setter Property="CommandParameter" Value="{Binding}"/>
+                            <Setter Property="ToolTip" Value="{Binding}"/>
+                        </Style>
+                    </MenuItem.ItemContainerStyle>
+                </MenuItem>
+                
+                <Separator Style="{StaticResource ModernSeparatorStyle}"/>
+                <MenuItem Header="_Save" Command="{Binding SaveFileCommand}" Style="{StaticResource ModernMenuItemStyle}">
+                    <MenuItem.Icon>
+                        <ui:SymbolIcon Symbol="Save24" Style="{StaticResource MenuIconStyle}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Save _As..." Command="{Binding SaveAsCommand}" Style="{StaticResource ModernMenuItemStyle}">
+                    <MenuItem.Icon>
+                        <ui:SymbolIcon Symbol="SaveAs24" Style="{StaticResource MenuIconStyle}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator Style="{StaticResource ModernSeparatorStyle}"/>
+                <MenuItem Header="E_xit" Command="{Binding ExitCommand}" Style="{StaticResource ModernMenuItemStyle}">
+                    <MenuItem.Icon>
+                        <ui:SymbolIcon Symbol="ArrowExit20" Style="{StaticResource MenuIconStyle}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="_Edit" Style="{StaticResource ModernMenuItemStyle}">
+                <MenuItem Header="_Undo" Style="{StaticResource ModernMenuItemStyle}">
+                    <MenuItem.Icon>
+                        <ui:SymbolIcon Symbol="ArrowUndo24" Style="{StaticResource MenuIconStyle}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="_Redo" Style="{StaticResource ModernMenuItemStyle}">
+                    <MenuItem.Icon>
+                        <ui:SymbolIcon Symbol="ArrowRedo24" Style="{StaticResource MenuIconStyle}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="_View" Style="{StaticResource ModernMenuItemStyle}">
+                <MenuItem Header="_Refresh" Style="{StaticResource ModernMenuItemStyle}">
+                    <MenuItem.Icon>
+                        <ui:SymbolIcon Symbol="ArrowSync24" Style="{StaticResource MenuIconStyle}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="_Theme" Style="{StaticResource ModernMenuItemStyle}">
+                    <MenuItem.Icon>
+                        <ui:SymbolIcon Symbol="ColorBackground24" Style="{StaticResource MenuIconStyle}"/>
+                    </MenuItem.Icon>
+                    <MenuItem Header="Light" Command="{Binding SetThemeCommand}" CommandParameter="Light" Style="{StaticResource ModernMenuItemStyle}"/>
+                    <MenuItem Header="Dark" Command="{Binding SetThemeCommand}" CommandParameter="Dark" Style="{StaticResource ModernMenuItemStyle}"/>
+                    <MenuItem Header="Auto" Command="{Binding SetThemeCommand}" CommandParameter="Auto" Style="{StaticResource ModernMenuItemStyle}"/>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="_Help" Style="{StaticResource ModernMenuItemStyle}">
+                <MenuItem Header="_About" Style="{StaticResource ModernMenuItemStyle}">
+                    <MenuItem.Icon>
+                        <ui:SymbolIcon Symbol="Info24" Style="{StaticResource MenuIconStyle}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+        </Menu>
+        
+        <!-- Modern Toolbar -->
+        <ui:Card Grid.Row="1" 
+                 Style="{StaticResource CompactCardStyle}"
+                 Margin="8,4,8,0">
+            <StackPanel Orientation="Horizontal">
+                <!-- File Operations -->
+                <ui:Button Command="{Binding NewFileCommand}"
+                           Style="{StaticResource IconButtonStyle}"
+                           ToolTip="New File (Ctrl+N)">
+                    <ui:SymbolIcon Symbol="DocumentAdd24" Style="{StaticResource ToolbarIconStyle}"/>
+                </ui:Button>
+                
+                <ui:Button Command="{Binding OpenFileCommand}"
+                           Style="{StaticResource IconButtonStyle}"
+                           ToolTip="Open File (Ctrl+O)">
+                    <ui:SymbolIcon Symbol="FolderOpen24" Style="{StaticResource ToolbarIconStyle}"/>
+                </ui:Button>
+                
+                <ui:Button Command="{Binding SaveFileCommand}"
+                           Style="{StaticResource IconButtonStyle}"
+                           ToolTip="Save File (Ctrl+S)">
+                    <ui:SymbolIcon Symbol="Save24" Style="{StaticResource ToolbarIconStyle}"/>
+                </ui:Button>
+                
+                <Separator Style="{StaticResource ModernSeparatorStyle}" 
+                           Width="1" Height="24" Margin="4,0"/>
+                
+                <!-- View Operations -->
+                <ui:Button Command="{Binding RefreshCommand}"
+                           Style="{StaticResource IconButtonStyle}"
+                           ToolTip="Refresh (F5)">
+                    <ui:SymbolIcon Symbol="ArrowSync24" Style="{StaticResource ToolbarIconStyle}"/>
+                </ui:Button>
+                
+                <ui:Button Command="{Binding FindCommand}"
+                           Style="{StaticResource IconButtonStyle}"
+                           ToolTip="Find Item (Ctrl+F)">
+                    <ui:SymbolIcon Symbol="Search24" Style="{StaticResource ToolbarIconStyle}"/>
+                </ui:Button>
+                
+                <Separator Style="{StaticResource ModernSeparatorStyle}" 
+                           Width="1" Height="24" Margin="4,0"/>
+                
+                <!-- Theme Toggle -->
+                <ui:Button Command="{Binding ToggleThemeCommand}"
+                           Style="{StaticResource IconButtonStyle}"
+                           ToolTip="Toggle Theme">
+                    <ui:SymbolIcon Symbol="WeatherMoon24" Style="{StaticResource ToolbarIconStyle}"/>
+                </ui:Button>
+                
+                <!-- Spacer -->
+                <Border Width="*"/>
+                
+                <!-- Status Indicators -->
+                <StackPanel Orientation="Horizontal" Margin="8,0">
+                    <ui:TextBlock Text="{Binding Items.Count, StringFormat='{}{0} items'}"
+                                  Style="{StaticResource DescriptionTextStyle}"
+                                  VerticalAlignment="Center"/>
+                    
+                    <ui:ProgressRing IsIndeterminate="True"
+                                     Style="{StaticResource ModernProgressRingStyle}"
+                                     Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                </StackPanel>
+            </StackPanel>
+        </ui:Card>
+        
+        <!-- Main Content Area -->
+        <Grid Grid.Row="2" Margin="8"
+              AllowDrop="True"
+              Drop="OnFileDrop"
+              DragOver="OnFileDragOver"
+              DragEnter="OnFileDragEnter"
+              DragLeave="OnFileDragLeave">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300" MinWidth="200"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*" MinWidth="300"/>
+            </Grid.ColumnDefinitions>
+            
+            <!-- Enhanced Item List with Modern Styling -->
+            <ui:Card Grid.Column="0" Margin="0,0,4,0" Style="{StaticResource ContainerCardStyle}">
+                <Grid Style="{StaticResource FadeInAnimationStyle}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <ui:TextBlock Grid.Row="0" 
+                                  Text="Items" 
+                                  Style="{StaticResource SectionHeaderStyle}"/>
+                    
+                    <!-- Search Box -->
+                    <ui:TextBox Grid.Row="1" 
+                                PlaceholderText="Search items..."
+                                Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                                Style="{StaticResource ModernTextBoxStyle}"
+                                Margin="0,0,0,8">
+                        <ui:TextBox.Icon>
+                            <ui:SymbolIcon Symbol="Search24" Style="{StaticResource MenuIconStyle}"/>
+                        </ui:TextBox.Icon>
+                    </ui:TextBox>
+                    
+                    <ListView Grid.Row="2"
+                              ItemsSource="{Binding FilteredItems}"
+                              SelectedItem="{Binding SelectedItem}"
+                              Style="{StaticResource ItemListStyle}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Style="{StaticResource ItemTemplateStyle}">
+                                    <Grid.ContextMenu>
+                                        <ContextMenu Style="{StaticResource ModernContextMenuStyle}">
+                                            <MenuItem Header="Edit Item" 
+                                                      Command="{Binding DataContext.EditItemCommand, RelativeSource={RelativeSource AncestorType=ListView}}"
+                                                      CommandParameter="{Binding}"
+                                                      Style="{StaticResource ModernMenuItemStyle}">
+                                                <MenuItem.Icon>
+                                                    <ui:SymbolIcon Symbol="Edit24" Style="{StaticResource MenuIconStyle}"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <MenuItem Header="Duplicate Item" 
+                                                      Command="{Binding DataContext.DuplicateItemCommand, RelativeSource={RelativeSource AncestorType=ListView}}"
+                                                      CommandParameter="{Binding}"
+                                                      Style="{StaticResource ModernMenuItemStyle}">
+                                                <MenuItem.Icon>
+                                                    <ui:SymbolIcon Symbol="Copy24" Style="{StaticResource MenuIconStyle}"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <Separator Style="{StaticResource ModernSeparatorStyle}"/>
+                                            <MenuItem Header="Delete Item" 
+                                                      Command="{Binding DataContext.DeleteItemCommand, RelativeSource={RelativeSource AncestorType=ListView}}"
+                                                      CommandParameter="{Binding}"
+                                                      Style="{StaticResource ModernMenuItemStyle}">
+                                                <MenuItem.Icon>
+                                                    <ui:SymbolIcon Symbol="Delete24" Style="{StaticResource MenuIconStyle}"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <Separator Style="{StaticResource ModernSeparatorStyle}"/>
+                                            <MenuItem Header="Properties" 
+                                                      Command="{Binding DataContext.ShowItemPropertiesCommand, RelativeSource={RelativeSource AncestorType=ListView}}"
+                                                      CommandParameter="{Binding}"
+                                                      Style="{StaticResource ModernMenuItemStyle}">
+                                                <MenuItem.Icon>
+                                                    <ui:SymbolIcon Symbol="Settings24" Style="{StaticResource MenuIconStyle}"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                        </ContextMenu>
+                                    </Grid.ContextMenu>
+                                    
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="32"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <!-- Enhanced thumbnail with image support -->
+                                    <Border Grid.Column="0" 
+                                            Width="24" Height="24"
+                                            Background="{DynamicResource ControlFillColorDefaultBrush}"
+                                            BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                                            BorderThickness="1"
+                                            CornerRadius="2">
+                                        <Image Source="{Binding Thumbnail}" 
+                                               Style="{StaticResource ThumbnailImageStyle}"
+                                               Visibility="{Binding Thumbnail, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                    </Border>
+                                    
+                                    <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                                        <ui:TextBlock Text="{Binding Name}" 
+                                                      FontTypography="Body"/>
+                                        <ui:TextBlock Text="{Binding Id, StringFormat='ID: {0}'}" 
+                                                      Style="{StaticResource DescriptionTextStyle}"/>
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
+            </ui:Card>
+            
+            <!-- Splitter -->
+            <GridSplitter Grid.Column="1" 
+                          Width="4" 
+                          HorizontalAlignment="Center" 
+                          VerticalAlignment="Stretch"
+                          Background="Transparent"/>
+            
+            <!-- Enhanced Properties Panel -->
+            <ui:Card Grid.Column="2" Margin="4,0,0,0" Style="{StaticResource ContainerCardStyle}">
+                <Grid Style="{StaticResource FadeInAnimationStyle}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <ui:TextBlock Grid.Row="0" 
+                                  Text="Properties" 
+                                  Style="{StaticResource SectionHeaderStyle}"/>
+                    
+                    <ScrollViewer Grid.Row="1" Style="{StaticResource ModernScrollViewerStyle}">
+                        <StackPanel DataContext="{Binding SelectedItem}">
+                            <!-- Basic Properties Group -->
+                            <Expander Header="Basic Properties" 
+                                      IsExpanded="True"
+                                      Style="{StaticResource ModernExpanderStyle}">
+                                <StackPanel>
+                                    <StackPanel Style="{StaticResource FormGroupStyle}">
+                                        <ui:TextBlock Text="Name" Style="{StaticResource PropertyLabelStyle}"/>
+                                        <ui:TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
+                                                    Style="{StaticResource ModernTextBoxStyle}"/>
+                                    </StackPanel>
+                                    
+                                    <StackPanel Style="{StaticResource FormGroupStyle}">
+                                        <ui:TextBlock Text="ID" Style="{StaticResource PropertyLabelStyle}"/>
+                                        <ui:NumberBox Value="{Binding Id}" IsReadOnly="True"/>
+                                    </StackPanel>
+                                    
+                                    <StackPanel Style="{StaticResource FormGroupStyle}">
+                                        <ui:TextBlock Text="Stackable" Style="{StaticResource PropertyLabelStyle}"/>
+                                        <ui:ToggleSwitch IsChecked="{Binding IsStackable}"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Expander>
+                            
+                            <!-- Advanced Properties Group -->
+                            <Expander Header="Advanced Properties" 
+                                      IsExpanded="False"
+                                      Style="{StaticResource ModernExpanderStyle}">
+                                <StackPanel>
+                                    <StackPanel Style="{StaticResource FormGroupStyle}">
+                                        <ui:TextBlock Text="Type" Style="{StaticResource PropertyLabelStyle}"/>
+                                        <ComboBox SelectedItem="{Binding Type}"/>
+                                    </StackPanel>
+                                    
+                                    <StackPanel Style="{StaticResource FormGroupStyle}">
+                                        <ui:TextBlock Text="Speed" Style="{StaticResource PropertyLabelStyle}"/>
+                                        <ui:NumberBox Value="{Binding Speed}"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Expander>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </ui:Card>
+        </Grid>
+        
+        <!-- Enhanced Status Bar -->
+        <ui:Card Grid.Row="3" 
+                 Style="{StaticResource CompactCardStyle}"
+                 Margin="8,0,8,8">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- Status Text -->
+                <ui:TextBlock Grid.Column="0"
+                              Text="{Binding StatusText}"
+                              Style="{StaticResource DescriptionTextStyle}"
+                              VerticalAlignment="Center"/>
+                
+                <!-- File Info -->
+                <StackPanel Grid.Column="1" 
+                            Orientation="Horizontal" 
+                            Margin="8,0"
+                            Visibility="{Binding CurrentFilePath, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <ui:SymbolIcon Symbol="Document24" Style="{StaticResource StatusIconStyle}"/>
+                    <ui:TextBlock Text="{Binding CurrentFileName}"
+                                  Style="{StaticResource DescriptionTextStyle}"
+                                  VerticalAlignment="Center"/>
+                </StackPanel>
+                
+                <!-- Progress Indicator -->
+                <StackPanel Grid.Column="2" 
+                            Orientation="Horizontal" 
+                            Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <ui:ProgressRing IsIndeterminate="True"
+                                     Style="{StaticResource ModernProgressRingStyle}"/>
+                    <ui:TextBlock Text="{Binding LoadingText, FallbackValue='Loading...'}"
+                                  Style="{StaticResource DescriptionTextStyle}"
+                                  VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </ui:Card>
+        
+        <!-- Enhanced Loading Overlay -->
+        <Grid Grid.Row="0" Grid.RowSpan="4" 
+              Style="{StaticResource LoadingOverlayStyle}"
+              Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <ui:Card Style="{StaticResource LoadingCardStyle}">
+                <StackPanel Orientation="Horizontal">
+                    <ui:ProgressRing IsIndeterminate="True" 
+                                     Style="{StaticResource FluentProgressRingStyle}"
+                                     Margin="0,0,16,0"/>
+                    <StackPanel>
+                        <ui:TextBlock Text="{Binding LoadingText, FallbackValue='Loading...'}" 
+                                      FontTypography="Body"/>
+                        <ui:TextBlock Text="{Binding LoadingSubText}" 
+                                      Style="{StaticResource DescriptionTextStyle}"
+                                      Visibility="{Binding LoadingSubText, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                    </StackPanel>
+                </StackPanel>
+            </ui:Card>
+        </Grid>
+        
+        <!-- Drag and Drop Overlay -->
+        <Grid x:Name="DragDropOverlay"
+              Grid.Row="0" Grid.RowSpan="4"
+              Background="#80000000"
+              Visibility="Collapsed">
+            <ui:Card Style="{StaticResource ElevatedCardStyle}"
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Center"
+                     Padding="48">
+                <StackPanel HorizontalAlignment="Center">
+                    <ui:SymbolIcon Symbol="CloudArrowUp48" 
+                                   Width="64" Height="64"
+                                   Foreground="{DynamicResource SystemAccentColorBrush}"/>
+                    <ui:TextBlock Text="Drop files here to open"
+                                  FontTypography="SubtitleStrong"
+                                  HorizontalAlignment="Center"/>
+                    <ui:TextBlock Text="Supported formats: .otb, .dat, .spr"
+                                  Style="{StaticResource DescriptionTextStyle}"
+                                  HorizontalAlignment="Center"/>
+                </StackPanel>
+            </ui:Card>
+        </Grid>
+    </Grid>
+</ui:FluentWindow>

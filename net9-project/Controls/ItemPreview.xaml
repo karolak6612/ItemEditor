@@ -1,0 +1,402 @@
+<UserControl x:Class="ItemEditor.Controls.ItemPreview"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:controls="clr-namespace:ItemEditor.Controls"
+             xmlns:viewmodels="clr-namespace:ItemEditor.ViewModels"
+             xmlns:converters="clr-namespace:ItemEditor.Converters"
+             x:Name="Root">
+    
+    <UserControl.Resources>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <converters:InvertedBooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter"/>
+        
+        <!-- Zoom Levels -->
+        <x:Array x:Key="ZoomLevels" Type="sys:Double" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+            <sys:Double>0.25</sys:Double>
+            <sys:Double>0.5</sys:Double>
+            <sys:Double>0.75</sys:Double>
+            <sys:Double>1.0</sys:Double>
+            <sys:Double>1.5</sys:Double>
+            <sys:Double>2.0</sys:Double>
+            <sys:Double>3.0</sys:Double>
+            <sys:Double>4.0</sys:Double>
+            <sys:Double>6.0</sys:Double>
+            <sys:Double>8.0</sys:Double>
+        </x:Array>
+        
+        <!-- Preview Background Styles -->
+        <Style x:Key="CheckerboardBackground" TargetType="Border">
+            <Setter Property="Background">
+                <Setter.Value>
+                    <DrawingBrush TileMode="Tile" Viewport="0,0,16,16" ViewportUnits="Absolute">
+                        <DrawingBrush.Drawing>
+                            <DrawingGroup>
+                                <GeometryDrawing Brush="White">
+                                    <GeometryDrawing.Geometry>
+                                        <RectangleGeometry Rect="0,0,16,16"/>
+                                    </GeometryDrawing.Geometry>
+                                </GeometryDrawing>
+                                <GeometryDrawing Brush="#FFE0E0E0">
+                                    <GeometryDrawing.Geometry>
+                                        <GeometryGroup>
+                                            <RectangleGeometry Rect="0,0,8,8"/>
+                                            <RectangleGeometry Rect="8,8,8,8"/>
+                                        </GeometryGroup>
+                                    </GeometryDrawing.Geometry>
+                                </GeometryDrawing>
+                            </DrawingGroup>
+                        </DrawingBrush.Drawing>
+                    </DrawingBrush>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <!-- Animation Control Style -->
+        <Style x:Key="AnimationButtonStyle" TargetType="ui:Button">
+            <Setter Property="Width" Value="32"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="Appearance" Value="Subtle"/>
+        </Style>
+    </UserControl.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Header with Controls -->
+        <Border Grid.Row="0" 
+               Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+               BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+               BorderThickness="0,0,0,1"
+               Padding="12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- Title -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <ui:SymbolIcon Symbol="Image16" 
+                                  Margin="0,0,8,0"
+                                  VerticalAlignment="Center"/>
+                    <ui:TextBlock Text="Item Preview" 
+                                 FontTypography="BodyStrong"
+                                 VerticalAlignment="Center"/>
+                    <ui:TextBlock Text="{Binding SelectedItem.DisplayText, StringFormat=' - {0}'}" 
+                                 FontTypography="Body"
+                                 Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                 VerticalAlignment="Center"/>
+                </StackPanel>
+                
+                <!-- View Controls -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <!-- Zoom Control -->
+                    <ui:ComboBox ItemsSource="{StaticResource ZoomLevels}"
+                                SelectedItem="{Binding ZoomLevel}"
+                                Width="80"
+                                Margin="4,0">
+                        <ui:ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <ui:TextBlock Text="{Binding StringFormat={}{0:P0}}"/>
+                            </DataTemplate>
+                        </ui:ComboBox.ItemTemplate>
+                    </ui:ComboBox>
+                    
+                    <!-- View Mode Toggle -->
+                    <ui:ToggleButton Content="Grid"
+                                    IsChecked="{Binding ShowGrid}"
+                                    Icon="{ui:SymbolIcon Grid16}"
+                                    Margin="4,0"/>
+                    
+                    <!-- Background Toggle -->
+                    <ui:ToggleButton Content="Checker"
+                                    IsChecked="{Binding ShowCheckerboard}"
+                                    Icon="{ui:SymbolIcon CheckboxChecked16}"
+                                    Margin="4,0"/>
+                    
+                    <!-- Comparison Mode -->
+                    <ui:ToggleButton Content="Compare"
+                                    IsChecked="{Binding IsComparisonMode}"
+                                    Icon="{ui:SymbolIcon ArrowSwap16}"
+                                    Margin="4,0"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+        
+        <!-- Main Preview Area -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto" x:Name="ComparisonColumn"/>
+                <ColumnDefinition Width="*" x:Name="ComparisonPreviewColumn"/>
+            </Grid.ColumnDefinitions>
+            
+            <!-- Primary Preview -->
+            <Border Grid.Column="0" 
+                   Style="{StaticResource CheckerboardBackground}"
+                   Visibility="{Binding ShowCheckerboard, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            
+            <ScrollViewer Grid.Column="0"
+                         x:Name="PreviewScrollViewer"
+                         ZoomMode="Enabled"
+                         HorizontalScrollBarVisibility="Auto"
+                         VerticalScrollBarVisibility="Auto"
+                         Background="Transparent">
+                
+                <Canvas x:Name="PreviewCanvas"
+                       Background="Transparent"
+                       MouseLeftButtonDown="OnCanvasMouseLeftButtonDown"
+                       MouseMove="OnCanvasMouseMove"
+                       MouseLeftButtonUp="OnCanvasMouseLeftButtonUp"
+                       MouseWheel="OnCanvasMouseWheel">
+                    
+                    <!-- Grid Overlay -->
+                    <Canvas x:Name="GridOverlay"
+                           Visibility="{Binding ShowGrid, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <!-- Grid lines will be drawn programmatically -->
+                    </Canvas>
+                    
+                    <!-- Sprite Image -->
+                    <Image x:Name="SpriteImage"
+                          Source="{Binding CurrentSprite}"
+                          Stretch="None"
+                          RenderOptions.BitmapScalingMode="NearestNeighbor"
+                          AllowDrop="True"
+                          Drop="OnSpriteDrop"
+                          DragOver="OnSpriteDragOver"
+                          DragEnter="OnSpriteDragEnter"
+                          DragLeave="OnSpriteDragLeave">
+                        <Image.RenderTransform>
+                            <ScaleTransform x:Name="SpriteScale" 
+                                          ScaleX="{Binding ZoomLevel}" 
+                                          ScaleY="{Binding ZoomLevel}"/>
+                        </Image.RenderTransform>
+                    </Image>
+                    
+                    <!-- Selection Rectangle -->
+                    <Rectangle x:Name="SelectionRectangle"
+                              Stroke="{DynamicResource AccentFillColorDefaultBrush}"
+                              StrokeThickness="1"
+                              StrokeDashArray="3,3"
+                              Fill="Transparent"
+                              Visibility="Collapsed"/>
+                </Canvas>
+            </ScrollViewer>
+            
+            <!-- Comparison Splitter -->
+            <GridSplitter Grid.Column="1"
+                         Width="4"
+                         Background="{DynamicResource CardStrokeColorDefaultBrush}"
+                         Visibility="{Binding IsComparisonMode, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            
+            <!-- Comparison Preview -->
+            <Border Grid.Column="2"
+                   Style="{StaticResource CheckerboardBackground}"
+                   Visibility="{Binding IsComparisonMode, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            
+            <ScrollViewer Grid.Column="2"
+                         x:Name="ComparisonScrollViewer"
+                         ZoomMode="Enabled"
+                         HorizontalScrollBarVisibility="Auto"
+                         VerticalScrollBarVisibility="Auto"
+                         Background="Transparent"
+                         Visibility="{Binding IsComparisonMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+                
+                <Canvas Background="Transparent">
+                    <Image Source="{Binding ComparisonSprite}"
+                          Stretch="None"
+                          RenderOptions.BitmapScalingMode="NearestNeighbor">
+                        <Image.RenderTransform>
+                            <ScaleTransform ScaleX="{Binding ZoomLevel}" 
+                                          ScaleY="{Binding ZoomLevel}"/>
+                        </Image.RenderTransform>
+                    </Image>
+                </Canvas>
+            </ScrollViewer>
+            
+            <!-- No Item Selected Message -->
+            <Border Grid.Column="0" Grid.ColumnSpan="3"
+                   Visibility="{Binding SelectedItem, Converter={StaticResource InvertedBooleanToVisibilityConverter}}">
+                <StackPanel HorizontalAlignment="Center" 
+                           VerticalAlignment="Center">
+                    <ui:SymbolIcon Symbol="Image48" 
+                                  FontSize="48"
+                                  Foreground="{DynamicResource TextFillColorDisabledBrush}"
+                                  Margin="0,0,0,16"/>
+                    <ui:TextBlock Text="No item selected" 
+                                 FontTypography="BodyLarge"
+                                 Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                 HorizontalAlignment="Center"/>
+                    <ui:TextBlock Text="Select an item to preview its sprites" 
+                                 FontTypography="Caption"
+                                 Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                 HorizontalAlignment="Center"
+                                 Margin="0,4,0,0"/>
+                </StackPanel>
+            </Border>
+            
+            <!-- Loading Overlay -->
+            <Border Grid.Column="0" Grid.ColumnSpan="3"
+                   Background="{DynamicResource SystemFillColorSolidBackgroundBaseBrush}"
+                   Opacity="0.8"
+                   Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <StackPanel HorizontalAlignment="Center" 
+                           VerticalAlignment="Center">
+                    <ui:ProgressRing IsIndeterminate="True" 
+                                   Width="32" Height="32"/>
+                    <ui:TextBlock Text="Loading sprite..." 
+                                 FontTypography="Body"
+                                 Margin="0,8,0,0"
+                                 HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+        
+        <!-- Animation Controls -->
+        <Border Grid.Row="2" 
+               Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+               BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+               BorderThickness="0,1,0,0"
+               Padding="12"
+               Visibility="{Binding HasMultipleFrames, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- Playback Controls -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <ui:Button Command="{Binding FirstFrameCommand}"
+                              Icon="{ui:SymbolIcon Previous16}"
+                              Style="{StaticResource AnimationButtonStyle}"
+                              ToolTip="First Frame"/>
+                    <ui:Button Command="{Binding PreviousFrameCommand}"
+                              Icon="{ui:SymbolIcon ChevronLeft16}"
+                              Style="{StaticResource AnimationButtonStyle}"
+                              ToolTip="Previous Frame"/>
+                    <ui:ToggleButton IsChecked="{Binding IsPlaying}"
+                                    Command="{Binding PlayPauseCommand}"
+                                    Style="{StaticResource AnimationButtonStyle}"
+                                    ToolTip="Play/Pause">
+                        <ui:ToggleButton.Content>
+                            <ui:SymbolIcon>
+                                <ui:SymbolIcon.Style>
+                                    <Style TargetType="ui:SymbolIcon">
+                                        <Setter Property="Symbol" Value="Play16"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                                                <Setter Property="Symbol" Value="Pause16"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ui:SymbolIcon.Style>
+                            </ui:SymbolIcon>
+                        </ui:ToggleButton.Content>
+                    </ui:ToggleButton>
+                    <ui:Button Command="{Binding NextFrameCommand}"
+                              Icon="{ui:SymbolIcon ChevronRight16}"
+                              Style="{StaticResource AnimationButtonStyle}"
+                              ToolTip="Next Frame"/>
+                    <ui:Button Command="{Binding LastFrameCommand}"
+                              Icon="{ui:SymbolIcon Next16}"
+                              Style="{StaticResource AnimationButtonStyle}"
+                              ToolTip="Last Frame"/>
+                </StackPanel>
+                
+                <!-- Frame Slider -->
+                <StackPanel Grid.Column="1" Margin="16,0">
+                    <Slider Value="{Binding CurrentFrameIndex}"
+                           Minimum="0"
+                           Maximum="{Binding MaxFrameIndex}"
+                           IsSnapToTickEnabled="True"
+                           TickFrequency="1"
+                           TickPlacement="BottomRight"/>
+                    <ui:TextBlock HorizontalAlignment="Center"
+                                 FontTypography="Caption"
+                                 Foreground="{DynamicResource TextFillColorSecondaryBrush}">
+                        <Run Text="Frame"/>
+                        <Run Text="{Binding CurrentFrameIndex, Mode=OneWay}"/>
+                        <Run Text="of"/>
+                        <Run Text="{Binding MaxFrameIndex, Mode=OneWay}"/>
+                    </ui:TextBlock>
+                </StackPanel>
+                
+                <!-- Animation Settings -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <ui:TextBlock Text="Speed:" 
+                                 VerticalAlignment="Center"
+                                 Margin="0,0,4,0"/>
+                    <ui:NumberBox Value="{Binding AnimationSpeed}"
+                                 Minimum="0.1"
+                                 Maximum="10"
+                                 SmallChange="0.1"
+                                 LargeChange="1"
+                                 SpinButtonPlacementMode="Inline"
+                                 Width="80"/>
+                    <ui:TextBlock Text="x" 
+                                 VerticalAlignment="Center"
+                                 Margin="4,0,8,0"/>
+                    <ui:ToggleButton Content="Loop"
+                                    IsChecked="{Binding IsLooping}"
+                                    Icon="{ui:SymbolIcon ArrowRepeatAll16}"
+                                    Margin="4,0"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+        
+        <!-- Status Bar -->
+        <Border Grid.Row="3" 
+               Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+               BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+               BorderThickness="0,1,0,0"
+               Padding="12,4">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- Sprite Information -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <ui:TextBlock FontTypography="Caption"
+                                 Foreground="{DynamicResource TextFillColorSecondaryBrush}">
+                        <Run Text="Size:"/>
+                        <Run Text="{Binding SpriteWidth, Mode=OneWay}"/>
+                        <Run Text="x"/>
+                        <Run Text="{Binding SpriteHeight, Mode=OneWay}"/>
+                        <Run Text="•"/>
+                        <Run Text="Zoom:"/>
+                        <Run Text="{Binding ZoomLevel, StringFormat={}{0:P0}, Mode=OneWay}"/>
+                    </ui:TextBlock>
+                    
+                    <ui:TextBlock Text=" • "
+                                 FontTypography="Caption"
+                                 Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                 Visibility="{Binding HasMultipleFrames, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                    
+                    <ui:TextBlock FontTypography="Caption"
+                                 Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                 Visibility="{Binding HasMultipleFrames, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Run Text="{Binding TotalFrames, Mode=OneWay}"/>
+                        <Run Text="frames"/>
+                    </ui:TextBlock>
+                </StackPanel>
+                
+                <!-- Mouse Position -->
+                <ui:TextBlock Grid.Column="1"
+                             Text="{Binding MousePosition}"
+                             FontTypography="Caption"
+                             Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

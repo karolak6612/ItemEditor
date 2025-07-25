@@ -1,0 +1,338 @@
+<UserControl x:Class="ItemEditor.Controls.SearchBox"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:controls="clr-namespace:ItemEditor.Controls"
+             xmlns:models="clr-namespace:ItemEditor.Models"
+             xmlns:converters="clr-namespace:ItemEditor.Converters"
+             x:Name="Root">
+    
+    <UserControl.Resources>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <converters:InvertedBooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter"/>
+        
+        <!-- Search Filter Template -->
+        <DataTemplate x:Key="SearchFilterTemplate">
+            <Border Background="{DynamicResource SubtleFillColorSecondaryBrush}"
+                   BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                   BorderThickness="1"
+                   CornerRadius="4"
+                   Padding="8,4"
+                   Margin="2">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <ui:TextBlock Grid.Column="0"
+                                 Text="{Binding DisplayText}"
+                                 FontTypography="Caption"
+                                 VerticalAlignment="Center"/>
+                    
+                    <ui:Button Grid.Column="1"
+                              Command="{Binding DataContext.RemoveFilterCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                              CommandParameter="{Binding}"
+                              Icon="{ui:SymbolIcon Dismiss12}"
+                              Appearance="Subtle"
+                              Width="16" Height="16"
+                              Margin="4,0,0,0"/>
+                </Grid>
+            </Border>
+        </DataTemplate>
+        
+        <!-- Saved Search Template -->
+        <DataTemplate x:Key="SavedSearchTemplate">
+            <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                   BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                   BorderThickness="1"
+                   CornerRadius="4"
+                   Padding="8"
+                   Margin="0,2">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <ui:SymbolIcon Grid.Column="0"
+                                  Symbol="Search16"
+                                  Margin="0,0,8,0"
+                                  VerticalAlignment="Center"/>
+                    
+                    <StackPanel Grid.Column="1">
+                        <ui:TextBlock Text="{Binding Name}"
+                                     FontTypography="BodyStrong"/>
+                        <ui:TextBlock Text="{Binding Description}"
+                                     FontTypography="Caption"
+                                     Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                    </StackPanel>
+                    
+                    <ui:Button Grid.Column="2"
+                              Command="{Binding DataContext.LoadSavedSearchCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                              CommandParameter="{Binding}"
+                              Content="Load"
+                              Appearance="Subtle"
+                              Margin="4,0"/>
+                    
+                    <ui:Button Grid.Column="3"
+                              Command="{Binding DataContext.DeleteSavedSearchCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                              CommandParameter="{Binding}"
+                              Icon="{ui:SymbolIcon Delete16}"
+                              Appearance="Subtle"
+                              Margin="4,0,0,0"/>
+                </Grid>
+            </Border>
+        </DataTemplate>
+    </UserControl.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Main Search Box -->
+        <ui:AutoSuggestBox Grid.Row="0"
+                          x:Name="MainSearchBox"
+                          Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                          PlaceholderText="Search items by name, ID, type, or description..."
+                          Icon="{ui:SymbolIcon Search16}"
+                          QuerySubmitted="OnQuerySubmitted"
+                          TextChanged="OnTextChanged"
+                          SuggestionChosen="OnSuggestionChosen"
+                          ItemsSource="{Binding SearchSuggestions}"
+                          Margin="0,0,0,8">
+            
+            <ui:AutoSuggestBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <ui:SymbolIcon Grid.Column="0"
+                                      Symbol="Search16"
+                                      Margin="0,0,8,0"
+                                      VerticalAlignment="Center"/>
+                        
+                        <ui:TextBlock Grid.Column="1"
+                                     Text="{Binding Text}"
+                                     VerticalAlignment="Center"/>
+                        
+                        <ui:TextBlock Grid.Column="2"
+                                     Text="{Binding Category}"
+                                     FontTypography="Caption"
+                                     Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                     VerticalAlignment="Center"/>
+                    </Grid>
+                </DataTemplate>
+            </ui:AutoSuggestBox.ItemTemplate>
+        </ui:AutoSuggestBox>
+        
+        <!-- Quick Filter Buttons -->
+        <WrapPanel Grid.Row="1" 
+                  Orientation="Horizontal"
+                  Margin="0,0,0,8">
+            <ui:ToggleButton Content="All"
+                            IsChecked="{Binding ShowAllTypes}"
+                            Command="{Binding ToggleAllTypesCommand}"
+                            Margin="0,0,4,4"/>
+            <ui:ToggleButton Content="Ground"
+                            IsChecked="{Binding ShowGroundItems}"
+                            Command="{Binding ToggleItemTypeCommand}"
+                            CommandParameter="{x:Static models:ItemType.Ground}"
+                            Margin="0,0,4,4"/>
+            <ui:ToggleButton Content="Container"
+                            IsChecked="{Binding ShowContainerItems}"
+                            Command="{Binding ToggleItemTypeCommand}"
+                            CommandParameter="{x:Static models:ItemType.Container}"
+                            Margin="0,0,4,4"/>
+            <ui:ToggleButton Content="Weapon"
+                            IsChecked="{Binding ShowWeaponItems}"
+                            Command="{Binding ToggleItemTypeCommand}"
+                            CommandParameter="{x:Static models:ItemType.Weapon}"
+                            Margin="0,0,4,4"/>
+            <ui:ToggleButton Content="Armor"
+                            IsChecked="{Binding ShowArmorItems}"
+                            Command="{Binding ToggleItemTypeCommand}"
+                            CommandParameter="{x:Static models:ItemType.Armor}"
+                            Margin="0,0,4,4"/>
+            <ui:ToggleButton Content="Modified"
+                            IsChecked="{Binding ShowModifiedOnly}"
+                            Command="{Binding ToggleModifiedOnlyCommand}"
+                            Icon="{ui:SymbolIcon Edit16}"
+                            Margin="0,0,4,4"/>
+        </WrapPanel>
+        
+        <!-- Active Filters -->
+        <Expander Grid.Row="2"
+                 Header="Active Filters"
+                 IsExpanded="{Binding HasActiveFilters}"
+                 Visibility="{Binding HasActiveFilters, Converter={StaticResource BooleanToVisibilityConverter}}"
+                 Margin="0,0,0,8">
+            <StackPanel>
+                <!-- Filter Tags -->
+                <ItemsControl ItemsSource="{Binding ActiveFilters}"
+                             ItemTemplate="{StaticResource SearchFilterTemplate}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+                
+                <!-- Filter Actions -->
+                <StackPanel Orientation="Horizontal" 
+                           Margin="0,8,0,0">
+                    <ui:Button Content="Clear All Filters"
+                              Command="{Binding ClearAllFiltersCommand}"
+                              Icon="{ui:SymbolIcon ClearSelection16}"
+                              Appearance="Subtle"
+                              Margin="0,0,8,0"/>
+                    <ui:Button Content="Save Search"
+                              Command="{Binding SaveSearchCommand}"
+                              Icon="{ui:SymbolIcon Save16}"
+                              Appearance="Subtle"/>
+                </StackPanel>
+            </StackPanel>
+        </Expander>
+        
+        <!-- Advanced Search Panel -->
+        <Expander Grid.Row="3"
+                 Header="Advanced Search"
+                 IsExpanded="{Binding IsAdvancedSearchExpanded}">
+            <Grid Margin="0,8,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                
+                <!-- ID Range -->
+                <ui:TextBlock Grid.Row="0" Grid.Column="0"
+                             Text="ID Range:"
+                             FontTypography="BodyStrong"
+                             Margin="0,0,0,4"/>
+                <StackPanel Grid.Row="1" Grid.Column="0" 
+                           Orientation="Horizontal"
+                           Margin="0,0,8,12">
+                    <ui:NumberBox Value="{Binding MinId}"
+                                 Minimum="0"
+                                 Maximum="65535"
+                                 PlaceholderText="Min"
+                                 Width="80"
+                                 Margin="0,0,4,0"/>
+                    <ui:TextBlock Text="to" 
+                                 VerticalAlignment="Center"
+                                 Margin="4,0"/>
+                    <ui:NumberBox Value="{Binding MaxId}"
+                                 Minimum="0"
+                                 Maximum="65535"
+                                 PlaceholderText="Max"
+                                 Width="80"
+                                 Margin="4,0,0,0"/>
+                </StackPanel>
+                
+                <!-- Item Type -->
+                <ui:TextBlock Grid.Row="0" Grid.Column="1"
+                             Text="Item Type:"
+                             FontTypography="BodyStrong"
+                             Margin="0,0,0,4"/>
+                <ui:ComboBox Grid.Row="1" Grid.Column="1"
+                            ItemsSource="{Binding AvailableItemTypes}"
+                            SelectedItem="{Binding SelectedItemType}"
+                            Margin="8,0,0,12"/>
+                
+                <!-- Properties -->
+                <ui:TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                             Text="Properties:"
+                             FontTypography="BodyStrong"
+                             Margin="0,0,0,4"/>
+                
+                <StackPanel Grid.Row="3" Grid.Column="0" 
+                           Margin="0,0,8,12">
+                    <ui:CheckBox Content="Stackable"
+                                IsChecked="{Binding FilterStackable}"
+                                IsThreeState="True"
+                                Margin="0,0,0,4"/>
+                    <ui:CheckBox Content="Moveable"
+                                IsChecked="{Binding FilterMoveable}"
+                                IsThreeState="True"
+                                Margin="0,0,0,4"/>
+                    <ui:CheckBox Content="Pickupable"
+                                IsChecked="{Binding FilterPickupable}"
+                                IsThreeState="True"/>
+                </StackPanel>
+                
+                <StackPanel Grid.Row="3" Grid.Column="1" 
+                           Margin="8,0,0,12">
+                    <ui:CheckBox Content="Has Light"
+                                IsChecked="{Binding FilterHasLight}"
+                                IsThreeState="True"
+                                Margin="0,0,0,4"/>
+                    <ui:CheckBox Content="Modified"
+                                IsChecked="{Binding FilterModified}"
+                                IsThreeState="True"
+                                Margin="0,0,0,4"/>
+                    <ui:CheckBox Content="Has Errors"
+                                IsChecked="{Binding FilterHasErrors}"
+                                IsThreeState="True"/>
+                </StackPanel>
+                
+                <!-- Custom Properties -->
+                <ui:TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2"
+                             Text="Custom Properties:"
+                             FontTypography="BodyStrong"
+                             Margin="0,0,0,4"/>
+                
+                <Grid Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"
+                     Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <ui:TextBox Grid.Column="0"
+                               Text="{Binding CustomPropertyKey}"
+                               PlaceholderText="Property name..."
+                               Margin="0,0,4,0"/>
+                    <ui:TextBox Grid.Column="1"
+                               Text="{Binding CustomPropertyValue}"
+                               PlaceholderText="Property value..."
+                               Margin="4,0,4,0"/>
+                    <ui:Button Grid.Column="2"
+                              Content="Add"
+                              Command="{Binding AddCustomPropertyFilterCommand}"
+                              Icon="{ui:SymbolIcon Add16}"/>
+                </Grid>
+                
+                <!-- Saved Searches -->
+                <Expander Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2"
+                         Header="Saved Searches"
+                         IsExpanded="False">
+                    <ScrollViewer MaxHeight="200"
+                                 VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding SavedSearches}"
+                                     ItemTemplate="{StaticResource SavedSearchTemplate}"/>
+                    </ScrollViewer>
+                </Expander>
+            </Grid>
+        </Expander>
+    </Grid>
+</UserControl>
